@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block body %}
+<header class="topbar">
+  <div class="brand">
+    {% include "_logo.html" %}
+    <span>Fixture</span>
+  </div>
+  <div class="account">
+    {% if user.picture %}
+    <img class="avatar" src="{{ user.picture }}" alt="" referrerpolicy="no-referrer">
+    {% else %}
+    <span class="avatar avatar-fallback">{{ user.name[:1] | upper }}</span>
+    {% endif %}
+    <span class="account-email">{{ user.email }}</span>
+    <a class="btn-ghost" href="/auth/logout">Sign out</a>
+  </div>
+</header>
+
+<main class="dashboard">
+  <section class="intro">
+    <h1>Welcome, {{ user.name.split(' ')[0] }}.</h1>
+    <p class="muted">Fixture is connected to your Google account with read-only access.</p>
+    <div class="status-row">
+      {% for label, data in [("Google Calendar", calendar), ("Gmail", inbox)] %}
+      <span class="status {{ 'status-error' if data.error else 'status-ok' }}">
+        <span class="dot"></span>{{ label }} · {{ "Error" if data.error else "Connected" }}
+      </span>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <header class="card-head">
+        <h2>Upcoming events</h2>
+        <span class="count">{{ calendar["items"] | length }}</span>
+      </header>
+      {% if calendar.calendars %}
+      {# Which calendars are included: the ones checked in Google Calendar. #}
+      <div class="legend">
+        {% for c in calendar.calendars %}
+        <span class="legend-item"><span class="cal-dot" style="background: {{ c.color }}"></span>{{ c.name }}</span>
+        {% endfor %}
+        {% if calendar.skipped %}
+        <span class="legend-skipped" title="These calendars only share free/busy times, or couldn't be read.">Not shown: {{ calendar.skipped | join(", ") }}</span>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% if calendar.error %}
+      <p class="empty">Couldn't load your calendar: {{ calendar.error }}</p>
+      {% elif not calendar["items"] %}
+      <p class="empty">No upcoming events.</p>
+      {% else %}
+      <ul class="list">
+        {% for e in calendar["items"] %}
+        <li class="row">
+          <div class="when">
+            <span class="day">{{ e.day }}</span>
+            <span class="time">{{ e.time }}</span>
+          </div>
+          <div class="what">
+            <span class="title">
+              {% if e.calendar %}<span class="cal-dot" style="background: {{ e.calendar.color }}" title="{{ e.calendar.name }}"></span>{% endif %}{{ e.title }}
+            </span>
+            {% if e.calendar and calendar.calendars | length > 1 %}
+            <span class="sub">{{ e.calendar.name }}</span>
+            {% endif %}
+            {% if e.attendees %}
+            <span class="sub" title="{{ e.attendees | join(', ') }}">
+              {{ e.attendees | length }} attendee{{ 's' if e.attendees | length != 1 }} · {{ e.attendees[0] }}{% if e.attendees | length > 1 %} +{{ e.attendees | length - 1 }}{% endif %}
+            </span>
+            {% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      {% set scheduling_count = inbox["items"] | selectattr("scheduling_match") | list | length %}
+      <header class="card-head">
+        <h2>Recent emails</h2>
+        {% if inbox["items"] %}
+        {# Filter toggle: a tiny script at the bottom switches data-filter on the list. #}
+        <div class="segmented" role="group" aria-label="Filter emails">
+          <button type="button" data-filter="all" aria-pressed="true">All <span>{{ inbox["items"] | length }}</span></button>
+          <button type="button" data-filter="scheduling" aria-pressed="false">Scheduling <span>{{ scheduling_count }}</span></button>
+        </div>
+        {% endif %}
+      </header>
+      {% if inbox.error %}
+      <p class="empty">Couldn't load your inbox: {{ inbox.error }}</p>
+      {% elif not inbox["items"] %}
+      <p class="empty">Your inbox is empty.</p>
+      {% else %}
+      <ul class="list" id="email-list" data-filter="all">
+        {% for m in inbox["items"] %}
+        <li class="email {{ 'unread' if m.unread }} {{ 'is-scheduling' if m.scheduling_match }}">
+          {# <details> expands on click with no JavaScript. #}
+          <details>
+            <summary class="row">
+              <div class="what">
+                <span class="title" title="{{ m.address }}">{{ m.sender }}</span>
+                <span class="sub">{{ m.subject }}</span>
+              </div>
+              <div class="meta">
+                <span class="date">{{ m.date }}</span>
+                {% if m.scheduling_match %}<span class="tag">Scheduling</span>{% endif %}
+              </div>
+              <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </summary>
+            <div class="preview">
+              <p>{{ m.snippet or "No preview available." }}</p>
+              {% if m.scheduling_match %}
+              <p class="why">Tagged as scheduling because it mentions <strong>“{{ m.scheduling_match }}”</strong>.</p>
+              {% endif %}
+            </div>
+          </details>
+        </li>
+        {% endfor %}
+      </ul>
+      <p class="empty empty-filtered">No scheduling emails in your last {{ inbox["items"] | length }} messages.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <p class="footnote">Read-only demo. Showing your next 10 events across your checked calendars and 20 most recent inbox emails (headers and Gmail's short preview only). Scheduling tags come from simple keyword rules.</p>
+</main>
+
+<script>
+  // Email filter: set data-filter on the list; CSS hides non-matching rows.
+  const list = document.getElementById("email-list");
+  document.querySelectorAll(".segmented button").forEach((button) => {
+    button.addEventListener("click", () => {
+      list.dataset.filter = button.dataset.filter;
+      document.querySelectorAll(".segmented button").forEach((b) => {
+        b.setAttribute("aria-pressed", String(b === button));
+      });
+    });
+  });
+</script>
+{% endblock %}

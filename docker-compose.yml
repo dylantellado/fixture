@@ -32,7 +32,11 @@ services:
   frontend:
     build: ./src/frontend
     env_file: .env
+    environment:
+      - SECRETS_DIR=/run/secrets
     ports:
       - "8501:8501"
     depends_on:
       - api
+    volumes:
+      - ./secrets:/run/secrets:ro
