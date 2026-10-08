@@ -18,7 +18,7 @@ Fixture is a Harvard AC215 course project by Dylan Tellado and Will Sherwood. It
 - **Prefer simple, easy-to-change solutions** so we can pivot without large rewrites.
 - **Keep this file current:** if a request changes the project's direction, update CLAUDE.md to match.
 
-Right now every service is a placeholder: each `main.py` only prints a message, no service has dependencies, and there are no tests.
+**What exists so far:** a Google connection proof of concept. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail. Everything is read-only; nothing writes to a calendar or sends email yet. `preprocess`, `rag`, and `api` are still placeholders.
 
 ## Current structure
 
@@ -29,18 +29,33 @@ docker-compose.yml   runs all services together
 .env.example         template for .env (copy it, never commit .env)
 data/                local data (git-ignored)
 samples/             sample inputs that are safe to commit
-secrets/             local credentials (git-ignored)
+secrets/             local credentials (git-ignored), see "Google access" below
 src/
-  ingest/       placeholder
+  ingest/       google_auth.py (command-line Google sign-in), list_events.py (prints next 10 events)
   preprocess/   placeholder
   rag/          placeholder
   api/          placeholder (port 8000 in compose)
-  frontend/     placeholder (port 8501 in compose)
+  frontend/     FastAPI web app (port 8501): Sign in with Google, then a dashboard of
+                upcoming events (all checked calendars) and recent emails with a
+                keyword-based scheduling filter
 ```
+
+Inside `src/frontend/`: `main.py` (routes and sign-in), `google_data.py` (Google API calls and formatting), `templates/` (Jinja HTML), `static/` (CSS), `test_google_data.py` (tests).
 
 The service names suggest a rough pipeline (ingest → preprocess → rag → api → frontend), but what each one does hasn't been decided.
 
-Each service under `src/` is currently self-contained, with its own `Dockerfile`, `pyproject.toml`, `uv.lock`, `.python-version` (3.12), and `main.py`.
+Each service under `src/` is currently self-contained, with its own `Dockerfile`, `pyproject.toml`, `uv.lock`, `.python-version` (3.12), and `main.py`. Services don't import from each other, so `ingest` and `frontend` each have their own Google sign-in code.
+
+## Google access
+
+- Google Cloud project: `fixture-ac215-96dhbm`. Calendar and Gmail APIs are enabled.
+- The OAuth consent screen is in Testing mode, so only listed test users can sign in, and logins expire after about 7 days.
+- Permissions are listed in one `SCOPES` list per service: `src/ingest/google_auth.py` (read-only Calendar) and `src/frontend/main.py` (read-only Calendar and Gmail, plus basic profile). Ask before adding write permissions.
+- Files in `secrets/` (never commit them; get them from a teammate privately):
+  - `credentials.json`: "Fixture Desktop" OAuth client, used by `src/ingest`
+  - `web_credentials.json`: "Fixture Web" OAuth client, used by `src/frontend` (redirect URI `http://localhost:8501/auth/callback`)
+  - `token.json`: your personal login for `src/ingest`, created on first run
+- The web app keeps logins in server memory only, so restarting it (including `--reload` after a code change) signs everyone out.
 
 ## Commands
 
@@ -56,6 +71,24 @@ Single service (from its folder, e.g. `src/api`):
 ```sh
 uv run main.py
 uv add <package>   # adds a dependency and updates uv.lock
+```
+
+Calendar check (from `src/ingest`; opens a browser to sign in the first time):
+
+```sh
+uv run python list_events.py
+```
+
+Web app (from `src/frontend`; then open http://localhost:8501):
+
+```sh
+uv run uvicorn main:app --port 8501 --reload
+```
+
+Tests (from `src/frontend`):
+
+```sh
+uv run pytest
 ```
 
 ## Working rules
