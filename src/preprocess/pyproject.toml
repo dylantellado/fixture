@@ -1,0 +1,6 @@
+[project]
+name = "preprocess"
+version = "0.1.0"
+description = "preprocess service"
+requires-python = ">=3.12"
+dependencies = []

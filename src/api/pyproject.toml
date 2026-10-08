@@ -1,0 +1,6 @@
+[project]
+name = "api"
+version = "0.1.0"
+description = "api service"
+requires-python = ">=3.12"
+dependencies = []

@@ -1,0 +1,38 @@
+services:
+  ingest:
+    build: ./src/ingest
+    env_file: .env
+    volumes:
+      - ./data:/data
+      - ./samples:/samples:ro
+
+  preprocess:
+    build: ./src/preprocess
+    env_file: .env
+    volumes:
+      - ./data:/data
+
+  rag:
+    build: ./src/rag
+    env_file: .env
+    volumes:
+      - ./data:/data
+      - ./secrets:/run/secrets:ro
+
+  api:
+    build: ./src/api
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rag
+    volumes:
+      - ./secrets:/run/secrets:ro
+
+  frontend:
+    build: ./src/frontend
+    env_file: .env
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
