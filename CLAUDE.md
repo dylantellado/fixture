@@ -8,13 +8,21 @@ Fixture is a Harvard AC215 course project by Dylan Tellado and Will Sherwood. It
 
 **Core goal: trust.** Fixture must never break a rule the user has set, such as moving or booking over a commitment marked as fixed.
 
-**Approach:** an AI agent reads and responds to scheduling emails. Separate, deterministic logic checks every proposed action against the user's rules before anything changes on the calendar. Models, data, and tools are not decided yet.
+**Current thinking:** an AI agent reads and responds to scheduling emails. Separate, predictable logic checks every proposed action against the user's rules before anything changes on the calendar. Models, data, and tools are not decided yet.
 
-## Status
+## Project status and flexibility
 
-Early stage. Every service is a placeholder: each `main.py` only prints a message, and no service has dependencies yet. There are no tests yet.
+- **Early and exploratory:** the overall goal (a trustworthy, autonomous scheduling assistant) is set. The design, features, data, models, and tools are all open to change.
+- **Nothing is final:** that includes existing code, file structure, and past decisions. If a request conflicts with what's already in the repo, follow the request and point out the conflict.
+- **Don't lock in on one approach:** for a meaningful design choice, briefly lay out the options and tradeoffs and ask which we want. Don't pick one and build heavily around it.
+- **Prefer simple, easy-to-change solutions** so we can pivot without large rewrites.
+- **Keep this file current:** if a request changes the project's direction, update CLAUDE.md to match.
 
-## Structure
+Right now every service is a placeholder: each `main.py` only prints a message, no service has dependencies, and there are no tests.
+
+## Current structure
+
+This is the starting layout, not a final architecture. Folders and services may be renamed, merged, split, or removed.
 
 ```
 docker-compose.yml   runs all services together
@@ -23,14 +31,16 @@ data/                local data (git-ignored)
 samples/             sample inputs that are safe to commit
 secrets/             local credentials (git-ignored)
 src/
-  ingest/       bringing data into the system
-  preprocess/   cleaning and transforming data
-  rag/          retrieval-augmented generation
-  api/          HTTP API (port 8000 in compose)
-  frontend/     user interface (port 8501 in compose)
+  ingest/       placeholder
+  preprocess/   placeholder
+  rag/          placeholder
+  api/          placeholder (port 8000 in compose)
+  frontend/     placeholder (port 8501 in compose)
 ```
 
-Each service under `src/` is self-contained, with its own `Dockerfile`, `pyproject.toml`, `uv.lock`, `.python-version` (3.12), and `main.py`. Don't import code across services. Add dependencies to the service that needs them.
+The service names suggest a rough pipeline (ingest → preprocess → rag → api → frontend), but what each one does hasn't been decided.
+
+Each service under `src/` is currently self-contained, with its own `Dockerfile`, `pyproject.toml`, `uv.lock`, `.python-version` (3.12), and `main.py`.
 
 ## Commands
 
@@ -54,4 +64,4 @@ uv add <package>   # adds a dependency and updates uv.lock
 - **Keep code simple, readable, and commented:** both team members must be able to explain any part of it.
 - **Add tests for new features.**
 - **Work on a feature branch:** merge into `main` only through a pull request.
-- **Ask before making major design decisions:** that includes picking models, frameworks, data stores, or service boundaries, because the implementation isn't settled.
+- **Ask before making major design decisions:** see "Project status and flexibility" above.
