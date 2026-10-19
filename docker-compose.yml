@@ -34,9 +34,11 @@ services:
     env_file: .env
     environment:
       - SECRETS_DIR=/run/secrets
+      - DATA_DIR=/data
     ports:
       - "8501:8501"
     depends_on:
       - api
     volumes:
       - ./secrets:/run/secrets:ro
+      - ./data:/data

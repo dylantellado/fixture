@@ -5,20 +5,48 @@ Run from src/frontend with:
 """
 
 import os
-import secrets
+import sys
 from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.errors import HttpError
+from dotenv import load_dotenv
 from starlette.middleware.sessions import SessionMiddleware
 
 import google_data
+from credential_store import CredentialStore
+
+REPO_ROOT = Path(__file__).resolve().parents[2]  # this file lives in src/frontend/
+
+# Read settings from .env at the repo root. Docker passes them in directly instead.
+load_dotenv(REPO_ROOT / ".env")
+
+
+def require_env(name: str, how_to_generate: str) -> str:
+    """Return a required setting, or stop with a message saying how to create it."""
+    value = os.environ.get(name)
+    if not value:
+        sys.exit(
+            f"Missing {name}. Add it to .env at the repo root (see .env.example).\n"
+            f"Generate one from src/frontend with:\n  {how_to_generate}"
+        )
+    return value
+
+
+SESSION_SECRET = require_env(
+    "SESSION_SECRET", 'uv run python -c "import secrets; print(secrets.token_urlsafe(32))"'
+)
+TOKEN_ENCRYPTION_KEY = require_env(
+    "TOKEN_ENCRYPTION_KEY",
+    'uv run python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"',
+)
 
 # The Google OAuth library refuses plain http by default. That's right for
 # production, but this demo only runs on http://localhost.
@@ -35,8 +63,9 @@ SCOPES = [
     "https://www.googleapis.com/auth/gmail.readonly",
 ]
 
-# secrets/ at the repo root (this file lives in src/frontend/). Docker overrides it.
-SECRETS_DIR = Path(os.environ.get("SECRETS_DIR", Path(__file__).resolve().parents[2] / "secrets"))
+# secrets/ and data/ at the repo root. Docker overrides both.
+SECRETS_DIR = Path(os.environ.get("SECRETS_DIR", REPO_ROOT / "secrets"))
+DATA_DIR = Path(os.environ.get("DATA_DIR", REPO_ROOT / "data"))
 CLIENT_FILE = SECRETS_DIR / "web_credentials.json"  # "Fixture Web" OAuth client
 REDIRECT_URI = os.environ.get("REDIRECT_URI", "http://localhost:8501/auth/callback")
 
@@ -49,15 +78,17 @@ ERRORS = {
     "scopes": "Fixture needs both Calendar and Gmail access. Please allow both.",
 }
 
+# Signed-in users' Google credentials, encrypted in data/fixture.db.
+try:
+    store = CredentialStore(DATA_DIR / "fixture.db", TOKEN_ENCRYPTION_KEY)
+except ValueError:
+    sys.exit("TOKEN_ENCRYPTION_KEY is not a valid key. Generate a new one (see .env.example).")
+
 app = FastAPI(title="Fixture")
-# The browser cookie only holds a random session id; Google tokens stay on the server.
-app.add_middleware(SessionMiddleware, secret_key=secrets.token_urlsafe(32), same_site="lax")
+# The signed browser cookie holds only the user's email; Google tokens stay in the database.
+app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET, same_site="lax")
 app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=APP_DIR / "templates")
-
-# Signed-in users' credentials, keyed by session id. Kept in memory only,
-# so restarting the server signs everyone out. Fine for a demo.
-CREDENTIALS: dict[str, Credentials] = {}
 
 
 def make_flow(**kwargs) -> Flow:
@@ -67,11 +98,25 @@ def make_flow(**kwargs) -> Flow:
 
 
 def current_credentials(request: Request) -> Credentials | None:
-    """Return this browser's Google credentials, refreshing them if expired."""
-    creds = CREDENTIALS.get(request.session.get("sid", ""))
-    if creds and creds.expired and creds.refresh_token:
-        creds.refresh(GoogleRequest())
-    return creds if creds and creds.valid else None
+    """Return the signed-in user's Google credentials, or None if signed out.
+
+    Expired access tokens are refreshed and the new version saved back.
+    """
+    email = request.session.get("email")
+    creds = store.load(email) if email else None
+    if creds is None:
+        return None
+
+    if not creds.valid and creds.refresh_token:
+        try:
+            creds.refresh(GoogleRequest())
+        except RefreshError:
+            # Access was revoked or the login expired (Testing mode: ~7 days).
+            store.delete(email)
+            return None
+        store.save(email, creds)
+
+    return creds if creds.valid else None
 
 
 @app.get("/")
@@ -96,7 +141,7 @@ def home(request: Request):
     return templates.TemplateResponse(
         request,
         "dashboard.html",
-        {"user": request.session.get("user"), "calendar": calendar, "inbox": inbox},
+        {"user": store.load_profile(request.session["email"]), "calendar": calendar, "inbox": inbox},
     )
 
 
@@ -128,16 +173,18 @@ def callback(request: Request):
     if not creds.has_scopes(SCOPES):
         return RedirectResponse("/?error=scopes")
 
-    sid = secrets.token_urlsafe(16)
-    CREDENTIALS[sid] = creds
+    profile = google_data.fetch_profile(creds)
+    store.save(profile["email"], creds, name=profile["name"], picture=profile["picture"])
     request.session.clear()
-    request.session["sid"] = sid
-    request.session["user"] = google_data.fetch_profile(creds)
+    request.session["email"] = profile["email"]
     return RedirectResponse("/")
 
 
 @app.get("/auth/logout")
 def logout(request: Request):
-    CREDENTIALS.pop(request.session.get("sid", ""), None)
+    """Sign out and delete this user's stored credentials (in every browser)."""
+    email = request.session.get("email")
+    if email:
+        store.delete(email)
     request.session.clear()
     return RedirectResponse("/")

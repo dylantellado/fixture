@@ -27,7 +27,7 @@ This is the starting layout, not a final architecture. Folders and services may 
 ```
 docker-compose.yml   runs all services together
 .env.example         template for .env (copy it, never commit .env)
-data/                local data (git-ignored)
+data/                local data (git-ignored); fixture.db holds the web app's encrypted logins
 samples/             sample inputs that are safe to commit
 secrets/             local credentials (git-ignored), see "Google access" below
 src/
@@ -40,7 +40,7 @@ src/
                 keyword-based scheduling filter
 ```
 
-Inside `src/frontend/`: `main.py` (routes and sign-in), `google_data.py` (Google API calls and formatting), `templates/` (Jinja HTML), `static/` (CSS), `test_google_data.py` (tests).
+Inside `src/frontend/`: `main.py` (routes and sign-in), `google_data.py` (Google API calls and formatting), `credential_store.py` (encrypted SQLite storage for users' Google logins), `templates/` (Jinja HTML), `static/` (CSS), `test_google_data.py` and `test_credential_store.py` (tests).
 
 The service names suggest a rough pipeline (ingest → preprocess → rag → api → frontend), but what each one does hasn't been decided.
 
@@ -55,7 +55,10 @@ Each service under `src/` is currently self-contained, with its own `Dockerfile`
   - `credentials.json`: "Fixture Desktop" OAuth client, used by `src/ingest`
   - `web_credentials.json`: "Fixture Web" OAuth client, used by `src/frontend` (redirect URI `http://localhost:8501/auth/callback`)
   - `token.json`: your personal login for `src/ingest`, created on first run
-- The web app keeps logins in server memory only, so restarting it (including `--reload` after a code change) signs everyone out.
+- The web app saves each user's Google login, encrypted, in `data/fixture.db` (keyed by email), so logins survive server restarts. The browser cookie holds only the signed-in email. Expired access tokens are refreshed and saved; revoked or expired logins are deleted and the user signs in again. Logging out deletes the stored login.
+- The web app needs two values in `.env` at the repo root (each person generates their own; `.env.example` shows how):
+  - `SESSION_SECRET`: signs the browser cookie. Changing it signs everyone out.
+  - `TOKEN_ENCRYPTION_KEY`: encrypts stored logins. Changing it makes old records unreadable, so everyone signs in again.
 
 ## Commands
 
@@ -79,7 +82,7 @@ Calendar check (from `src/ingest`; opens a browser to sign in the first time):
 uv run python list_events.py
 ```
 
-Web app (from `src/frontend`; then open http://localhost:8501):
+Web app (from `src/frontend`; needs `SESSION_SECRET` and `TOKEN_ENCRYPTION_KEY` in `.env`; then open http://localhost:8501):
 
 ```sh
 uv run uvicorn main:app --port 8501 --reload

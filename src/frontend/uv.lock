@@ -365,11 +365,13 @@ name = "frontend"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "cryptography" },
     { name = "fastapi" },
     { name = "google-api-python-client" },
     { name = "google-auth-oauthlib" },
     { name = "itsdangerous" },
     { name = "jinja2" },
+    { name = "python-dotenv" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -380,11 +382,13 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "cryptography", specifier = ">=50.0.2" },
     { name = "fastapi", specifier = ">=0.142.4" },
     { name = "google-api-python-client", specifier = ">=2.201.0" },
     { name = "google-auth-oauthlib", specifier = ">=1.5.0" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.54.0" },
 ]
 
