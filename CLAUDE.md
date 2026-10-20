@@ -18,7 +18,7 @@ Fixture is a Harvard AC215 course project by Dylan Tellado and Will Sherwood. It
 - **Prefer simple, easy-to-change solutions** so we can pivot without large rewrites.
 - **Keep this file current:** if a request changes the project's direction, update CLAUDE.md to match.
 
-**What exists so far:** a Google connection proof of concept. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail. Everything is read-only; nothing writes to a calendar or sends email yet. `ingest` and `preprocess` are working one-shot jobs over a generated, fictional multi-user email corpus (see `docs/data/corpus_notes.md`; plan in `docs/data/generation/`); `rag` is still a placeholder job; `api` only answers `GET /health`.
+**What exists so far:** a Google connection proof of concept and the Milestone 2 search pipeline on fake data. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail, plus a "Search past threads" page over the demo mailboxes. Everything is read-only; nothing writes to a calendar or sends email yet. `ingest` and `preprocess` are working one-shot jobs over a generated, fictional email corpus of 4 users (see `docs/data/corpus_notes.md`; plan in `docs/data/generation/`); `rag` indexes each user's messages into their own ChromaDB collection; `api` answers `GET /health`, `GET /users`, and `POST /search`, which searches one user's collection only.
 
 ## Milestone 2
 
@@ -47,15 +47,16 @@ src/
   ingest/       validates and dedups source threads -> data/raw/threads.jsonl; validate.py checks thread files;
                 also google_auth.py and list_events.py (Calendar check)
   preprocess/   cleans, anonymizes, flattens -> data/processed/messages.jsonl + manifest.json
-  rag/          placeholder job
-  api/          FastAPI app (port 8000), only GET /health so far; test_main.py
+  rag/          indexes each user's messages into ChromaDB (messages_<user_id>); query.py searches from the command line
+  api/          FastAPI app (port 8000): GET /health, GET /users, POST /search; ChromaDB access in chroma_store.py
   (chromadb)    ChromaDB server from a pinned image, no folder (host port 8001)
   frontend/     FastAPI web app (port 8501): Sign in with Google, then a dashboard of
                 upcoming events (all checked calendars) and recent emails with a
-                keyword-based scheduling filter
+                keyword-based scheduling filter; /search searches the demo mailboxes
+                through the api, with no sign-in
 ```
 
-Inside `src/frontend/`: `main.py` (routes and sign-in), `google_data.py` (Google API calls and formatting), `credential_store.py` (encrypted SQLite storage for users' Google logins), `templates/` (Jinja HTML), `static/` (CSS), `test_google_data.py` and `test_credential_store.py` (tests).
+Inside `src/frontend/`: `main.py` (routes and sign-in), `google_data.py` (Google API calls and formatting), `credential_store.py` (encrypted SQLite storage for users' Google logins), `api_client.py` (calls to the api for the search page), `templates/` (Jinja HTML), `static/` (CSS), `test_*.py` (tests), and `conftest.py` (throwaway settings for tests).
 
 For Milestone 2, the pipeline is ingest → preprocess → rag (one-shot jobs) → api → frontend, as described in the README's Data contract.
 
@@ -109,7 +110,7 @@ API (from `src/api`; then open http://localhost:8000/health):
 uv run uvicorn main:app --port 8000 --reload
 ```
 
-Tests (from `src/frontend` or `src/api`):
+Tests (from any service folder: `src/ingest`, `src/preprocess`, `src/rag`, `src/api`, or `src/frontend`):
 
 ```sh
 uv run pytest
