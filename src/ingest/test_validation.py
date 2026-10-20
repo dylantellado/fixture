@@ -91,7 +91,7 @@ def test_sender_must_be_a_participant():
 
 def test_corpus_rules_catch_real_domain_and_wrong_weekday():
     thread = copy.deepcopy(GOOD_THREAD)
-    thread["participants"][1] = "Dana Whitfield <dana@gmail.com>"
+    thread["participants"][1] = "Dana Whitfield <dana@mail.test>"
     thread["messages"][0]["timestamp"] = "Fri, 03 Sep 2026 10:02:00 -0400"  # Sep 3 is a Thursday
     errors, _warnings = generated_corpus_errors(thread)
     assert any("not a fictional" in e for e in errors)
