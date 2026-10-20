@@ -9,25 +9,28 @@
 services:
   # --- Data pipeline (Will) ---
 
+  # Each pipeline job gets only the folders it uses: read-only inputs,
+  # writable outputs. No .env, secrets, or other data (e.g. data/fixture.db).
+
   ingest:
     build: ./src/ingest
-    env_file: .env
     environment:
       - DATA_DIR=/data
     volumes:
-      - ./data:/data
-      - ./samples:/samples:ro
+      - ./data/source:/data/source:ro   # users.json, generated_threads.jsonl
+      - ./data/raw:/data/raw            # writes threads.jsonl
 
   preprocess:
     build: ./src/preprocess
-    env_file: .env
     environment:
       - DATA_DIR=/data
     depends_on:
       ingest:
         condition: service_completed_successfully
     volumes:
-      - ./data:/data
+      - ./data/source:/data/source:ro   # users.json (to recognize each user's own address)
+      - ./data/raw:/data/raw:ro         # reads threads.jsonl
+      - ./data/processed:/data/processed  # writes messages.jsonl, manifest.json
 
   # --- Search (Dylan) ---
 
