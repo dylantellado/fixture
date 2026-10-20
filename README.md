@@ -51,13 +51,13 @@ This is the source of truth for how the data side (Will) and the search side (Dy
 
 | File | Written by | Contents |
 |------|------------|----------|
-| `data/source/users.json` | data generation | The fake users: a JSON list of `{"user_id", "name"}` at minimum. |
-| `data/source/generated_threads.jsonl` | data generation | One JSON object per thread: `user_id`, `thread_id`, `subject`, `participants`, `messages` (each: `sender`, `recipients`, `timestamp`, `body`, `label`). Versioned with DVC, never git. |
-| `data/raw/threads.jsonl` | `ingest` | Same shape as the source threads, validated and deduplicated, with stable `thread_id`s and `user_id` kept. |
+| `data/source/users.json` | data generation | The fake users: a JSON list of `{"user_id", "name", "email"}`. |
+| `data/source/generated_threads.jsonl` | data generation | One JSON object per thread: `user_id`, `thread_id`, `subject`, `participants`, `messages` (each: `sender`, `recipients`, `timestamp`, `body`, `label`). `timestamp` is the email "Date" header format, e.g. `Tue, 13 Oct 2026 09:12:00 -0400`. Versioned with DVC, never git. |
+| `data/raw/threads.jsonl` | `ingest` | Same shape as the source threads, validated and deduplicated, sorted by `(user_id, thread_id)`, with `user_id` kept. Adds `source` (`"generated"`) and `provenance` (`file`, `line`, `sha256` of the thread). |
 | `data/processed/messages.jsonl` | `preprocess` | One JSON object per message (schema below). This is what `rag` indexes. |
 | `data/processed/manifest.json` | `preprocess` | Counts, file hashes, and provenance (below). |
 
-`samples/` has small, fake, committed versions of the files the search side reads: `samples/users.json` and `samples/messages_sample.jsonl` (20 messages, two users, all six labels). The data pipeline replaces them with real generated data later.
+`samples/` has small, fake, committed versions of the files the search side reads: `samples/users.json` (the four generated users) and `samples/messages_sample.jsonl` (20 hand-made messages, two users, all six labels). `samples/generated_threads_sample.jsonl` has 16 source threads covering every user and every shared contact. The full corpus is described in `docs/data/corpus_notes.md`.
 
 ### `messages.jsonl` schema
 
@@ -71,8 +71,8 @@ One JSON object per line:
 | `source` | string | `"generated"` for now. |
 | `sender` | string | `"Display Name <placeholder>"`, e.g. `"Jordan Lee <EMAIL_003>"`. |
 | `recipients` | list of strings | Same format as `sender`. Always a list, possibly empty. |
-| `timestamp` | string | ISO 8601 with a UTC offset, e.g. `2026-10-13T09:12:00-04:00`. |
-| `subject` | string | |
+| `timestamp` | string | Always `YYYY-MM-DDTHH:MM:SS±HH:MM`, in the sender's offset, e.g. `2026-10-13T09:12:00-04:00`. UTC is `+00:00`, never `Z`. |
+| `subject` | string | The thread's subject (the same for every message in a thread). |
 | `body` | string | Cleaned text: no quoted replies, signatures, or HTML. |
 | `label` | string | One of the labels below. |
 
@@ -90,9 +90,10 @@ Labels:
 ### Rules the search side depends on
 
 - **`user_id` format:** lowercase letters, digits, and underscores only (e.g. `user_01`), because it becomes part of a ChromaDB collection name.
-- **`message_id` is deterministic, never random:** the first 16 hex characters of `sha256("<user_id>|<thread_id>|<position>")`, where `position` is the message's 0-based index in its thread. Re-running the pipeline gives the same ids, and ids never collide across users.
+- **`message_id` is deterministic, never random:** the first 16 hex characters of `sha256("<user_id>|<thread_id>|<position>")`, where `position` is the message's 0-based index in its thread in `data/raw/threads.jsonl` (preprocess never drops a message, so positions never shift). Re-running the pipeline gives the same ids, and ids never collide across users.
 - **No nulls:** `message_id`, `user_id`, `thread_id`, `sender`, `timestamp`, `source`, `subject`, and `label` are always strings (`""` if missing). `recipients` is always a list and `body` is always a string.
-- **Anonymization:** email addresses become `EMAIL_###` and phone numbers become `PHONE_###`, using one placeholder map shared across all users, so the same address always gets the same placeholder. Display names stay readable.
+- **Anonymization:** email addresses become `EMAIL_###` and phone numbers become `PHONE_###`, using one placeholder map shared across all users, so the same address always gets the same placeholder. Display names stay readable. Placeholders are numbered in sorted order of the addresses and numbers in the whole corpus, so they are stable for a given data version but can renumber when data is added (rag rebuilds each collection from scratch, so that's fine). Treat them as opaque strings: there are three digits today, more past 999. An address with no display name is written `<EMAIL_005>`. Phone numbers are normalized before numbering, so every way of writing a number gets one placeholder.
+- **Sorting by time:** offsets differ between messages, so sort by parsed time, not by the `timestamp` string (rag stores a numeric timestamp for this).
 - **Safe failure:** `preprocess` exits non-zero on any failure and never leaves half-written files (write to a temporary file, then rename).
 
 ### `manifest.json`

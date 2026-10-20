@@ -18,7 +18,7 @@ Fixture is a Harvard AC215 course project by Dylan Tellado and Will Sherwood. It
 - **Prefer simple, easy-to-change solutions** so we can pivot without large rewrites.
 - **Keep this file current:** if a request changes the project's direction, update CLAUDE.md to match.
 
-**What exists so far:** a Google connection proof of concept. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail. Everything is read-only; nothing writes to a calendar or sends email yet. `ingest`, `preprocess`, and `rag` run as placeholder jobs that log and exit 0; `api` only answers `GET /health`.
+**What exists so far:** a Google connection proof of concept. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail. Everything is read-only; nothing writes to a calendar or sends email yet. `ingest` and `preprocess` are working one-shot jobs over a generated, fictional multi-user email corpus (see `docs/data/corpus_notes.md`; plan in `docs/data/generation/`); `rag` is still a placeholder job; `api` only answers `GET /health`.
 
 ## Milestone 2
 
@@ -44,8 +44,9 @@ data/                local data (git-ignored); fixture.db holds the web app's en
 samples/             fake data safe to commit: users.json, messages_sample.jsonl (processed schema)
 secrets/             local credentials (git-ignored), see "Google access" below
 src/
-  ingest/       placeholder job (main.py); also google_auth.py and list_events.py (Calendar check)
-  preprocess/   placeholder job
+  ingest/       validates and dedups source threads -> data/raw/threads.jsonl; validate.py checks thread files;
+                also google_auth.py and list_events.py (Calendar check)
+  preprocess/   cleans, anonymizes, flattens -> data/processed/messages.jsonl + manifest.json
   rag/          placeholder job
   api/          FastAPI app (port 8000), only GET /health so far; test_main.py
   (chromadb)    ChromaDB server from a pinned image, no folder (host port 8001)

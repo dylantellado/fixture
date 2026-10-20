@@ -1,5 +1,6 @@
 # Local data and credentials
-data/
+# Leading slash: only the top-level data folder, not docs/data/
+/data/
 secrets/
 .env
 

@@ -1,0 +1,21 @@
+ingest-1      | 2026-10-20 01:40:55,346 INFO ingest: read /data/source/users.json sha256=f112d23c2a62c3b3e803f300aad3bf4dfdcbcb61f174b5e47366cefc4c92dc0c
+ingest-1      | 2026-10-20 01:40:55,347 INFO ingest: read /data/source/generated_threads.jsonl sha256=eb2efe27847679ddc04703de4ec96d65da0785419ab78091953560d87be9b1d3
+ingest-1      | 2026-10-20 01:40:55,441 INFO ingest: users: 4
+ingest-1      | 2026-10-20 01:40:55,442 INFO ingest:   user_01: 40 threads, 100 messages
+ingest-1      | 2026-10-20 01:40:55,442 INFO ingest:   user_02: 40 threads, 97 messages
+ingest-1      | 2026-10-20 01:40:55,442 INFO ingest:   user_03: 40 threads, 90 messages
+ingest-1      | 2026-10-20 01:40:55,442 INFO ingest:   user_04: 40 threads, 90 messages
+ingest-1      | 2026-10-20 01:40:55,442 INFO ingest: total: 160 threads, 377 messages (dropped 0 duplicate threads, 0 duplicate messages)
+ingest-1      | 2026-10-20 01:40:55,443 INFO ingest: wrote /data/raw/threads.jsonl sha256=798a15d5d00235c264d2f89beb4164a3ab01131f4901d51b9144d1e0d55c3df4
+ingest-1 exited with code 0
+preprocess-1  | 2026-10-20 01:40:56,042 INFO preprocess: read /data/raw/threads.jsonl sha256=798a15d5d00235c264d2f89beb4164a3ab01131f4901d51b9144d1e0d55c3df4
+preprocess-1  | 2026-10-20 01:40:56,043 INFO preprocess: read /data/source/users.json sha256=f112d23c2a62c3b3e803f300aad3bf4dfdcbcb61f174b5e47366cefc4c92dc0c
+preprocess-1  | 2026-10-20 01:40:56,152 INFO preprocess:   user_01: 100 messages
+preprocess-1  | 2026-10-20 01:40:56,152 INFO preprocess:   user_02: 97 messages
+preprocess-1  | 2026-10-20 01:40:56,152 INFO preprocess:   user_03: 90 messages
+preprocess-1  | 2026-10-20 01:40:56,152 INFO preprocess:   user_04: 90 messages
+preprocess-1  | 2026-10-20 01:40:56,152 INFO preprocess: total: 377 messages in 160 threads
+preprocess-1  | 2026-10-20 01:40:56,152 INFO preprocess: labels: {'acceptance': 100, 'assistant_handoff': 21, 'new_request': 40, 'none': 98, 'proposed_times': 79, 'reschedule': 39}
+preprocess-1  | 2026-10-20 01:40:56,152 INFO preprocess: wrote /data/processed/messages.jsonl sha256=3f9eb1863b9fee1e0e8f0346011f4703680723b7cdf1dbb36b4ffd1840d39a7b
+preprocess-1  | 2026-10-20 01:40:56,152 INFO preprocess: wrote /data/processed/manifest.json (git_commit=379d28c7960971b50079414819f1d7b48b9f92c6)
+preprocess-1 exited with code 0

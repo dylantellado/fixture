@@ -1,2 +1,9 @@
 .venv/
 __pycache__/
+.pytest_cache/
+# Never bake credentials into the image (they live in secrets/ at the repo root,
+# but guard against copies landing here).
+token.json
+credentials.json
+*.env
+.env

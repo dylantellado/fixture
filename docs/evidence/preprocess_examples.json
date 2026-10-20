@@ -1,0 +1,235 @@
+{
+  "description": "Before/after examples from the preprocess run on data-v1. \"before\" is from data/raw/threads.jsonl, \"after\" from data/processed/messages.jsonl.",
+  "manifest": {
+    "created_at": "2026-10-20T01:40:56Z",
+    "git_commit": "379d28c7960971b50079414819f1d7b48b9f92c6",
+    "counts": {
+      "total": 377,
+      "per_user": {
+        "user_01": 100,
+        "user_02": 97,
+        "user_03": 90,
+        "user_04": 90
+      },
+      "threads": 160,
+      "per_label": {
+        "acceptance": 100,
+        "assistant_handoff": 21,
+        "new_request": 40,
+        "none": 98,
+        "proposed_times": 79,
+        "reschedule": 39
+      }
+    },
+    "sha256": {
+      "data/raw/threads.jsonl": "798a15d5d00235c264d2f89beb4164a3ab01131f4901d51b9144d1e0d55c3df4",
+      "data/source/users.json": "f112d23c2a62c3b3e803f300aad3bf4dfdcbcb61f174b5e47366cefc4c92dc0c",
+      "data/processed/messages.jsonl": "3f9eb1863b9fee1e0e8f0346011f4703680723b7cdf1dbb36b4ffd1840d39a7b"
+    }
+  },
+  "examples": [
+    {
+      "demonstrates": "Outlook-style quoted reply removed; signature title line removed; addresses anonymized; timestamp to ISO",
+      "before": {
+        "user_id": "user_03",
+        "thread_id": "t017",
+        "position": 1,
+        "sender": "Sofia Okafor <sofia.okafor@example.com>",
+        "recipients": [
+          "Maya Lindqvist <maya.lindqvist@brightwater.example>"
+        ],
+        "timestamp": "Sun, 27 Sep 2026 19:15:00 -0400",
+        "body": "Dear Maya,\n\nThank you for letting me know, and please don't apologize; these things happen.\n\nOption 2 works best for me: Friday, October 2, 11:00 am CT, which is 12:00 pm ET. So my calendar now reads:\n\n  * Wednesday, September 30, 2:00 pm ET: cancelled\n  * Friday, October 2, 11:00-11:45 am CT / 12:00-12:45 pm ET: first-round case interview, by video\n\nThank you for rearranging it so quickly.\n\nBest regards,\nSofia Okafor\nMS Data Science, the College | TA, STAT 142\n\n________________________________\nFrom: Maya Lindqvist <maya.lindqvist@brightwater.example>\nSent: Sunday, September 27, 2026 6:40 PM\nTo: Sofia Okafor <sofia.okafor@example.com>\nSubject: RE: Brightwater Strategy Group: first-round interview\n\nHi Sofia,\n\nApologies for the weekend email. Your interviewer has been pulled onto an urgent client deadline, so we need to move your interview on Wednesday, September 30 at 1:00 pm CT. I'm very sorry for the change. Here are two new options with a different consultant:\n\n  Option 1: Thursday, October 1, 9:00 am CT\n  Option 2: Friday, October 2, 11:00 am CT\n\nSame format: 45 minutes by video. Let me know which works and I'll send a fresh link.\n\nBest,\nMaya\n\nMaya Lindqvist\nCampus Recruiter | Brightwater Strategy Group\nChicago Office\n(312) 555-0163",
+        "label": "acceptance"
+      },
+      "after": {
+        "message_id": "51e340b46ed1f11c",
+        "user_id": "user_03",
+        "thread_id": "t017",
+        "source": "generated",
+        "sender": "Sofia Okafor <EMAIL_070>",
+        "recipients": [
+          "Maya Lindqvist <EMAIL_053>"
+        ],
+        "timestamp": "2026-09-27T19:15:00-04:00",
+        "subject": "Brightwater Strategy Group: first-round interview",
+        "body": "Dear Maya,\n\nThank you for letting me know, and please don't apologize; these things happen.\n\nOption 2 works best for me: Friday, October 2, 11:00 am CT, which is 12:00 pm ET. So my calendar now reads:\n\n* Wednesday, September 30, 2:00 pm ET: cancelled\n* Friday, October 2, 11:00-11:45 am CT / 12:00-12:45 pm ET: first-round case interview, by video\n\nThank you for rearranging it so quickly.\n\nBest regards,\nSofia Okafor",
+        "label": "acceptance"
+      }
+    },
+    {
+      "demonstrates": "Forward kept as content with a one-line header; unsubscribe footer after \"--\" removed",
+      "before": {
+        "user_id": "user_02",
+        "thread_id": "t012",
+        "position": 0,
+        "sender": "Marcus Bell <marcus.bell@example.com>",
+        "recipients": [
+          "Sam Ortiz <sam.ortiz@example.com>"
+        ],
+        "timestamp": "Fri, 18 Sep 2026 19:22:00 -0400",
+        "body": "thoughts?? this is the startup I talked to last week\n\n---------- Forwarded message ---------\nFrom: Tidewell <updates@tidewell.example>\nDate: Fri, Sep 18, 2026 at 2:04 PM\nSubject: We're hiring: Founding Software Engineer\nTo: <marcus.bell@example.com>\n\n\nTidewell is hiring our first new-grad engineer.\n\nYou'll work on the sync engine that keeps our customers' apps working when the network doesn't: conflict resolution, replication, and the test harness that tries to break both. Team of six, in person in San Francisco three days a week.\n\nWhat we look for: you've built something real, you like reading papers, and you write things down.\n\nApply: https://tidewell.example/jobs/founding-swe\n\n--\nTidewell, San Francisco\nYou're getting this because you signed up for Tidewell updates.",
+        "label": "none"
+      },
+      "after": {
+        "message_id": "fd26251b8367fd61",
+        "user_id": "user_02",
+        "thread_id": "t012",
+        "source": "generated",
+        "sender": "Marcus Bell <EMAIL_050>",
+        "recipients": [
+          "Sam Ortiz <EMAIL_068>"
+        ],
+        "timestamp": "2026-09-18T19:22:00-04:00",
+        "subject": "Fwd: We're hiring: Founding Software Engineer",
+        "body": "thoughts?? this is the startup I talked to last week\n\nForwarded message from Tidewell:\n\nTidewell is hiring our first new-grad engineer.\n\nYou'll work on the sync engine that keeps our customers' apps working when the network doesn't: conflict resolution, replication, and the test harness that tries to break both. Team of six, in person in San Francisco three days a week.\n\nWhat we look for: you've built something real, you like reading papers, and you write things down.\n\nApply: https://tidewell.example/jobs/founding-swe",
+        "label": "none"
+      }
+    },
+    {
+      "demonstrates": "Confidentiality footer and signature title removed",
+      "before": {
+        "user_id": "user_01",
+        "thread_id": "t019",
+        "position": 0,
+        "sender": "Jordan Lee <jordan.lee@larkmoor.example>",
+        "recipients": [
+          "Priya Shah <priya.shah@example.com>"
+        ],
+        "timestamp": "Thu, 01 Oct 2026 09:15:00 -0400",
+        "body": "Hi Priya,\n\nThank you for your interest in Larkmoor Capital. I'm pleased to let you know that we'd like to invite you to a first-round interview for our 2027 Summer Analyst Program in Investment Banking.\n\nThe first round is a 30-minute video interview with a member of our coverage team, covering your background, your motivation and a few basic technical questions. Please reply to confirm that you'd like to move forward, and we'll get it scheduled for next week.\n\nBest regards,\nJordan Lee\nCampus Recruiter, Larkmoor Capital\n\nThis email and any attachments are confidential and intended solely for the use of the individual to whom they are addressed. If you have received this email in error, please notify the sender and delete it. Larkmoor Capital does not accept liability for any errors or omissions in the contents of this message.",
+        "label": "new_request"
+      },
+      "after": {
+        "message_id": "9b2ed44ba40923e8",
+        "user_id": "user_01",
+        "thread_id": "t019",
+        "source": "generated",
+        "sender": "Jordan Lee <EMAIL_043>",
+        "recipients": [
+          "Priya Shah <EMAIL_063>"
+        ],
+        "timestamp": "2026-10-01T09:15:00-04:00",
+        "subject": "Larkmoor Capital: first-round interview",
+        "body": "Hi Priya,\n\nThank you for your interest in Larkmoor Capital. I'm pleased to let you know that we'd like to invite you to a first-round interview for our 2027 Summer Analyst Program in Investment Banking.\n\nThe first round is a 30-minute video interview with a member of our coverage team, covering your background, your motivation and a few basic technical questions. Please reply to confirm that you'd like to move forward, and we'll get it scheduled for next week.\n\nBest regards,\nJordan Lee",
+        "label": "new_request"
+      }
+    },
+    {
+      "demonstrates": "Separate full-name signature block with a UK phone number removed; British date kept",
+      "before": {
+        "user_id": "user_04",
+        "thread_id": "t007",
+        "position": 1,
+        "sender": "Rohan Mehta <rohan.mehta@calderbay.example>",
+        "recipients": [
+          "Lena Fischer <lena.fischer@example.com>"
+        ],
+        "timestamp": "Thu, 10 Sep 2026 07:52:00 +0100",
+        "body": "Hi Lena,\n\nNot out of the blue at all, that's what the network is for! And please, Rohan is fine.\n\nSince we're in the same city, let's do it in person rather than on a screen. Weekdays are a bit unpredictable for me, so I tend to do these on Saturday mornings. How about this Saturday, 12 September, at 10:00 at the Linden café near my office? It's about two minutes from the station.\n\nCheers,\nRohan\n\nRohan Mehta\nAssociate, Calder Bay Partners\n+44 20 7946 0123",
+        "label": "proposed_times"
+      },
+      "after": {
+        "message_id": "8ad6bd221e8f12c2",
+        "user_id": "user_04",
+        "thread_id": "t007",
+        "source": "generated",
+        "sender": "Rohan Mehta <EMAIL_066>",
+        "recipients": [
+          "Lena Fischer <EMAIL_046>"
+        ],
+        "timestamp": "2026-09-10T07:52:00+01:00",
+        "subject": "College alumni network: a coffee?",
+        "body": "Hi Lena,\n\nNot out of the blue at all, that's what the network is for! And please, Rohan is fine.\n\nSince we're in the same city, let's do it in person rather than on a screen. Weekdays are a bit unpredictable for me, so I tend to do these on Saturday mornings. How about this Saturday, 12 September, at 10:00 at the Linden café near my office? It's about two minutes from the station.\n\nCheers,\nRohan",
+        "label": "proposed_times"
+      }
+    },
+    {
+      "demonstrates": "Sign-off \"Safe travels,\" kept with the name; title and phone lines removed; phone in the text anonymized",
+      "before": {
+        "user_id": "user_02",
+        "thread_id": "t038",
+        "position": 0,
+        "sender": "Tess Navarro <tess.navarro@larkmoor.example>",
+        "recipients": [
+          "Marcus Bell <marcus.bell@example.com>"
+        ],
+        "timestamp": "Fri, 16 Oct 2026 11:25:00 -0400",
+        "body": "Hi Marcus,\n\nHere is your itinerary for the final round on Thursday, October 22. Everything is booked and paid for by Larkmoor.\n\nWednesday, October 21\n  Train: departs Boston 4:10 pm, arrives New York 7:55 pm. Ticket confirmation LK7Q2M (e-ticket attached).\n  Hotel: check-in from 3:00 pm, one night. It's a seven-minute walk from our office; the address and confirmation number are in the attached PDF.\n  Dinner: expense up to $60, keep the receipt.\n\nThursday, October 22\n  Hotel checkout: 11:00 am. The front desk can hold your bag.\n  8:45 am: arrive at our office and check in at reception on the 14th floor with photo ID.\n  9:00 am-12:30 pm: interviews (agenda to follow from Jordan).\n  12:30 pm: lunch with two engineers from the team.\n  Train home: departs New York 3:30 pm, arrives Boston 7:20 pm. Confirmation LK7Q2N.\n\nTaxis between the station and the hotel are reimbursable. Please submit receipts within 30 days through the expense link in the attachment.\n\nIf a train is delayed or anything goes wrong on the day, call or text me at 212.555.0117.\n\nSafe travels,\nTess Navarro\nRecruiting Coordinator, Larkmoor Capital\n212.555.0117",
+        "label": "none"
+      },
+      "after": {
+        "message_id": "fcf3986ff9f5470d",
+        "user_id": "user_02",
+        "thread_id": "t038",
+        "source": "generated",
+        "sender": "Tess Navarro <EMAIL_073>",
+        "recipients": [
+          "Marcus Bell <EMAIL_050>"
+        ],
+        "timestamp": "2026-10-16T11:25:00-04:00",
+        "subject": "Final round travel itinerary: Oct 21-22",
+        "body": "Hi Marcus,\n\nHere is your itinerary for the final round on Thursday, October 22. Everything is booked and paid for by Larkmoor.\n\nWednesday, October 21\nTrain: departs Boston 4:10 pm, arrives New York 7:55 pm. Ticket confirmation LK7Q2M (e-ticket attached).\nHotel: check-in from 3:00 pm, one night. It's a seven-minute walk from our office; the address and confirmation number are in the attached PDF.\nDinner: expense up to $60, keep the receipt.\n\nThursday, October 22\nHotel checkout: 11:00 am. The front desk can hold your bag.\n8:45 am: arrive at our office and check in at reception on the 14th floor with photo ID.\n9:00 am-12:30 pm: interviews (agenda to follow from Jordan).\n12:30 pm: lunch with two engineers from the team.\nTrain home: departs New York 3:30 pm, arrives Boston 7:20 pm. Confirmation LK7Q2N.\n\nTaxis between the station and the hotel are reimbursable. Please submit receipts within 30 days through the expense link in the attachment.\n\nIf a train is delayed or anything goes wrong on the day, call or text me at PHONE_005.\n\nSafe travels,\nTess Navarro",
+        "label": "none"
+      }
+    },
+    {
+      "demonstrates": "Mailing-list email: same text in three inboxes; phone in the text anonymized; unsubscribe footer removed",
+      "before": {
+        "user_id": "user_01",
+        "thread_id": "t001",
+        "position": 0,
+        "sender": "Dana Whitfield <dana.whitfield@careers.college.example>",
+        "recipients": [
+          "Career Center Students <career-students@lists.college.example>"
+        ],
+        "timestamp": "Tue, 01 Sep 2026 08:30:00 -0400",
+        "body": "Hi everyone,\n\nWelcome back! Fall recruiting moves fast, so here are the dates to put in your calendar now:\n\n  * Resume workshop: Thu Sep 10, 4:00-5:00 pm, Wexley Hall 120\n  * Career Fair: Thu Sep 24, 1:00-4:00 pm, Wexley Hall (register online by Sep 21)\n  * Interview prep night: Tue Oct 6, 6:00 pm, virtual\n\nDrop-in advising runs Monday to Thursday, 1:00-3:00 pm, no appointment needed.\nFor a 1:1 appointment, just reply to me or call the front desk at (617) 555-0140.\n\n\nStudying abroad this term? All of our workshops are recorded, and advisors can\nmeet by video. Mention your time zone when you write.\n\nWishing you a great start to the semester,\n\nDana Whitfield\nSenior Career Advisor | Career Center, Wexley Hall\n(617) 555-0142\n\n--\nYou are receiving this because you are subscribed to Career Center Students.\nTo unsubscribe, email career-students-leave@lists.college.example.",
+        "label": "none"
+      },
+      "after": {
+        "message_id": "1901c022a62edc40",
+        "user_id": "user_01",
+        "thread_id": "t001",
+        "source": "generated",
+        "sender": "Dana Whitfield <EMAIL_023>",
+        "recipients": [
+          "Career Center Students <EMAIL_012>"
+        ],
+        "timestamp": "2026-09-01T08:30:00-04:00",
+        "subject": "Fall recruiting kickoff: dates for your calendar",
+        "body": "Hi everyone,\n\nWelcome back! Fall recruiting moves fast, so here are the dates to put in your calendar now:\n\n* Resume workshop: Thu Sep 10, 4:00-5:00 pm, Wexley Hall 120\n* Career Fair: Thu Sep 24, 1:00-4:00 pm, Wexley Hall (register online by Sep 21)\n* Interview prep night: Tue Oct 6, 6:00 pm, virtual\n\nDrop-in advising runs Monday to Thursday, 1:00-3:00 pm, no appointment needed.\nFor a 1:1 appointment, just reply to me or call the front desk at PHONE_008.\n\nStudying abroad this term? All of our workshops are recorded, and advisors can\nmeet by video. Mention your time zone when you write.\n\nWishing you a great start to the semester,",
+        "label": "none"
+      }
+    },
+    {
+      "demonstrates": "Same newsletter in another inbox: same placeholders, different message_id",
+      "before": {
+        "user_id": "user_04",
+        "thread_id": "t001",
+        "position": 0,
+        "sender": "Dana Whitfield <dana.whitfield@careers.college.example>",
+        "recipients": [
+          "Career Center Students <career-students@lists.college.example>"
+        ],
+        "timestamp": "Tue, 01 Sep 2026 08:30:00 -0400",
+        "body": "Hi everyone,\n\nWelcome back! Fall recruiting moves fast, so here are the dates to put in your calendar now:\n\n  * Resume workshop: Thu Sep 10, 4:00-5:00 pm, Wexley Hall 120\n  * Career Fair: Thu Sep 24, 1:00-4:00 pm, Wexley Hall (register online by Sep 21)\n  * Interview prep night: Tue Oct 6, 6:00 pm, virtual\n\nDrop-in advising runs Monday to Thursday, 1:00-3:00 pm, no appointment needed.\nFor a 1:1 appointment, just reply to me or call the front desk at (617) 555-0140.\n\n\nStudying abroad this term? All of our workshops are recorded, and advisors can\nmeet by video. Mention your time zone when you write.\n\nWishing you a great start to the semester,\n\nDana Whitfield\nSenior Career Advisor | Career Center, Wexley Hall\n(617) 555-0142\n\n--\nYou are receiving this because you are subscribed to Career Center Students.\nTo unsubscribe, email career-students-leave@lists.college.example.",
+        "label": "none"
+      },
+      "after": {
+        "message_id": "1136e6d128fa95e5",
+        "user_id": "user_04",
+        "thread_id": "t001",
+        "source": "generated",
+        "sender": "Dana Whitfield <EMAIL_023>",
+        "recipients": [
+          "Career Center Students <EMAIL_012>"
+        ],
+        "timestamp": "2026-09-01T08:30:00-04:00",
+        "subject": "Fall recruiting kickoff: dates for your calendar",
+        "body": "Hi everyone,\n\nWelcome back! Fall recruiting moves fast, so here are the dates to put in your calendar now:\n\n* Resume workshop: Thu Sep 10, 4:00-5:00 pm, Wexley Hall 120\n* Career Fair: Thu Sep 24, 1:00-4:00 pm, Wexley Hall (register online by Sep 21)\n* Interview prep night: Tue Oct 6, 6:00 pm, virtual\n\nDrop-in advising runs Monday to Thursday, 1:00-3:00 pm, no appointment needed.\nFor a 1:1 appointment, just reply to me or call the front desk at PHONE_008.\n\nStudying abroad this term? All of our workshops are recorded, and advisors can\nmeet by video. Mention your time zone when you write.\n\nWishing you a great start to the semester,",
+        "label": "none"
+      }
+    }
+  ]
+}
