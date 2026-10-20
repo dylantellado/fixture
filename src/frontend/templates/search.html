@@ -24,7 +24,12 @@
   <form class="search-form card" method="get" action="/search">
     <label class="field">
       <span>Mailbox</span>
-      <select name="user_id">
+      <select name="user_id" required>
+        {# If the requested user isn't in the list, show a placeholder instead of
+           silently showing the first user next to the "isn't indexed" message. #}
+        {% if user_id not in users | map(attribute="user_id") %}
+        <option value="" selected disabled>Choose a mailbox</option>
+        {% endif %}
         {% for u in users %}
         <option value="{{ u.user_id }}" {{ "selected" if u.user_id == user_id }}>{{ u.name or u.user_id }}</option>
         {% endfor %}
