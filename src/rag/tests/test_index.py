@@ -16,14 +16,20 @@ def index(client, ef, data_dir):
     return main.run(lambda: client, ef, data_dir=data_dir, samples_dir=SAMPLES_DIR)
 
 
-def test_sample_gives_one_collection_per_user(chroma_client, fake_ef, data_dir, sample_messages):
+def test_sample_gives_one_collection_per_user(chroma_client, fake_ef, data_dir, sample_messages, sample_users):
     sizes = index(chroma_client, fake_ef, data_dir)
 
-    assert sizes == {"messages_user_01": 10, "messages_user_02": 10}
-    assert sorted(c.name for c in chroma_client.list_collections()) == ["messages_user_01", "messages_user_02"]
+    # Every user in users.json gets a collection, even one with no sample
+    # messages yet (its collection is empty). Expectations come from the
+    # sample files, so this stays right if samples gain users or messages.
+    # All sample bodies are short, so each message is exactly one chunk.
+    user_ids = [u["user_id"] for u in sample_users]
+    expected = {collection_name(u): sum(m["user_id"] == u for m in sample_messages) for u in user_ids}
+    assert sizes == expected
+    assert sorted(c.name for c in chroma_client.list_collections()) == sorted(expected)
 
-    # Each collection holds exactly that user's messages (all sample bodies are short: one chunk each).
-    for user_id in ("user_01", "user_02"):
+    # Each collection holds exactly that user's messages.
+    for user_id in user_ids:
         stored = chroma_client.get_collection(collection_name(user_id)).get(include=["metadatas"])
         expected_ids = {f"{m['message_id']}-0" for m in sample_messages if m["user_id"] == user_id}
         assert set(stored["ids"]) == expected_ids
@@ -69,7 +75,7 @@ def test_rerun_does_not_duplicate(chroma_client, fake_ef, data_dir):
 
     assert first == second
     assert ids_before == ids_after
-    assert len(chroma_client.list_collections()) == 2
+    assert len(chroma_client.list_collections()) == len(first)  # one per user, no extras
 
 
 def test_removed_message_disappears_after_rebuild(chroma_client, fake_ef, data_dir, sample_messages, sample_users):

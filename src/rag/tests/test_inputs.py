@@ -47,7 +47,9 @@ def test_prefers_pipeline_output_and_manifest(data_dir):
 def test_committed_samples_are_valid():
     users, messages, manifest = load_and_validate(find_input_files(SAMPLES_DIR / "missing", SAMPLES_DIR))
     assert len(messages) == 20
-    assert {u["user_id"] for u in users} == {"user_01", "user_02"}
+    # Every message's user is listed; users.json may also list users with no sample messages.
+    assert {m["user_id"] for m in messages} == {"user_01", "user_02"}
+    assert {m["user_id"] for m in messages} <= {u["user_id"] for u in users}
     assert manifest == {}
 
 
