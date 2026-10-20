@@ -29,6 +29,9 @@
       <li>Fixture never changes anything from this page</li>
       <li>Only approved test accounts can sign in for now</li>
     </ul>
+
+    {# The search page uses fake demo mailboxes, so it needs no sign-in. #}
+    <p class="login-alt">No test account? <a href="/search">Search past threads in the demo data</a></p>
   </div>
 </main>
 {% endblock %}

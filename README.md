@@ -126,7 +126,13 @@ Labels:
 ### API
 
 - `GET /health` → `{"status": "ok"}`
-- `POST /search` with `{"user_id": str, "query": str, "k": int = 5}` returns:
+- `GET /users` → users that have a `messages_<user_id>` collection, read from collection metadata (`user_name` and `indexed_at`, set by `rag`):
+
+  ```json
+  [{"user_id": "user_01", "name": "Priya Shah", "indexed_at": "2026-10-20T01:20:48+00:00"}]
+  ```
+
+- `POST /search` with `{"user_id": str, "query": str, "k": int = 5, "label": str | null = null}` returns:
 
   ```json
   {
@@ -136,6 +142,8 @@ Labels:
   }
   ```
 
-  It only searches `messages_<user_id>`, never another user's collection. An unknown `user_id` returns `400`.
+  It only searches `messages_<user_id>`, never another user's collection. Results come best first, and `score` is `1 - cosine distance`, rounded to 3 places. `k` is 1–20, `query` can't be blank, and the optional `label` (one of the six labels) limits results to that label. A `user_id` that doesn't match `^[a-z0-9_]+$` or has no collection returns `400` `{"detail": "unknown user"}`. Other invalid input returns `422`. If ChromaDB is unreachable, `/users` and `/search` return `503`.
+
+  See `src/api/README.md` for examples.
 
 Inside Docker, `rag` and `api` reach ChromaDB at `CHROMA_HOST=chromadb`, `CHROMA_PORT=8000`, and the frontend reaches the API at `API_URL=http://api:8000`.
