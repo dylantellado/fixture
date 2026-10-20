@@ -49,6 +49,7 @@ services:
     env_file: .env
     environment:
       - DATA_DIR=/data
+      - SAMPLES_DIR=/samples  # used only when data/processed/messages.jsonl is missing
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
     depends_on:
@@ -58,7 +59,7 @@ services:
         condition: service_healthy
     volumes:
       - ./data:/data
-      - ./secrets:/run/secrets:ro
+      - ./samples:/samples:ro
       - model_cache:/root/.cache/chroma  # embedding model downloads once, shared with api
 
   api:
