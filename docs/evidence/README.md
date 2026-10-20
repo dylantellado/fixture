@@ -40,3 +40,4 @@ Result: 4 users, 160 threads, 377 messages, 390 chunks.
 | [`pipeline_run.log`](pipeline_run.log) | An earlier `ingest` + `preprocess` run on the same data (same output hash, `3f9eb186…`). |
 | [`preprocess_examples.json`](preprocess_examples.json) | Example messages before and after `preprocess` (cleaning and anonymization). |
 | [`retrieval_example.md`](retrieval_example.md) | One retrieval from query to retrieved context, generated with rag's `query.py --markdown` against the full 4-user index. |
+| [`retrieval_check.md`](retrieval_check.md) | Will's 15 example queries, each searched in its user's collection: where the answering messages rank (all of them in the top 5 for 7 of 15), and 0 results from another user's mailbox. Generated with rag's `check_retrieval.py --markdown`. |
