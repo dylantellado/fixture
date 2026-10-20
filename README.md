@@ -114,9 +114,14 @@ Labels:
 ### Vector database
 
 - A ChromaDB server container (`chromadb` in `docker-compose.yml`, pinned version).
-- One collection per user, named `messages_<user_id>` (e.g. `messages_user_01`). Each chunk also stores `user_id` in its metadata.
-- Embeddings: `all-MiniLM-L6-v2` through Chroma's built-in default embedding function (runs locally with ONNX, no API key). Indexing and search use the same embedding function.
-- The model is cached in the `model_cache` Docker volume, shared by `rag` and `api`, so it downloads once.
+- One collection per user, named `messages_<user_id>` (e.g. `messages_user_01`), using cosine distance. `rag` rebuilds every collection from scratch on each run and deletes `messages_*` collections for users no longer in `users.json`. Every user in `users.json` gets a collection, even with no messages.
+- Collection metadata: `user_id`, `user_name` (display name from `users.json`), `indexed_at` (UTC ISO time), `input_path` and `input_sha256` (the indexed messages file), `used_sample_data` (bool), `manifest_git_commit` and `manifest_created_at` (from `manifest.json`, `""` if absent), `embedding_model`.
+- One chunk per message; bodies over ~1,000 characters are split into overlapping pieces. Chunk id: `<message_id>-<chunk index>` (index starts at 0). Chunk text: `From: <sender display name>\nSubject: <subject>\nDate: <timestamp>\n\n<body>`, with the header repeated on every piece (`From:` falls back to the raw sender when there is no display name).
+- Chunk metadata (all strings or ints, never null): `message_id`, `user_id`, `thread_id`, `sender`, `sender_name` (`""` if the sender has no display name), `timestamp`, `timestamp_epoch` (int Unix seconds with the UTC offset applied, `0` if `timestamp` is `""`; use it to sort, never the string), `source`, `subject`, `label`, `chunk_index` (int).
+- Embeddings: `all-MiniLM-L6-v2` through Chroma's built-in default embedding function, `chromadb.utils.embedding_functions.DefaultEmbeddingFunction()` from `chromadb==1.5.9` (runs locally with ONNX, no API key). Indexing and search must use this same function. Search score = `1 - cosine distance`.
+- `rag` requires timestamps to be ISO 8601 with a UTC offset (or `""`), every message's `user_id` to be in `users.json`, and `user_id`s not to end with `_` (Chroma collection names must end with a letter or digit). Otherwise it exits non-zero without touching the index.
+- If `data/processed/messages.jsonl` is missing, `rag` indexes `samples/` instead and logs a warning (`used_sample_data` is then `true`).
+- The model is cached in the `model_cache` Docker volume, shared by `rag` and `api`, so it downloads once. Details: `src/rag/README.md`.
 
 ### API
 
