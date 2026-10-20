@@ -16,7 +16,7 @@ Where each Milestone 2 requirement lives in this repo:
 | Pipeline logs and sample input/output | [`full_pipeline_run.log`](docs/evidence/full_pipeline_run.log), [`preprocess_examples.json`](docs/evidence/preprocess_examples.json) (before/after), [`samples/`](samples/) (small fake inputs). |
 | RAG: collection, chunking, vector database | `ingest` + `preprocess` (collection and cleaning), [`src/rag`](src/rag/README.md) (chunking, embeddings, one ChromaDB collection per user). |
 | One end-to-end retrieval example | [`retrieval_example.md`](docs/evidence/retrieval_example.md) (query → retrieved context) and [`api_search_response.json`](docs/evidence/api_search_response.json) (the same through the API). [`retrieval_check.md`](docs/evidence/retrieval_check.md) checks 15 example queries for quality and per-user isolation. |
-| Mock-up and app skeleton | [`docs/mockup/`](docs/mockup/README.md) (screens, Milestone 1 wireframe, what changed). Working skeleton: [`src/frontend`](src/frontend) (search page) calling [`src/api`](src/api/README.md) (`GET /users`, `POST /search`). |
+| Mock-up and app skeleton | [`docs/mockup/`](docs/mockup/README.md) (screens, Milestone 1 wireframe, what changed). Working skeleton: [`src/frontend`](src/frontend) (search and "How it works" pages) calling [`src/api`](src/api/README.md) (`GET /users`, `POST /search`). |
 | Tests | `uv run pytest` in each service folder under `src/`. |
 
 ## Layout

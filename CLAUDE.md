@@ -53,7 +53,8 @@ src/
   frontend/     FastAPI web app (port 8501): Sign in with Google, then a dashboard of
                 upcoming events (all checked calendars) and recent emails with a
                 keyword-based scheduling filter; /search searches the demo mailboxes
-                through the api, with no sign-in
+                through the api and /about shows the pipeline and live status, both
+                with no sign-in; one shared top bar (templates/_nav.html)
 ```
 
 Inside `src/frontend/`: `main.py` (routes and sign-in), `google_data.py` (Google API calls and formatting), `credential_store.py` (encrypted SQLite storage for users' Google logins), `api_client.py` (calls to the api for the search page), `templates/` (Jinja HTML), `static/` (CSS), `test_*.py` (tests), and `conftest.py` (throwaway settings for tests).
