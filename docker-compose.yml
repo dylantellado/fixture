@@ -24,11 +24,14 @@ services:
     build: ./src/preprocess
     environment:
       - DATA_DIR=/data
+      # Recorded in manifest.json. The container has no git, so pass it in:
+      #   GIT_COMMIT=$(git rev-parse HEAD) docker compose up --build
+      - GIT_COMMIT=${GIT_COMMIT:-unknown}
     depends_on:
       ingest:
         condition: service_completed_successfully
     volumes:
-      - ./data/source:/data/source:ro   # users.json (to recognize each user's own address)
+      - ./data/source:/data/source:ro   # users.json (so manifest counts list every user)
       - ./data/raw:/data/raw:ro         # reads threads.jsonl
       - ./data/processed:/data/processed  # writes messages.jsonl, manifest.json
 
