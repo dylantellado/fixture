@@ -141,6 +141,14 @@ def test_unknown_user_message(api, monkeypatch):
     monkeypatch.setattr(api_client, "search", raise_(api_client.UnknownUser()))
     response = client.get("/search", params={"user_id": "user_99", "q": "interview"})
     assert shown(response.text, main.SEARCH_ERRORS["unknown_user"])
+    # The picker asks for a mailbox instead of pretending user_99 is the first user.
+    assert '<option value="" selected disabled>Choose a mailbox</option>' in response.text
+
+
+def test_known_user_has_no_placeholder(api):
+    response = client.get("/search", params={"user_id": "user_02", "q": "interview"})
+    assert "Choose a mailbox" not in response.text
+    assert '<option value="user_02" selected>' in response.text
 
 
 # --- Links to the page ------------------------------------------------------------

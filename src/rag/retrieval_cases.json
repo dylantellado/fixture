@@ -1,0 +1,20 @@
+{
+  "source": "docs/data/corpus_notes.md, 'Example queries for the retrieval demo' (data-v1)",
+  "cases": [
+    {"name": "1", "user_id": "user_01", "query": "When and where do I meet my career advisor?", "answer": "Dana, in person, Tuesdays (3:00/3:30), Wexley Hall Room 214", "expected": ["1a61982811036a4a", "41399146de4c8d5f"]},
+    {"name": "1b", "user_id": "user_02", "query": "When and where do I meet my career advisor?", "answer": "Dana, by video, Fridays at 11 am", "expected": ["8dae41b1e5b399ae"]},
+    {"name": "1c", "user_id": "user_04", "query": "When and where do I meet my career advisor?", "answer": "Dana, Zoom, Monday mornings 8 am ET (1 pm London)", "expected": ["735da54c1a072886", "a5c5d849d2382de2"]},
+    {"name": "2", "user_id": "user_01", "query": "When is my Larkmoor superday?", "answer": "Friday, October 16 at 9:00 am, New York", "expected": ["ee745294983ee9d7"]},
+    {"name": "2b", "user_id": "user_02", "query": "When is my Larkmoor final round?", "answer": "Thursday, October 22, New York", "expected": ["613772d7c69fa3de"]},
+    {"name": "3", "user_id": "user_01", "query": "How does Rohan like to meet?", "answer": "Phone calls only, mornings ET (he's in London)", "expected": ["4964afa55a4da41d", "ba1d09c898efec38"]},
+    {"name": "3b", "user_id": "user_04", "query": "How does Rohan like to meet?", "answer": "In person, Saturday mornings at the Linden café", "expected": ["8ad6bd221e8f12c2", "5e757711cfd76baa"]},
+    {"name": "4", "user_id": "user_01", "query": "When was my Larkmoor first round moved to?", "answer": "Thursday, October 8 at 11:00 am ET (from Wed Oct 7)", "expected": ["094c5944e8bdda66"]},
+    {"name": "4b", "user_id": "user_02", "query": "When was my Larkmoor first round moved to?", "answer": "Friday, October 9 at 1:00 pm (from Tue Oct 6)", "expected": ["365da2cf1add02e3", "a404c55fa927c66a"]},
+    {"name": "5", "user_id": "user_02", "query": "When does Professor Osei meet?", "answer": "Only Monday mornings, 10 to 12, Room 307", "expected": ["ce97ef8acd96c8fb", "494ddc9e63db2032"]},
+    {"name": "6", "user_id": "user_02", "query": "Who schedules meetings with Tom Haskell?", "answer": "His assistant, Gwen Liu", "expected": ["2d2d15910d701afc", "7ae0f9aeb1b22234"]},
+    {"name": "7", "user_id": "user_03", "query": "When is the TA meeting when Prof. Vasquez travels?", "answer": "Moved from Monday to Thursday, 9 am", "expected": ["c4d57a2016f6ea81", "298da54872293839"]},
+    {"name": "8", "user_id": "user_03", "query": "When is my Brightwater final round?", "answer": "Moved to Monday, October 19, 10:00 am CT", "expected": ["c729def2406cdc05", "97a97e587ac5598b"]},
+    {"name": "9", "user_id": "user_03", "query": "Where does Hannah Cho like to meet?", "answer": "Lunch, 12 to 1, in person at Arcadia Café", "expected": ["5f1e7f2afcf240ab"]},
+    {"name": "10", "user_id": "user_04", "query": "What time is my Oct 26 advising in London time?", "answer": "12 noon (UK clocks go back first)", "expected": ["89d81fb662f62135"]}
+  ]
+}

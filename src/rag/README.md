@@ -128,6 +128,7 @@ Other settings (chunk size, overlap, batch size, model, retry) are constants in 
 | `chunking.py` | Builds each chunk's text, id, and metadata. |
 | `index.py` | Connects to ChromaDB (with retry), rebuilds collections, searches. |
 | `query.py` | Command-line search tool. |
+| `check_retrieval.py` | Checks retrieval quality and isolation on the example queries in `retrieval_cases.json`. |
 | `tests/` | Tests (see below). |
 
 ## How to run
@@ -160,6 +161,19 @@ user, which data was indexed, and each result (score, sender, date, subject,
 label, text) for evidence files. A user without a collection gets a clear
 message and exit code 1.
 
+## How to check retrieval
+
+`check_retrieval.py` runs the 15 example queries from `docs/data/corpus_notes.md`
+(copied into `retrieval_cases.json`) against the data-v1 index. For each one it
+reports where the messages that answer it rank in the user's top 5, and how
+many results came from another user's mailbox. That must always be 0, and the
+script exits non-zero if it isn't.
+
+```sh
+uv run python check_retrieval.py
+uv run python check_retrieval.py --markdown > ../../docs/evidence/retrieval_check.md
+```
+
 ## Tests
 
 ```sh
@@ -171,4 +185,5 @@ uv run pytest
 - `test_inputs.py`: sample fallback and each validation failure.
 - `test_index.py`: indexing into an in-memory ChromaDB with a tiny fake embedding function (fast, offline): one collection per user, reruns don't duplicate, removed messages and users disappear, bad input leaves the index alone, and the isolation test (searching user_01 for the contact shared with user_02 returns only user_01's emails).
 - `test_query.py`: the query tool's output and argument checks.
+- `test_check_retrieval.py`: the retrieval check's ranking, isolation count, summary, and the committed example queries.
 - `test_real_model.py`: one search with the real MiniLM model; skipped if the model can't be downloaded.
