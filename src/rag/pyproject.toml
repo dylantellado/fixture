@@ -3,4 +3,16 @@ name = "rag"
 version = "0.1.0"
 description = "rag service"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "chromadb==1.5.9",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+# Tests import the service's modules (config, chunking, ...) from this folder.
+pythonpath = ["."]
+testpaths = ["tests"]
