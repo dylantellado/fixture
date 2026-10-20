@@ -1,7 +1,19 @@
+# Startup order (see "Data contract" in the README):
+#   ingest -> preprocess -> rag   one-shot jobs; each waits for the previous to exit 0
+#   chromadb                      vector database; rag waits until it is healthy
+#   api                           starts after rag finishes
+#   frontend                      starts after api is healthy
+#
+# Each service is owned by one person (see CLAUDE.md); edit only your own.
+
 services:
+  # --- Data pipeline (Will) ---
+
   ingest:
     build: ./src/ingest
     env_file: .env
+    environment:
+      - DATA_DIR=/data
     volumes:
       - ./data:/data
       - ./samples:/samples:ro
@@ -9,25 +21,68 @@ services:
   preprocess:
     build: ./src/preprocess
     env_file: .env
+    environment:
+      - DATA_DIR=/data
+    depends_on:
+      ingest:
+        condition: service_completed_successfully
     volumes:
       - ./data:/data
+
+  # --- Search (Dylan) ---
+
+  chromadb:
+    image: chromadb/chroma:1.5.9
+    ports:
+      - "8001:8000"  # host 8001, because the api uses 8000
+    volumes:
+      - chroma_data:/data
+    healthcheck:
+      # The image has no curl or wget, so open a TCP connection with bash instead.
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/8000"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   rag:
     build: ./src/rag
     env_file: .env
+    environment:
+      - DATA_DIR=/data
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+    depends_on:
+      preprocess:
+        condition: service_completed_successfully
+      chromadb:
+        condition: service_healthy
     volumes:
       - ./data:/data
       - ./secrets:/run/secrets:ro
+      - model_cache:/root/.cache/chroma  # embedding model downloads once, shared with api
 
   api:
     build: ./src/api
     env_file: .env
+    environment:
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
     ports:
       - "8000:8000"
     depends_on:
-      - rag
+      rag:
+        condition: service_completed_successfully
     volumes:
       - ./secrets:/run/secrets:ro
+      - model_cache:/root/.cache/chroma
+    healthcheck:
+      # python:3.12-slim has no curl, so use Python to call /health.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # --- Web app ---
 
   frontend:
     build: ./src/frontend
@@ -35,10 +90,16 @@ services:
     environment:
       - SECRETS_DIR=/run/secrets
       - DATA_DIR=/data
+      - API_URL=http://api:8000
     ports:
       - "8501:8501"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     volumes:
       - ./secrets:/run/secrets:ro
       - ./data:/data
+
+volumes:
+  chroma_data:   # ChromaDB's stored collections
+  model_cache:   # all-MiniLM-L6-v2 ONNX model used by rag and api

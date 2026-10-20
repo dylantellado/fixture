@@ -1,6 +1,16 @@
-def main() -> None:
-    print("api service placeholder")
+"""Fixture API. For now it only answers GET /health, so Docker can check that
+it started. POST /search (see "Data contract" in the README) comes next.
+
+Run from src/api with:
+    uv run uvicorn main:app --port 8000 --reload
+"""
+
+from fastapi import FastAPI
+
+app = FastAPI(title="Fixture API")
 
 
-if __name__ == "__main__":
-    main()
+@app.get("/health")
+def health() -> dict:
+    """Report that the API is up."""
+    return {"status": "ok"}

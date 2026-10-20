@@ -18,23 +18,37 @@ Fixture is a Harvard AC215 course project by Dylan Tellado and Will Sherwood. It
 - **Prefer simple, easy-to-change solutions** so we can pivot without large rewrites.
 - **Keep this file current:** if a request changes the project's direction, update CLAUDE.md to match.
 
-**What exists so far:** a Google connection proof of concept. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail. Everything is read-only; nothing writes to a calendar or sends email yet. `preprocess`, `rag`, and `api` are still placeholders.
+**What exists so far:** a Google connection proof of concept. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail. Everything is read-only; nothing writes to a calendar or sends email yet. `ingest`, `preprocess`, and `rag` run as placeholder jobs that log and exit 0; `api` only answers `GET /health`.
+
+## Milestone 2
+
+**Scope:** a searchable, per-user email pipeline on fake data. Generated multi-user scheduling emails flow through `ingest` → `preprocess` → `rag`, which indexes each user's messages in ChromaDB. The `api` searches one user's messages at a time, and the frontend gets a search page.
+
+**The contract:** the "Data contract" section of `README.md` is the source of truth for file paths, the message schema, labels, id rules, the vector database layout, and the API. Read it before working on any service. Don't change it without telling the other person, and update it in the same PR as the change.
+
+**Ownership:**
+- **Will:** data generation, `src/ingest`, `src/preprocess`, DVC, labels, test scenarios
+- **Dylan:** `src/rag`, `src/api`, the frontend search page, the `chromadb` service, the mockup
+- **Both:** `docker-compose.yml` (each edits only their own services), `README.md`, `docs/` and evidence
+
+Will and Dylan build in parallel with separate Claude Code sessions. Stay inside your owner's area; if a change is needed in the other person's area, say so instead of making it.
 
 ## Current structure
 
 This is the starting layout, not a final architecture. Folders and services may be renamed, merged, split, or removed.
 
 ```
-docker-compose.yml   runs all services together
+docker-compose.yml   runs all services together, in pipeline order (see README)
 .env.example         template for .env (copy it, never commit .env)
 data/                local data (git-ignored); fixture.db holds the web app's encrypted logins
-samples/             sample inputs that are safe to commit
+samples/             fake data safe to commit: users.json, messages_sample.jsonl (processed schema)
 secrets/             local credentials (git-ignored), see "Google access" below
 src/
-  ingest/       google_auth.py (command-line Google sign-in), list_events.py (prints next 10 events)
-  preprocess/   placeholder
-  rag/          placeholder
-  api/          placeholder (port 8000 in compose)
+  ingest/       placeholder job (main.py); also google_auth.py and list_events.py (Calendar check)
+  preprocess/   placeholder job
+  rag/          placeholder job
+  api/          FastAPI app (port 8000), only GET /health so far; test_main.py
+  (chromadb)    ChromaDB server from a pinned image, no folder (host port 8001)
   frontend/     FastAPI web app (port 8501): Sign in with Google, then a dashboard of
                 upcoming events (all checked calendars) and recent emails with a
                 keyword-based scheduling filter
@@ -42,7 +56,7 @@ src/
 
 Inside `src/frontend/`: `main.py` (routes and sign-in), `google_data.py` (Google API calls and formatting), `credential_store.py` (encrypted SQLite storage for users' Google logins), `templates/` (Jinja HTML), `static/` (CSS), `test_google_data.py` and `test_credential_store.py` (tests).
 
-The service names suggest a rough pipeline (ingest → preprocess → rag → api → frontend), but what each one does hasn't been decided.
+For Milestone 2, the pipeline is ingest → preprocess → rag (one-shot jobs) → api → frontend, as described in the README's Data contract.
 
 Each service under `src/` is currently self-contained, with its own `Dockerfile`, `pyproject.toml`, `uv.lock`, `.python-version` (3.12), and `main.py`. Services don't import from each other, so `ingest` and `frontend` each have their own Google sign-in code.
 
@@ -88,7 +102,13 @@ Web app (from `src/frontend`; needs `SESSION_SECRET` and `TOKEN_ENCRYPTION_KEY` 
 uv run uvicorn main:app --port 8501 --reload
 ```
 
-Tests (from `src/frontend`):
+API (from `src/api`; then open http://localhost:8000/health):
+
+```sh
+uv run uvicorn main:app --port 8000 --reload
+```
+
+Tests (from `src/frontend` or `src/api`):
 
 ```sh
 uv run pytest
@@ -99,5 +119,6 @@ uv run pytest
 - **Never commit secrets:** that includes `.env`, credentials, API keys, tokens, and personal email or calendar data. Use fake data in `samples/`.
 - **Keep code simple, readable, and commented:** both team members must be able to explain any part of it.
 - **Add tests for new features.**
-- **Work on a feature branch:** merge into `main` only through a pull request.
+- **Work on a feature branch in its own git worktree:** Will and Dylan each work in a separate worktree so parallel sessions don't collide. Merge into `main` only through a pull request.
+- **Don't change the Data contract without telling the other person** (see "Milestone 2" above).
 - **Ask before making major design decisions:** see "Project status and flexibility" above.
