@@ -1,12 +1,6 @@
 [
-  {
-    "user_id": "user_01",
-    "name": "Priya Shah",
-    "email": "priya.shah@example.com"
-  },
-  {
-    "user_id": "user_02",
-    "name": "Marcus Bell",
-    "email": "marcus.bell@example.com"
-  }
+  {"user_id": "user_01", "name": "Priya Shah", "email": "priya.shah@example.com"},
+  {"user_id": "user_02", "name": "Marcus Bell", "email": "marcus.bell@example.com"},
+  {"user_id": "user_03", "name": "Sofia Okafor", "email": "sofia.okafor@example.com"},
+  {"user_id": "user_04", "name": "Lena Fischer", "email": "lena.fischer@example.com"}
 ]
