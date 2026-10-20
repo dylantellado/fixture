@@ -1,0 +1,29 @@
+{# Top bar shared by the dashboard, search, and about pages.
+   Needs `active` (which page is open) and `nav_user` (None when signed out);
+   main.nav_context() provides both. #}
+<header class="topbar">
+  <a class="brand brand-link" href="/">
+    {% include "_logo.html" %}
+    <span>Fixture</span>
+  </a>
+  <nav class="nav" aria-label="Main">
+    {% if nav_user %}
+    <a class="nav-item" href="/" {% if active == "dashboard" %}aria-current="page"{% endif %}>Dashboard</a>
+    {% endif %}
+    <a class="nav-item" href="/search" {% if active == "search" %}aria-current="page"{% endif %}>Search</a>
+    <a class="nav-item" href="/about" {% if active == "about" %}aria-current="page"{% endif %}>How it works</a>
+  </nav>
+  <div class="account">
+    {% if nav_user %}
+    {% if nav_user.picture %}
+    <img class="avatar" src="{{ nav_user.picture }}" alt="" referrerpolicy="no-referrer">
+    {% else %}
+    <span class="avatar avatar-fallback">{{ nav_user.name[:1] | upper }}</span>
+    {% endif %}
+    <span class="account-email">{{ nav_user.email }}</span>
+    <a class="btn-ghost" href="/auth/logout">Sign out</a>
+    {% else %}
+    <a class="btn-ghost" href="/">Sign in</a>
+    {% endif %}
+  </div>
+</header>

@@ -1,5 +1,6 @@
 """Fixture demo web app: sign in with Google, then see your calendar and inbox.
-The /search page searches fake demo mailboxes through the Fixture API, with no sign-in.
+The /search page searches fake demo mailboxes through the Fixture API, and /about
+explains the pipeline with live status. Neither needs sign-in.
 
 Run from src/frontend with:
     uv run uvicorn main:app --port 8501 --reload
@@ -94,6 +95,24 @@ SEARCH_ERRORS = {
     "api_error": "Something went wrong running that search. Please try a different query.",
 }
 
+# Clickable example questions on the search page, per demo mailbox. They come
+# from the retrieval demo in docs/data/corpus_notes.md (data-v1). Mailboxes not
+# listed here get the general ones.
+EXAMPLE_QUESTIONS = {
+    "user_01": ["When and where do I meet my career advisor?", "How does Rohan like to meet?",
+                "When is my Larkmoor superday?"],
+    "user_02": ["When does Professor Osei meet?", "Who schedules meetings with Tom Haskell?",
+                "When was my Larkmoor first round moved to?"],
+    "user_03": ["Where does Hannah Cho like to meet?", "When is the TA meeting when Prof. Vasquez travels?",
+                "When is my Brightwater final round?"],
+    "user_04": ["What time is my Oct 26 advising in London time?", "How does Rohan like to meet?",
+                "When and where do I meet my career advisor?"],
+}
+GENERAL_QUESTIONS = ["Who wants to reschedule?", "Which meetings are confirmed?", "Who handed scheduling to an assistant?"]
+
+# How many results the search page can ask for (the API allows 1 to 20).
+RESULT_COUNTS = (5, 10, 20)
+
 # Signed-in users' Google credentials, encrypted in data/fixture.db.
 try:
     store = CredentialStore(DATA_DIR / "fixture.db", TOKEN_ENCRYPTION_KEY)
@@ -135,6 +154,14 @@ def current_credentials(request: Request) -> Credentials | None:
     return creds if creds.valid else None
 
 
+def nav_context(request: Request, active: str) -> dict:
+    """What the shared top bar (_nav.html) needs: which page is open, and the
+    signed-in user's saved profile (None if signed out). Reads only our own
+    database, never Google, so it's fast and works when Google logins expire."""
+    email = request.session.get("email")
+    return {"active": active, "nav_user": store.load_profile(email) if email else None}
+
+
 @app.get("/")
 def home(request: Request):
     creds = current_credentials(request)
@@ -157,12 +184,17 @@ def home(request: Request):
     return templates.TemplateResponse(
         request,
         "dashboard.html",
-        {"user": store.load_profile(request.session["email"]), "calendar": calendar, "inbox": inbox},
+        {
+            **nav_context(request, "dashboard"),
+            "user": store.load_profile(request.session["email"]),
+            "calendar": calendar,
+            "inbox": inbox,
+        },
     )
 
 
 @app.get("/search")
-def search_page(request: Request, user_id: str = "", q: str = "", label: str = ""):
+def search_page(request: Request, user_id: str = "", q: str = "", label: str = "", k: str = "5"):
     """Search past threads in the fake demo mailboxes.
 
     This page never uses the signed-in Google account, so it works without
@@ -174,14 +206,19 @@ def search_page(request: Request, user_id: str = "", q: str = "", label: str = "
         "query": q.strip(),
         "label": label if label in api_client.LABELS else "",  # ignore unknown labels
         "labels": api_client.LABELS,
+        # Only the counts we offer; anything else (or a typo in the URL) means 5.
+        "k": int(k) if k in {str(n) for n in RESULT_COUNTS} else RESULT_COUNTS[0],
+        "result_counts": RESULT_COUNTS,
         "results": None,  # None = no search yet; [] = searched, nothing found
         "error": None,
-        "signed_in": bool(request.session.get("email")),
+        "selected_user": None,  # the picked mailbox, if it's indexed
+        "examples": [],
+        **nav_context(request, "search"),
     }
 
     # 1. Fill the user picker from GET /users.
     try:
-        page["users"] = api_client.list_users()
+        page["users"] = [api_client.format_user(u) for u in api_client.list_users()]
     except api_client.ApiUnavailable:
         page["error"] = SEARCH_ERRORS["api_down"]
     except api_client.ApiError:
@@ -191,11 +228,14 @@ def search_page(request: Request, user_id: str = "", q: str = "", label: str = "
             page["error"] = SEARCH_ERRORS["no_users"]
         elif not page["user_id"]:
             page["user_id"] = page["users"][0]["user_id"]  # default to the first user
+        page["selected_user"] = next((u for u in page["users"] if u["user_id"] == page["user_id"]), None)
+        if page["selected_user"]:
+            page["examples"] = EXAMPLE_QUESTIONS.get(page["user_id"], GENERAL_QUESTIONS)
 
     # 2. Search, if there's a query. The API checks that user_id is known.
     if page["query"] and page["users"]:
         try:
-            results = api_client.search(page["user_id"], page["query"], label=page["label"] or None)
+            results = api_client.search(page["user_id"], page["query"], k=page["k"], label=page["label"] or None)
             page["results"] = [api_client.format_result(r) for r in results]
         except api_client.UnknownUser:
             page["error"] = SEARCH_ERRORS["unknown_user"]
@@ -205,6 +245,19 @@ def search_page(request: Request, user_id: str = "", q: str = "", label: str = "
             page["error"] = SEARCH_ERRORS["api_error"]
 
     return templates.TemplateResponse(request, "search.html", page)
+
+
+@app.get("/about")
+def about_page(request: Request):
+    """How Fixture works, with the live status of the API and the indexed mailboxes."""
+    status = {"api_ok": api_client.is_healthy(), "users": [], "error": None}
+    if status["api_ok"]:
+        try:
+            status["users"] = [api_client.format_user(u) for u in api_client.list_users()]
+        except (api_client.ApiUnavailable, api_client.ApiError):
+            # /health answers without ChromaDB; /users needs it.
+            status["error"] = "The API is up, but its search database (ChromaDB) can't be reached."
+    return templates.TemplateResponse(request, "about.html", {**nav_context(request, "about"), "status": status})
 
 
 @app.get("/auth/login")

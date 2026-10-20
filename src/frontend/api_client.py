@@ -69,6 +69,14 @@ def search(user_id: str, query: str, k: int = 5, label: str | None = None) -> li
     return _request("POST", "/search", SEARCH_TIMEOUT, json=body).json()["results"]
 
 
+def is_healthy() -> bool:
+    """GET /health: is the API up? (It doesn't check ChromaDB; list_users does.)"""
+    try:
+        return _request("GET", "/health", USERS_TIMEOUT).json().get("status") == "ok"
+    except (ApiUnavailable, ApiError, UnknownUser):
+        return False
+
+
 # --- Formatting for the page ---
 
 # rag puts a small header ("From: ...", "Subject: ...", "Date: ...") at the
@@ -78,12 +86,17 @@ HEADER_LINE = re.compile(r"^(From|To|Subject|Date):.*$")
 SNIPPET_LENGTH = 280
 
 
-def snippet(text: str) -> str:
-    """The message text without its header lines, cut to SNIPPET_LENGTH characters."""
+def message_body(text: str) -> str:
+    """The message text without rag's header lines, keeping its line breaks."""
     lines = text.strip().splitlines()
     while lines and (HEADER_LINE.match(lines[0]) or not lines[0].strip()):
         lines.pop(0)
-    body = " ".join(line.strip() for line in lines if line.strip())
+    return "\n".join(lines).strip()
+
+
+def snippet(text: str) -> str:
+    """The message body on one line, cut to SNIPPET_LENGTH characters."""
+    body = " ".join(line.strip() for line in message_body(text).splitlines() if line.strip())
     if len(body) > SNIPPET_LENGTH:
         body = body[:SNIPPET_LENGTH].rsplit(" ", 1)[0] + "…"
     return body
@@ -111,11 +124,29 @@ def format_result(result: dict) -> dict:
     """Turn one API search result into the fields the search page shows."""
     metadata = result.get("metadata", {})
     label = metadata.get("label", "")
+    text = result.get("text", "")
+    score = result["score"]
     return {
         "sender": sender_label(metadata),
         "date": readable_date(metadata.get("timestamp", "")),
         "subject": metadata.get("subject") or "(no subject)",
         "label": LABELS.get(label, label),
-        "score": f"{result['score']:.3f}",  # same 3 places the API rounds to
-        "snippet": snippet(result.get("text", "")),
+        "label_key": label if label in LABELS else "none",  # picks the label's color
+        "score": f"{score:.3f}",  # same 3 places the API rounds to
+        "strength": round(max(0.0, min(1.0, score)) * 100),  # width of the match bar, in %
+        "snippet": snippet(text),
+        "body": message_body(text),  # shown under "Show full text"
+        # Where the result came from, so every answer can be traced to one email.
+        "message_id": metadata.get("message_id", ""),
+        "thread_id": metadata.get("thread_id", ""),
+        "chunk_index": metadata.get("chunk_index", 0),  # > 0: a later part of a long message
     }
+
+
+def format_user(user: dict) -> dict:
+    """Add a readable 'indexed' time to a user from GET /users.
+
+    rag records indexed_at in UTC, so the time is labeled UTC.
+    """
+    indexed_at = user.get("indexed_at", "")
+    return {**user, "indexed": f"{readable_date(indexed_at)} UTC" if indexed_at else ""}
