@@ -25,7 +25,11 @@ import api_client
 import google_data
 from credential_store import CredentialStore
 
-REPO_ROOT = Path(__file__).resolve().parents[2]  # this file lives in src/frontend/
+# This file lives in src/frontend/, so the repo root is three levels up.
+# In Docker the file is /app/main.py and this resolves to "/" (parents[2]
+# would crash there); that's fine because Docker sets every path and secret
+# through environment variables instead.
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # Read settings from .env at the repo root. Docker passes them in directly instead.
 load_dotenv(REPO_ROOT / ".env")

@@ -22,10 +22,18 @@ Each service under `src/` is its own [uv](https://docs.astral.sh/uv/) project wi
 
 ## Getting started
 
-```sh
-cp .env.example .env   # then fill in SESSION_SECRET and TOKEN_ENCRYPTION_KEY
-docker compose up --build
-```
+1. Copy the settings template, then fill in `SESSION_SECRET` and `TOKEN_ENCRYPTION_KEY` (`.env.example` shows how):
+
+   ```sh
+   cp .env.example .env
+   ```
+
+2. Put the generated source data in `data/source/`: `users.json` and `generated_threads.jsonl` (data-v1, see `docs/data/corpus_notes.md`). It isn't in git. Until DVC is set up, get the two files from Will. Later this step becomes `dvc pull`.
+3. Run the whole pipeline and app with one command. `GIT_COMMIT` is recorded in `data/processed/manifest.json`, so you can see which code produced the data:
+
+   ```sh
+   GIT_COMMIT=$(git rev-parse HEAD) docker compose up --build
+   ```
 
 Startup order: `ingest` → `preprocess` → `rag` run once and exit, each waiting for the previous one to succeed. `rag` also waits for `chromadb` to be healthy. `api` starts after `rag` finishes, and `frontend` starts after `api` is healthy.
 

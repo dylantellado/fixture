@@ -1,0 +1,57 @@
+# Full pipeline run: GIT_COMMIT=$(git rev-parse HEAD) docker compose up --build -d
+# Commit: 0c1bbe37700d38028476931b34c4ef5e57c8d5c6   Run started from a clean state (docker compose down -v)
+# Logs from: docker compose logs --no-color ingest preprocess chromadb rag api frontend
+# One line removed: rag's download progress bar for the embedding model (onnx.tar.gz), which is unreadable in a text file.
+
+api-1  | INFO:     Started server process [1]
+api-1  | INFO:     Waiting for application startup.
+api-1  | INFO:     Application startup complete.
+api-1       | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+api-1       | INFO:     127.0.0.1:51970 - "GET /health HTTP/1.1" 200 OK
+api-1       | INFO:     127.0.0.1:51978 - "GET /health HTTP/1.1" 200 OK
+api-1       | INFO:     127.0.0.1:58656 - "GET /health HTTP/1.1" 200 OK
+api-1       | INFO:     151.101.128.223:62258 - "GET /health HTTP/1.1" 200 OK
+api-1       | INFO:     151.101.128.223:17278 - "GET /users HTTP/1.1" 200 OK
+api-1       | INFO:     151.101.128.223:30902 - "POST /search HTTP/1.1" 200 OK
+api-1       | INFO:     151.101.128.223:46251 - "POST /search HTTP/1.1" 400 Bad Request
+api-1       | INFO:     172.21.0.4:37144 - "GET /users HTTP/1.1" 200 OK
+api-1       | INFO:     172.21.0.4:37150 - "POST /search HTTP/1.1" 200 OK
+api-1       | INFO:     127.0.0.1:58676 - "GET /health HTTP/1.1" 200 OK
+frontend-1  | INFO:     Started server process [1]
+frontend-1  | INFO:     Waiting for application startup.
+frontend-1  | INFO:     Application startup complete.
+frontend-1  | INFO:     Uvicorn running on http://0.0.0.0:8501 (Press CTRL+C to quit)
+frontend-1  | INFO:     151.101.128.223:60983 - "GET /search?user_id=user_03&q=Where+does+Hannah+Cho+like+to+meet%3F HTTP/1.1" 200 OK
+ingest-1    | 2026-10-20 02:25:33,703 INFO ingest: read /data/source/users.json sha256=f112d23c2a62c3b3e803f300aad3bf4dfdcbcb61f174b5e47366cefc4c92dc0c
+ingest-1    | 2026-10-20 02:25:33,704 INFO ingest: read /data/source/generated_threads.jsonl sha256=eb2efe27847679ddc04703de4ec96d65da0785419ab78091953560d87be9b1d3
+ingest-1    | 2026-10-20 02:25:33,748 INFO ingest: users: 4
+ingest-1    | 2026-10-20 02:25:33,748 INFO ingest:   user_01: 40 threads, 100 messages
+ingest-1    | 2026-10-20 02:25:33,748 INFO ingest:   user_02: 40 threads, 97 messages
+ingest-1    | 2026-10-20 02:25:33,748 INFO ingest:   user_03: 40 threads, 90 messages
+ingest-1    | 2026-10-20 02:25:33,748 INFO ingest:   user_04: 40 threads, 90 messages
+ingest-1    | 2026-10-20 02:25:33,748 INFO ingest: total: 160 threads, 377 messages (dropped 0 duplicate threads, 0 duplicate messages)
+ingest-1    | 2026-10-20 02:25:33,748 INFO ingest: wrote /data/raw/threads.jsonl sha256=798a15d5d00235c264d2f89beb4164a3ab01131f4901d51b9144d1e0d55c3df4
+preprocess-1  | 2026-10-20 02:25:34,247 INFO preprocess: read /data/raw/threads.jsonl sha256=798a15d5d00235c264d2f89beb4164a3ab01131f4901d51b9144d1e0d55c3df4
+preprocess-1  | 2026-10-20 02:25:34,248 INFO preprocess: read /data/source/users.json sha256=f112d23c2a62c3b3e803f300aad3bf4dfdcbcb61f174b5e47366cefc4c92dc0c
+preprocess-1  | 2026-10-20 02:25:34,319 INFO preprocess:   user_01: 100 messages
+preprocess-1  | 2026-10-20 02:25:34,319 INFO preprocess:   user_02: 97 messages
+preprocess-1  | 2026-10-20 02:25:34,319 INFO preprocess:   user_03: 90 messages
+preprocess-1  | 2026-10-20 02:25:34,319 INFO preprocess:   user_04: 90 messages
+preprocess-1  | 2026-10-20 02:25:34,319 INFO preprocess: total: 377 messages in 160 threads
+preprocess-1  | 2026-10-20 02:25:34,319 INFO preprocess: labels: {'acceptance': 100, 'assistant_handoff': 21, 'new_request': 40, 'none': 98, 'proposed_times': 79, 'reschedule': 39}
+preprocess-1  | 2026-10-20 02:25:34,319 INFO preprocess: wrote /data/processed/messages.jsonl sha256=3f9eb1863b9fee1e0e8f0346011f4703680723b7cdf1dbb36b4ffd1840d39a7b
+preprocess-1  | 2026-10-20 02:25:34,319 INFO preprocess: wrote /data/processed/manifest.json (git_commit=0c1bbe37700d38028476931b34c4ef5e57c8d5c6)
+rag-1         | 2026-10-20 02:25:39,580 INFO Input messages: /data/processed/messages.jsonl (sha256 3f9eb1863b9fee1e0e8f0346011f4703680723b7cdf1dbb36b4ffd1840d39a7b)
+rag-1         | 2026-10-20 02:25:39,580 INFO Input users:    /data/source/users.json
+rag-1         | 2026-10-20 02:25:39,583 INFO Validated 377 messages for 4 users
+rag-1         | 2026-10-20 02:25:39,583 INFO Manifest: git_commit=0c1bbe37700d38028476931b34c4ef5e57c8d5c6 created_at=2026-10-20T02:25:34Z
+rag-1         | 2026-10-20 02:25:39,584 INFO User user_01: 100 messages -> 103 chunks
+rag-1         | 2026-10-20 02:25:39,584 INFO User user_02: 97 messages -> 99 chunks
+rag-1         | 2026-10-20 02:25:39,585 INFO User user_03: 90 messages -> 95 chunks
+rag-1         | 2026-10-20 02:25:39,585 INFO User user_04: 90 messages -> 93 chunks
+rag-1         | 2026-10-20 02:25:39,640 INFO Connected to ChromaDB at chromadb:8000
+rag-1         | 2026-10-20 02:25:59,852 INFO Collection messages_user_01: 103 chunks
+rag-1         | 2026-10-20 02:25:59,852 INFO Collection messages_user_02: 99 chunks
+rag-1         | 2026-10-20 02:25:59,852 INFO Collection messages_user_03: 95 chunks
+rag-1         | 2026-10-20 02:25:59,852 INFO Collection messages_user_04: 93 chunks
+rag-1         | 2026-10-20 02:25:59,852 INFO Indexing finished in 20.3 s
