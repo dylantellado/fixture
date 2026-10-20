@@ -192,3 +192,46 @@ details[open] .chevron { transform: rotate(180deg); }
 .legend-skipped { font-style: italic; }
 .cal-dot { display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
 .legend-item .cal-dot { margin-right: 0; }
+
+/* Header links: "Search past threads" on the dashboard, the brand on the search page. */
+.nav-link { color: var(--muted); font-size: 14px; text-decoration: none; white-space: nowrap; }
+.nav-link:hover { color: var(--ink); }
+.brand-link { text-decoration: none; }
+.login-alt { margin: 18px 0 0; color: var(--muted); font-size: 13.5px; text-align: center; }
+.login-alt a { color: var(--accent); }
+
+/* Search page */
+.demo-note {
+  display: inline-block; margin: 14px 0 0; padding: 6px 12px; border-radius: 10px;
+  background: var(--accent-soft); color: var(--accent); font-size: 13.5px;
+}
+.search-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-top: 28px; padding: 16px 20px; overflow: visible; }
+.field { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; font-weight: 500; color: var(--muted); }
+.field-grow { flex: 1; min-width: 220px; }
+.field input, .field select {
+  font: inherit; font-size: 14px; color: var(--ink); background: var(--surface);
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: 9px;
+}
+.field input:focus, .field select:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+.btn-primary {
+  font: inherit; font-size: 14px; font-weight: 500; padding: 8px 18px; border: 0; border-radius: 9px;
+  background: var(--accent); color: var(--mark-ink); cursor: pointer;
+}
+.btn-primary:hover { opacity: 0.9; }
+.search-page .alert { margin-top: 20px; }
+.results { margin-top: 20px; }
+
+.result { padding: 14px 20px; border-top: 1px solid var(--border); }
+.result:first-child { border-top: none; }
+.result-head { display: flex; justify-content: space-between; gap: 12px; }
+.result-subject { margin-top: 1px; color: var(--muted); font-size: 13.5px; }
+.result-snippet { margin: 8px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--bg); font-size: 13.5px; line-height: 1.55; }
+.result-tags { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.score { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 760px) {
+  .search-form { padding: 14px 16px; }
+  .field, .btn-primary { width: 100%; }
+  .result { padding: 12px 16px; }
+  .result-head { flex-direction: column; gap: 0; }
+}

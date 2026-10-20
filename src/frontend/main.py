@@ -1,4 +1,5 @@
 """Fixture demo web app: sign in with Google, then see your calendar and inbox.
+The /search page searches fake demo mailboxes through the Fixture API, with no sign-in.
 
 Run from src/frontend with:
     uv run uvicorn main:app --port 8501 --reload
@@ -20,6 +21,7 @@ from googleapiclient.errors import HttpError
 from dotenv import load_dotenv
 from starlette.middleware.sessions import SessionMiddleware
 
+import api_client
 import google_data
 from credential_store import CredentialStore
 
@@ -76,6 +78,16 @@ ERRORS = {
     "cancelled": "Sign-in was cancelled.",
     "expired": "Your sign-in expired. Please try again.",
     "scopes": "Fixture needs both Calendar and Gmail access. Please allow both.",
+}
+
+# Friendly messages for the search page. Never show a stack trace.
+SEARCH_ERRORS = {
+    "api_down": "Search isn't available right now: the Fixture API or its database can't be reached. "
+                "Check that the api and chromadb services are running, then try again.",
+    "no_users": "No demo mailboxes have been indexed yet. Run the rag job to index the sample emails, "
+                "then reload this page.",
+    "unknown_user": "That demo user isn't indexed. Pick someone from the list.",
+    "api_error": "Something went wrong running that search. Please try a different query.",
 }
 
 # Signed-in users' Google credentials, encrypted in data/fixture.db.
@@ -143,6 +155,52 @@ def home(request: Request):
         "dashboard.html",
         {"user": store.load_profile(request.session["email"]), "calendar": calendar, "inbox": inbox},
     )
+
+
+@app.get("/search")
+def search_page(request: Request, user_id: str = "", q: str = "", label: str = ""):
+    """Search past threads in the fake demo mailboxes.
+
+    This page never uses the signed-in Google account, so it works without
+    signing in (Testing-mode logins expire). The API is called server-side.
+    """
+    page = {
+        "users": [],
+        "user_id": user_id,
+        "query": q.strip(),
+        "label": label if label in api_client.LABELS else "",  # ignore unknown labels
+        "labels": api_client.LABELS,
+        "results": None,  # None = no search yet; [] = searched, nothing found
+        "error": None,
+        "signed_in": bool(request.session.get("email")),
+    }
+
+    # 1. Fill the user picker from GET /users.
+    try:
+        page["users"] = api_client.list_users()
+    except api_client.ApiUnavailable:
+        page["error"] = SEARCH_ERRORS["api_down"]
+    except api_client.ApiError:
+        page["error"] = SEARCH_ERRORS["api_error"]
+    else:
+        if not page["users"]:
+            page["error"] = SEARCH_ERRORS["no_users"]
+        elif not page["user_id"]:
+            page["user_id"] = page["users"][0]["user_id"]  # default to the first user
+
+    # 2. Search, if there's a query. The API checks that user_id is known.
+    if page["query"] and page["users"]:
+        try:
+            results = api_client.search(page["user_id"], page["query"], label=page["label"] or None)
+            page["results"] = [api_client.format_result(r) for r in results]
+        except api_client.UnknownUser:
+            page["error"] = SEARCH_ERRORS["unknown_user"]
+        except api_client.ApiUnavailable:
+            page["error"] = SEARCH_ERRORS["api_down"]
+        except api_client.ApiError:
+            page["error"] = SEARCH_ERRORS["api_error"]
+
+    return templates.TemplateResponse(request, "search.html", page)
 
 
 @app.get("/auth/login")
