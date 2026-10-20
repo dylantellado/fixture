@@ -1,0 +1,57 @@
+{
+    "user_id": "user_01",
+    "query": "When and where do I meet my career advisor?",
+    "results": [
+        {
+            "text": "From: Dana Whitfield\nSubject: Fall recruiting kickoff: dates for your calendar\nDate: 2026-09-01T08:30:00-04:00\n\nHi everyone,\n\nWelcome back! Fall recruiting moves fast, so here are the dates to put in your calendar now:\n\n* Resume workshop: Thu Sep 10, 4:00-5:00 pm, Wexley Hall 120\n* Career Fair: Thu Sep 24, 1:00-4:00 pm, Wexley Hall (register online by Sep 21)\n* Interview prep night: Tue Oct 6, 6:00 pm, virtual\n\nDrop-in advising runs Monday to Thursday, 1:00-3:00 pm, no appointment needed.\nFor a 1:1 appointment, just reply to me or call the front desk at PHONE_008.\n\nStudying abroad this term? All of our workshops are recorded, and advisors can\nmeet by video. Mention your time zone when you write.\n\nWishing you a great start to the semester,",
+            "score": 0.536,
+            "metadata": {
+                "sender": "Dana Whitfield <EMAIL_023>",
+                "label": "none",
+                "thread_id": "t001",
+                "subject": "Fall recruiting kickoff: dates for your calendar",
+                "message_id": "1901c022a62edc40",
+                "source": "generated",
+                "sender_name": "Dana Whitfield",
+                "timestamp": "2026-09-01T08:30:00-04:00",
+                "chunk_index": 0,
+                "timestamp_epoch": 1788265800,
+                "user_id": "user_01"
+            }
+        },
+        {
+            "text": "From: Dana Whitfield\nSubject: Advising appointment\nDate: 2026-09-03T14:02:00-04:00\n\nHi Priya,\n\nLovely to hear from you, and welcome back. I'd be glad to meet. I have two openings next Tuesday, September 8: 3:00 or 3:30 pm Eastern. Either one would be in person, 30 minutes, in my office in Wexley Hall, Room 214 (second floor, at the end of the hall).\n\nIf you can, send me your current resume ahead of time so we can spend the meeting on edits instead of reading.\n\nWarmly,\nDana",
+            "score": 0.511,
+            "metadata": {
+                "sender": "Dana Whitfield <EMAIL_023>",
+                "source": "generated",
+                "timestamp": "2026-09-03T14:02:00-04:00",
+                "thread_id": "t002",
+                "message_id": "1a61982811036a4a",
+                "user_id": "user_01",
+                "label": "proposed_times",
+                "subject": "Advising appointment",
+                "sender_name": "Dana Whitfield",
+                "timestamp_epoch": 1788458520,
+                "chunk_index": 0
+            }
+        },
+        {
+            "text": "From: Priya Shah\nSubject: Advising appointment\nDate: 2026-09-03T16:40:00-04:00\n\nHi Dana,\n\n3:00 on Tuesday works well. I'll see you in Room 214, and I'll send my resume over the weekend.\n\nBest,\nPriya",
+            "score": 0.486,
+            "metadata": {
+                "user_id": "user_01",
+                "chunk_index": 0,
+                "timestamp": "2026-09-03T16:40:00-04:00",
+                "sender_name": "Priya Shah",
+                "sender": "Priya Shah <EMAIL_063>",
+                "source": "generated",
+                "message_id": "803ee4e596c6b3f1",
+                "timestamp_epoch": 1788468000,
+                "label": "acceptance",
+                "subject": "Advising appointment",
+                "thread_id": "t002"
+            }
+        }
+    ]
+}

@@ -1,0 +1,8 @@
+$ docker compose ps -a
+SERVICE      IMAGE                    STATUS                      PORTS
+api          fixture-app-api          Up 25 seconds (healthy)     0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+chromadb     chromadb/chroma:1.5.9    Up 52 seconds (healthy)     0.0.0.0:8001->8000/tcp, [::]:8001->8000/tcp
+frontend     fixture-app-frontend     Up 19 seconds               0.0.0.0:8501->8501/tcp, [::]:8501->8501/tcp
+ingest       fixture-app-ingest       Exited (0) 52 seconds ago   
+preprocess   fixture-app-preprocess   Exited (0) 51 seconds ago   
+rag          fixture-app-rag          Exited (0) 26 seconds ago   
