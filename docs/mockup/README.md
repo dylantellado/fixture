@@ -40,13 +40,14 @@ The web app runs at http://localhost:8501. It has three screens.
 
 ## What changed from the Milestone 1 wireframe
 
-<!-- TODO(Dylan): drafted without seeing ms1_wireframe.png. Check each point against the wireframe before submitting. -->
+The Milestone 1 wireframe shows the whole product in four steps: **connect Gmail & Calendar → set rules & priorities → Fixture schedules on its own → review the log or text it anytime**. It has four screens: Rules setup (P1–P3 priorities and preferences), Today (a calendar marking fixed, flexible, and changed-by-Fixture events), Activity log (actions, rule violations, blocked requests, Undo), and Text (a chat with Fixture).
 
-- **Search came before automation.** The wireframe went straight to Fixture booking meetings on its own. Building the skeleton showed that every later feature (drafting replies, checking rules, answering "when is my interview?") first needs to find the right past emails for the right user. So Milestone 2 adds a search page over indexed threads, and the booking flow waits for a later milestone.
-- **Demo data instead of the real inbox for search.** We planned to work on the signed-in user's Gmail. Our Google project is in Testing mode, so logins expire after about 7 days, and we don't want real email in our pipeline yet. The search page uses generated, anonymized mailboxes and says so on screen. The dashboard still shows the real (read-only) Google connection.
-- **One mailbox at a time, chosen by the app.** Each search runs against exactly one user's collection. The mailbox comes from the picker today (the signed-in account later), never from free text or an AI model, so one user's search can't surface another's mail.
-- **Labels became visible.** Our six scheduling labels (new request, proposed times, acceptance, reschedule, assistant handoff, not scheduling) are now a filter and a tag on each result, not a hidden internal step.
-- **Read-only dashboard as a connection check.** The wireframe's home screen was a schedule overview with Fixture's actions. The built dashboard is a simpler proof that Fixture can read Calendar and Gmail. Its scheduling tag uses keyword rules for now, a placeholder for the model-based labels.
+- **Step 1 is built.** Sign in with Google, then a read-only dashboard of upcoming events and recent emails. It's a simpler version of the Today screen: a list of events, without the fixed/flexible markers yet.
+- **A new screen came first: search.** The wireframe goes straight to Fixture scheduling on its own (step 3). Building the skeleton showed that the agent first needs a memory of past threads, for the right person only, before it can draft a reply or check a rule. So Milestone 2 adds "Search past threads" over an indexed, per-person store of emails.
+- **Rules setup, Activity log, and Text are not built yet.** They need the rule checker and the scheduling agent, which come in later milestones.
+- **A trust rule from the wireframe is already in place.** The Activity log's "Ignored: instruction inside email from unknown sender, email content can't trigger actions" is now a design rule: which mailbox to search always comes from the app, never from email text or an AI model, and each search opens only that one person's collection.
+- **Demo data instead of a real inbox for search.** Our Google project is in Testing mode, so logins expire after about 7 days, and we don't want real email in the pipeline yet. Search uses generated, anonymized mailboxes and says so on screen. The dashboard still shows the real, read-only Google connection.
+- **Scheduling labels became visible.** Each email has one of six labels (new request, proposed times, acceptance, reschedule, assistant handoff, not scheduling), shown as a tag on each result and usable as a filter.
 - **Error states were designed in.** Building it surfaced states the wireframe didn't have: expired sign-in, a permission left unticked, a calendar that only shares free/busy, the API being down, and nothing indexed yet. Each now has a plain-language message.
 
 ## Images
