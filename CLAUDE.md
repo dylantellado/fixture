@@ -40,7 +40,8 @@ This is the starting layout, not a final architecture. Folders and services may 
 ```
 docker-compose.yml   runs all services together, in pipeline order (see README)
 .env.example         template for .env (copy it, never commit .env)
-data/                local data (git-ignored); fixture.db holds the web app's encrypted logins
+data/                data/source/ holds the data-v1 inputs (committed until DVC is set up); everything
+                     else is local and git-ignored, e.g. fixture.db (the web app's encrypted logins)
 samples/             fake data safe to commit: users.json, messages_sample.jsonl (processed schema)
 secrets/             local credentials (git-ignored), see "Google access" below
 src/
