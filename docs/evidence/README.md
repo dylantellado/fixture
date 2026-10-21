@@ -15,6 +15,7 @@ All six services came up in order: `ingest` → `preprocess` → `rag` ran once 
 | File | What it shows |
 |------|---------------|
 | [`full_pipeline_run.log`](full_pipeline_run.log) | Logs from every service for that run: input and output sha256s, per-user counts, chunking, indexing into 4 collections, and the api and web app serving requests. One line was removed: rag's download progress bar for the embedding model, which is unreadable as text. |
+| [`running_containers.png`](running_containers.png) | Docker Desktop during the fresh-clone test (a new `git clone`, set up only from the README): `ingest`, `preprocess` and `rag` have finished, and `chromadb` and `api` are running. `api` only starts after `rag` succeeds. `frontend` is still starting in this shot; `compose_ps.txt` shows all six services from the full run. |
 | [`compose_ps.txt`](compose_ps.txt) | `docker compose ps -a` right after the run: the three jobs `Exited (0)`, and `chromadb`, `api` and `frontend` up. |
 | [`api_search_response.json`](api_search_response.json) | A real `POST /search` response from the running api, for `user_01`: "When and where do I meet my career advisor?" (k=3). |
 | [`../mockup/search_page.png`](../mockup/search_page.png) | The web app's "Search past threads" page with the same query, served by the `frontend` container and calling the `api` container. |
