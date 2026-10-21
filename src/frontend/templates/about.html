@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}How it works · Fixture{% endblock %}
+{% block body %}
+{% include "_nav.html" %}
+
+<main class="page">
+  <section class="page-head">
+    <div>
+      <h1>How Fixture works</h1>
+      <p class="muted">Fixture will handle the back-and-forth of scheduling emails for you, without ever breaking a rule you've set. First, it needs a memory of your past scheduling threads. That's what this milestone builds: a private, searchable index of each person's emails.</p>
+    </div>
+  </section>
+
+  <section class="card section">
+    <h2>From inbox to answer</h2>
+    <ol class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div><strong>Ingest</strong><p>Checks the generated email threads and removes duplicates.</p></div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div><strong>Preprocess</strong><p>Turns each thread into clean messages and replaces email addresses and phone numbers with placeholders. Every message keeps a scheduling label, like Proposed times or Reschedule.</p></div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div><strong>Index</strong><p>Turns each message into an embedding (all-MiniLM-L6-v2) and stores it in that person's own ChromaDB collection.</p></div>
+      </li>
+      <li>
+        <span class="step-num">4</span>
+        <div><strong>API</strong><p>Searches one person's collection per request and returns the closest messages, best first.</p></div>
+      </li>
+      <li>
+        <span class="step-num">5</span>
+        <div><strong>This app</strong><p>Lets you pick a mailbox and ask a question on the <a href="/search">Search</a> page.</p></div>
+      </li>
+    </ol>
+    <p class="muted small">All five run as separate Docker containers, started in order with one command: <code>docker compose up</code>.</p>
+  </section>
+
+  <div class="grid">
+    <section class="card section">
+      <h2>Private by design</h2>
+      <ul class="checks">
+        <li><strong>One collection per person.</strong> A search opens exactly one mailbox's collection, so it can't return someone else's email, even when two people write to the same contact.</li>
+        <li><strong>The app chooses the mailbox.</strong> Which mailbox to search always comes from the app, never from an AI model or from text inside an email.</li>
+        <li><strong>Anonymized and read-only.</strong> Addresses and phone numbers are replaced before indexing, and nothing here sends email or changes a calendar.</li>
+      </ul>
+    </section>
+
+    <section class="card section">
+      <h2>System status</h2>
+      <p class="status-line">
+        <span class="status {{ 'status-ok' if status.api_ok and not status.error else 'status-error' }}">
+          <span class="dot"></span>
+          {% if not status.api_ok %}API unreachable{% elif status.error %}Database unreachable{% else %}API and database up{% endif %}
+        </span>
+      </p>
+      {% if not status.api_ok %}
+      <p class="muted small">The Fixture API isn't answering. Check that the api service is running.</p>
+      {% elif status.error %}
+      <p class="muted small">{{ status.error }}</p>
+      {% elif not status.users %}
+      <p class="muted small">No mailboxes are indexed yet. Run the rag job to index the emails.</p>
+      {% else %}
+      <table class="status-table">
+        <thead><tr><th>Mailbox</th><th>ID</th><th>Indexed</th></tr></thead>
+        <tbody>
+          {% for u in status.users %}
+          <tr>
+            <td><a href="/search?user_id={{ u.user_id }}">{{ u.name or u.user_id }}</a></td>
+            <td><code>{{ u.user_id }}</code></td>
+            <td>{{ u.indexed }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+  </div>
+
+  <p class="footnote">All people, companies, and emails in the demo data are fictional. Harvard AC215 project by Dylan Tellado and Will Sherwood.</p>
+</main>
+{% endblock %}

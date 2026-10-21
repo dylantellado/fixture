@@ -1,21 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
-<header class="topbar">
-  <div class="brand">
-    {% include "_logo.html" %}
-    <span>Fixture</span>
-  </div>
-  <div class="account">
-    <a class="nav-link" href="/search">Search past threads</a>
-    {% if user.picture %}
-    <img class="avatar" src="{{ user.picture }}" alt="" referrerpolicy="no-referrer">
-    {% else %}
-    <span class="avatar avatar-fallback">{{ user.name[:1] | upper }}</span>
-    {% endif %}
-    <span class="account-email">{{ user.email }}</span>
-    <a class="btn-ghost" href="/auth/logout">Sign out</a>
-  </div>
-</header>
+{% include "_nav.html" %}
 
 <main class="dashboard">
   <section class="intro">

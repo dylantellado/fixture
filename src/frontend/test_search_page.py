@@ -57,7 +57,7 @@ def api(monkeypatch):
     searches = []
 
     def fake_search(user_id, query, k=5, label=None):
-        searches.append({"user_id": user_id, "query": query, "label": label})
+        searches.append({"user_id": user_id, "query": query, "k": k, "label": label})
         return [RESULT]
 
     monkeypatch.setattr(api_client, "list_users", lambda: USERS)
@@ -89,7 +89,9 @@ def test_results_render(api):
     assert "Acceptance" in page
     assert "0.797" in page
     assert "Great, let&#39;s do Tuesday" in page  # snippet, HTML-escaped
-    assert api == [{"user_id": "user_01", "query": "Northbridge interview", "label": None}]
+    assert "Show full text" in page
+    assert "0ed574b41b112de0" in page  # each result shows the message it came from
+    assert api == [{"user_id": "user_01", "query": "Northbridge interview", "k": 5, "label": None}]
 
 
 def test_label_filter_is_sent_and_unknown_labels_are_ignored(api):
@@ -160,9 +162,9 @@ def test_sign_in_page_links_to_search():
     assert 'href="/search"' in response.text
 
 
-def test_dashboard_links_to_search(monkeypatch):
-    """The signed-in dashboard still renders, now with a link to search.
-    Google is never called: the user's data is faked."""
+def test_dashboard_and_top_bar_when_signed_in(monkeypatch, api):
+    """The signed-in dashboard still renders, and the shared top bar shows the
+    account on every page. Google is never called: the user's data is faked."""
     email = "test.user@example.com"
     main.store.save(email, Credentials(token="fake"), name="Test User")  # temporary test database
     monkeypatch.setattr(main, "current_credentials", lambda request: "fake-credentials")
@@ -177,6 +179,74 @@ def test_dashboard_links_to_search(monkeypatch):
     response = signed_in.get("/")
     assert "Welcome, Test." in response.text
     assert 'href="/search"' in response.text
+    assert 'href="/" aria-current="page">Dashboard' in response.text
+
+    response = signed_in.get("/search")
+    assert email in response.text and "Sign out" in response.text
+    assert 'href="/search" aria-current="page">Search' in response.text
+
+
+def test_signed_out_top_bar(api):
+    response = client.get("/search")
+    assert 'href="/search" aria-current="page">Search' in response.text
+    assert ">Dashboard<" not in response.text  # only for signed-in users
+    assert ">Sign in<" in response.text
+
+
+def test_result_count_is_sent_and_limited(api):
+    client.get("/search", params={"user_id": "user_01", "q": "x", "k": "10"})
+    client.get("/search", params={"user_id": "user_01", "q": "x", "k": "7"})  # not offered
+    client.get("/search", params={"user_id": "user_01", "q": "x", "k": "abc"})  # not a number
+    assert [s["k"] for s in api] == [10, 5, 5]
+
+
+def test_example_questions_follow_the_mailbox(api, monkeypatch):
+    response = client.get("/search", params={"user_id": "user_02"})
+    assert "When does Professor Osei meet?" in response.text
+    # Each example is a link that runs that search in the same mailbox.
+    assert 'href="/search?user_id=user_02&amp;q=When+does+Professor+Osei+meet%3F&amp;k=5"' in response.text
+
+    # A mailbox without its own examples gets the general ones.
+    monkeypatch.setattr(api_client, "list_users", lambda: [{"user_id": "user_09", "name": "New", "indexed_at": ""}])
+    response = client.get("/search")
+    assert main.GENERAL_QUESTIONS[0] in response.text
+
+
+def test_mailbox_shows_when_it_was_indexed(api):
+    response = client.get("/search", params={"user_id": "user_01"})
+    assert "Indexed Tue, Oct 20, 2026 · 1:20 AM UTC" in response.text
+
+
+def test_guide_shows_before_the_first_search(api):
+    assert "How to search" in client.get("/search").text
+    assert "How to search" not in client.get("/search", params={"q": "interview"}).text
+
+
+# --- How it works ------------------------------------------------------------------
+
+
+def test_about_page_shows_status_and_mailboxes(api, monkeypatch):
+    monkeypatch.setattr(api_client, "is_healthy", lambda: True)
+    response = client.get("/about")
+    assert response.status_code == 200
+    assert "How Fixture works" in response.text
+    assert "API and database up" in response.text
+    assert "Marcus Bell" in response.text and "user_02" in response.text
+    assert 'href="/about" aria-current="page">How it works' in response.text
+
+
+def test_about_page_when_api_is_down(monkeypatch):
+    monkeypatch.setattr(api_client, "is_healthy", lambda: False)
+    response = client.get("/about")
+    assert response.status_code == 200
+    assert "API unreachable" in response.text
+
+
+def test_about_page_when_database_is_down(monkeypatch):
+    monkeypatch.setattr(api_client, "is_healthy", lambda: True)
+    monkeypatch.setattr(api_client, "list_users", raise_(api_client.ApiUnavailable("503")))
+    response = client.get("/about")
+    assert "Database unreachable" in response.text
 
 
 # --- api_client ------------------------------------------------------------------
@@ -197,8 +267,14 @@ def test_format_result():
         "date": "Tue, Oct 13, 2026 · 3:05 PM",
         "subject": "Re: Northbridge Capital first-round interview",
         "label": "Acceptance",
+        "label_key": "acceptance",
         "score": "0.797",
+        "strength": 80,
         "snippet": "Great, let's do Tuesday, October 20 at 2:30 pm Eastern.",
+        "body": "Great, let's do Tuesday, October 20 at 2:30 pm Eastern.",
+        "message_id": "0ed574b41b112de0",
+        "thread_id": "",
+        "chunk_index": 0,
     }
 
 
@@ -217,3 +293,19 @@ def test_long_snippet_is_cut_on_a_word():
 def test_bad_timestamp_is_shown_as_is():
     assert api_client.readable_date("") == ""
     assert api_client.readable_date("not a date") == "not a date"
+
+
+def test_full_text_keeps_line_breaks_and_drops_the_header():
+    text = "From: A\nSubject: S\nDate: D\n\nHi,\n\nSee you then."
+    assert api_client.message_body(text) == "Hi,\n\nSee you then."
+
+
+def test_match_bar_width_stays_between_0_and_100():
+    assert api_client.format_result({**RESULT, "score": 1.2})["strength"] == 100
+    assert api_client.format_result({**RESULT, "score": -0.1})["strength"] == 0
+
+
+def test_format_user():
+    user = {"user_id": "user_01", "name": "Priya Shah", "indexed_at": "2026-10-20T02:25:39+00:00"}
+    assert api_client.format_user(user)["indexed"] == "Tue, Oct 20, 2026 · 2:25 AM UTC"
+    assert api_client.format_user({**user, "indexed_at": ""})["indexed"] == ""
