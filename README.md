@@ -22,7 +22,7 @@ Where each Milestone 2 requirement lives in this repo:
 ## Layout
 
 ```
-data/        local data (git-ignored; DVC for data/source is planned)
+data/        data/source/ holds the data-v1 inputs (in git); everything else in data/ is local and git-ignored
 docs/        data notes, evidence of pipeline runs, and the app mock-up
 samples/     fake sample data checked into the repo
 secrets/     local credentials (git-ignored)
@@ -44,8 +44,7 @@ Each service under `src/` is its own [uv](https://docs.astral.sh/uv/) project wi
    cp .env.example .env
    ```
 
-2. Put the generated source data in `data/source/`: `users.json` and `generated_threads.jsonl` (data-v1, see `docs/data/corpus_notes.md`). It isn't in git. Until DVC is set up, get the two files from Will. Later this step becomes `dvc pull`.
-3. Run the whole pipeline and app with one command. `GIT_COMMIT` is recorded in `data/processed/manifest.json`, so you can see which code produced the data:
+2. Run the whole pipeline and app with one command. `GIT_COMMIT` is recorded in `data/processed/manifest.json`, so you can see which code produced the data. The input data (data-v1, see `docs/data/corpus_notes.md`) is already in `data/source/`:
 
    ```sh
    GIT_COMMIT=$(git rev-parse HEAD) docker compose up --build
@@ -76,7 +75,7 @@ This is the source of truth for how the data side (Will) and the search side (Dy
 | File | Written by | Contents |
 |------|------------|----------|
 | `data/source/users.json` | data generation | The fake users: a JSON list of `{"user_id", "name", "email"}`. |
-| `data/source/generated_threads.jsonl` | data generation | One JSON object per thread: `user_id`, `thread_id`, `subject`, `participants`, `messages` (each: `sender`, `recipients`, `timestamp`, `body`, `label`). `timestamp` is the email "Date" header format, e.g. `Tue, 13 Oct 2026 09:12:00 -0400`. Versioned with DVC, never git. |
+| `data/source/generated_threads.jsonl` | data generation | One JSON object per thread: `user_id`, `thread_id`, `subject`, `participants`, `messages` (each: `sender`, `recipients`, `timestamp`, `body`, `label`). `timestamp` is the email "Date" header format, e.g. `Tue, 13 Oct 2026 09:12:00 -0400`. Committed to git for now (data-v1, fictional, ~300 KB) so a fresh clone runs end to end; DVC will take over once its storage bucket exists. |
 | `data/raw/threads.jsonl` | `ingest` | Same shape as the source threads, validated and deduplicated, sorted by `(user_id, thread_id)`, with `user_id` kept. Adds `source` (`"generated"`) and `provenance` (`file`, `line`, `sha256` of the thread). |
 | `data/processed/messages.jsonl` | `preprocess` | One JSON object per message (schema below). This is what `rag` indexes. |
 | `data/processed/manifest.json` | `preprocess` | Counts, file hashes, and provenance (below). |

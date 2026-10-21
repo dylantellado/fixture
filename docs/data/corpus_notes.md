@@ -6,7 +6,7 @@ is fictional: people, firms, addresses (`.example` domains) and phone numbers
 (reserved fictional ranges).
 
 **Size:** 4 users, 160 threads (40 each), 377 messages, Sep 1 to Oct 18, 2026.
-The data lives in `data/` (DVC, not git); a small sample is in
+The data-v1 inputs are committed in `data/source/` (DVC will take over once its storage bucket exists); a small sample is in
 `samples/generated_threads_sample.jsonl`.
 
 ## Users
