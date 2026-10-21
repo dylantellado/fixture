@@ -1,6 +1,9 @@
 # Local data and credentials
-# Leading slash: only the top-level data folder, not docs/data/
-/data/
+# Leading slash: only the top-level data folder, not docs/data/.
+# Everything in data/ stays local except data/source/: the fictional data-v1
+# inputs, committed so a fresh clone runs end to end (until DVC is set up).
+/data/*
+!/data/source/
 secrets/
 .env
 
