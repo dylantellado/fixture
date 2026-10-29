@@ -17,7 +17,7 @@ users and contacts, other writing styles, a later date range, and many hard nega
 | `users.json` | 4 fictional students, `eval_01` to `eval_04` (same format as `data/source/users.json`) |
 | `threads.jsonl` | 140 threads, 298 messages, in the source-thread format from the Data contract. `label` is the final label. Nothing else is in it, so a classifier never sees the notes below. |
 | `annotations.jsonl` | One line per message, keyed by `user_id` + `thread_id` + `position` (0-based index in the thread): `writer_agent`, `category`, `difficulty` (easy/hard), `needs_response`, `intended_label` (writer), `labeler_label` (independent labeler), `final_label`, `rationale`, `rules_version` (the version of `docs/data/labeling_rules.md` the values follow) |
-| `changes_rules_v1.0.json` | Every change made when the set was re-checked against labeling rules v1.0 (see below) |
+| `changes_rules_v1.0.json`, `changes_rules_v1.1.json` | Every change made when the set was re-checked against labeling rules v1.0 and v1.1 (see below) |
 | `check.py` | Checks the set (format, rules below, counts, agreement, leakage). `python3 data/eval/v1/check.py final` |
 | `build.py` | How the writers' drafts became the two files above (merge and renumber, apply labels, apply rule changes) |
 
@@ -63,14 +63,14 @@ time and European winter time offsets.
    rules (below) and recorded in the rationale. `build.py finalize` then wrote `threads.jsonl`
    and `annotations.jsonl`.
 5. `check.py final`, `src/ingest/validate.py`, `ingest` and `preprocess` were run on the result.
-6. **Re-check against labeling rules v1.0.** Another independent agent applied the rules to all 298 messages without seeing the current values. I settled each difference by the written rules, recorded the changes in `changes_rules_v1.0.json`, and applied them with `build.py apply-changes` (see "Changes for labeling rules v1.0").
+6. **Re-checks against labeling rules v1.0 and v1.1.** Each time, an independent agent applied the rules to all 298 messages without seeing the current values. I settled each difference by the written rules, recorded the changes in `changes_rules_v1.0.json` and `changes_rules_v1.1.json`, and applied them with `build.py apply-changes` (see "Changes for labeling rules").
 
 ## Label rules
 
-**[`docs/data/labeling_rules.md`](../../../docs/data/labeling_rules.md) (v1.0) is the
+**[`docs/data/labeling_rules.md`](../../../docs/data/labeling_rules.md) (v1.1) is the
 source of truth** for every `label` and `needs_response` in this set. Every value follows
-it (`rules_version` in `annotations.jsonl`). Its "Proposed (not yet adopted)" section lists
-open gaps; those are not applied here.
+it (`rules_version` in `annotations.jsonl`). Its "Not adopted in v1.1" section lists
+proposals that were deliberately left out; they are not applied here.
 
 Before v1.0, the writers and the first labeler had worked under two clarifications that v1.0
 replaced: vague pleasantries were `none` (now E8: `new_request`), and cold sales asks were
@@ -78,21 +78,21 @@ labeled by intent (now E9: `none`).
 
 ## Final counts
 
-These are under labeling rules v1.0.
+These are under labeling rules v1.1.
 
 | Label | Messages | Share |
 |---|---|---|
 | `none` | 117 (82 hard, 35 easy) | 39% |
-| `proposed_times` | 40 | 13% |
+| `proposed_times` | 42 | 14% |
 | `acceptance` | 36 | 12% |
-| `new_request` | 36 | 12% |
 | `reschedule` | 35 | 12% |
 | `assistant_handoff` | 34 | 11% |
+| `new_request` | 34 | 11% |
 | **Total** | **298** in 140 threads | |
 
-- Every label has at least 30 messages, and hard negatives are 70% of `none` (82/117).
+- Every label has at least 30 messages, and hard negatives are 70.1% of `none` (82/117), just above the 70% floor.
 - **Difficulty:** 130 hard and 168 easy.
-- **`needs_response`:** 57 true and 241 false. 91 of the 298 messages were sent by the users
+- **`needs_response`:** 65 true and 233 false. 91 of the 298 messages were sent by the users
   themselves, and those are always false (NR1).
 - **Categories:** 93 categories. `python3 data/eval/v1/check.py final` prints the counts per
   category, writer and user. The largest hard-negative groups are the automated ones:
@@ -113,8 +113,8 @@ These are under labeling rules v1.0.
 ## Labeler agreement and disagreements
 
 The writer and the independent labeler agreed on **295 of 298 messages (99.0%)**. That was
-before labeling rules v1.0, which changed 8 more labels. The final label now matches the
-writer's intended label on 287 of 298 messages.
+before labeling rules v1.0 and v1.1, which changed 8 and 2 more labels. The final label now
+matches the writer's intended label on 285 of 298 messages.
 
 That number is surely higher than two people would get. Both sides are Claude models
 working from the same written rules, and the writers wrote each message to fit a label.
@@ -129,7 +129,9 @@ All three disagreements were kept, because they are the most useful cases:
 | `eval_02/t012/0` assistant forwards her boss's "find 30 min with Devon" note and asks for availability | new_request | assistant_handoff | `assistant_handoff` | It is the first message telling Devon that scheduling goes through the assistant, the same as the other assistants who introduce themselves. |
 | `eval_04/t003/0` registrar: STAT 320 lecture moves from 9:00 to 11:00 | none | reschedule | `reschedule` | A group notice moving a recurring class meeting matches the group-announcement rule. The two room-only registrar notices (`eval_01/t023/0`, `eval_03/t006/0`) keep the same time and stay `none`. |
 
-## Changes for labeling rules v1.0
+## Changes for labeling rules
+
+### v1.0
 
 18 changes to 16 messages. Rule ids are from `docs/data/labeling_rules.md`. `message_id` is the
 id `preprocess` gives the message (Data contract rule), and the second column is
@@ -158,6 +160,36 @@ id `preprocess` gives the message (Data contract rule), and the second column is
 
 Why each changed is in that message's `rationale` and in `changes_rules_v1.0.json`.
 
+### v1.1
+
+10 changes to 9 messages, from the rules adopted in v1.1 (E13 to E16, NR3, NR5 to NR8).
+
+| message_id | Message | Field | Old → new | Rule |
+|---|---|---|---|---|
+| `242ee72c955e52c6` | eval_01/t012/1 | label | `new_request` → `proposed_times` | E16 |
+| `21b0d7a30432234b` | eval_02/t004/0 | label | `new_request` → `proposed_times` | E16 |
+| `21b0d7a30432234b` | eval_02/t004/0 | needs_response | `false` → `true` | NR5 |
+| `f18c7049b14478c3` | eval_01/t028/2 | needs_response | `false` → `true` | NR8 |
+| `073b191de6af31b0` | eval_02/t032/2 | needs_response | `false` → `true` | NR8 |
+| `ceae82382155e138` | eval_03/t001/2 | needs_response | `false` → `true` | NR3 |
+| `ec44b5c988e39d56` | eval_03/t005/1 | needs_response | `false` → `true` | NR3 |
+| `4e4b812a6be79657` | eval_03/t008/3 | needs_response | `false` → `true` | NR3 |
+| `1c1469a06714b27f` | eval_03/t010/3 | needs_response | `false` → `true` | NR3 |
+| `8fe96589b1fc4c72` | eval_03/t019/2 | needs_response | `false` → `true` | NR3 |
+
+The v1.1 re-check agent proposed 3 more label changes, which were **not** made:
+- **`eval_03/t020/2` `reschedule` → `proposed_times`:** the same T1 case as in v1.0.
+- **`eval_03/t029/2` `assistant_handoff` → `none`:** a reading of T2's "first notice". No v1.1 rule touches it, and two earlier passes agreed on `assistant_handoff`.
+- **`eval_04/t026/0` `acceptance` → `none` (E14):** E14 needs a time that was already agreed, and nothing in the thread shows that agreement (E15: agreement isn't inferred from outside the new text). It stays `acceptance` (D3) and is listed below as a known ambiguity.
+
+E13 (still on? check-ins) and E14 (restated agreed time) changed nothing. The only "still on?"
+messages (`eval_01/t033/0`, `eval_04/t014/0`) are sent by the users, so they are `false` under
+NR1. The restated-time messages were already `none`/`false`. E15 changed nothing either:
+every message whose earlier agreement is only quoted is labeled by what its own new text
+says (e.g. `eval_04/t019/0` "I need to move our check-in on Thursday at 2").
+
+Why each v1.1 change was made is in the `rationale` and in `changes_rules_v1.1.json`.
+
 The re-check agent proposed one more label change, which was **not** made:
 `eval_03/t020/2` `reschedule` → `proposed_times`. Noor accepted the new Wednesday 5pm time in
 the previous message, so asking to move it again is `reschedule` under T1's last sentence.
@@ -172,33 +204,32 @@ The edge-case rules were checked on every message they could apply to:
 
 ## Known ambiguities
 
-These follow the adopted rules but are close calls. Where a proposed rule in
-`labeling_rules.md` would settle one, its id is given (final label in brackets):
+These follow the adopted rules (v1.1) but are close calls. Where a proposal that was not
+adopted in v1.1 would bear on one, its id is given (final label in brackets):
 
 - `eval_01/t002/2` [assistant_handoff]: the PI asks the research coordinator to find time with Talia, but she is also the person Talia meets (P4).
+- `eval_03/t017/1` [assistant_handoff]: a forwarded deadline notice whose real point is asking a postdoc to find an hour with Noor (P4).
 - `eval_01/t016/0` [assistant_handoff]: "get the time from my roommate, she's booking the room" (P7).
-- `eval_02/t004/0` [new_request, needs_response false]: an automated interview invite with a self-scheduling link. NR4 makes it `false` even though the user must act (P5).
-- `eval_01/t028/2` and `eval_02/t032/2` [new_request, needs_response false]: vague catch-ups (E8) that are an aside or put off to the new year (P10).
 - `eval_03/t003/0` [none]: a thank-you that says "we'll be in touch in December to arrange a call" (P6).
-- `eval_03/t002/0` [new_request]: Noor's own sponsorship pitch. E9 is about sales asks to the user (P9).
 - `eval_03/t016/0` [none]: a seminar announcement with a sign-up sheet for meeting the speaker (P8).
+- `eval_03/t002/0` [new_request]: Noor's own sponsorship pitch. E9 is about sales asks to the user (P9).
 - `eval_03/t010/1`, `eval_03/t021/0`, `eval_03/t029/2` [assistant_handoff]: a secretary, a conference secretariat or a chief of staff takes over and asks for availability. In `t029/2`, the previous message had already named her, so "first notice" (T2) is a judgment call.
 - `eval_03/t011/2` [new_request]: turns down the replacement times in a reschedule and asks for more (T1, E7).
-- `eval_03/t017/1` [assistant_handoff]: a forwarded deadline notice whose real point is asking a postdoc to find an hour with Noor (P4).
-- `eval_03/t005/1`, `eval_03/t010/3`, `eval_03/t019/2` [acceptance, needs_response false]: confirm a time and ask the user to send the invite or link (P11).
-- `eval_04/t026/0` [acceptance]: "Confirming your final round" is the only place in the thread that sets the time (P2 and P3 could make it `none`).
-- "Still on for Thursday at 3?" check-ins (`confirmation_question`) are `none` (P1). In this set they are all sent by the user, so `needs_response` is false either way.
-- `tz_logistics_after_confirmed` messages that restate an agreed time are `none`, not `acceptance` (P2).
-- In a few threads, the time being accepted or moved appears only in quoted history from before Nov 2 (P3).
+- `eval_03/t020/2` [reschedule]: asks to move a group sync that was confirmed one message earlier (T1). Two re-check agents read it as `proposed_times`.
+- `eval_04/t026/0` [acceptance]: "Confirming your final round" is the only place in the thread that sets the time. E14 would make it `none` only if an earlier agreement were visible.
+- `eval_01/t012/1` [proposed_times]: a person, not a system, sends the booking link. E16 covers both.
+- `eval_01/t028/2` [new_request, needs_response true]: mostly "I'll get back to you", plus "we should get the whole lab out for coffee sometime" (E8, NR8).
+- `eval_01/t018/1` [assistant_handoff, needs_response false]: the professor copies his assistant who will arrange the call, and adds "please revert to her". It could be read as asking the user to write first.
+- `eval_01/t007/2` [reschedule, needs_response false]: the onsite moves to a fixed new date, and a reply is needed only if it conflicts.
 
 ## Limitations
 
 - **Everything is written by language models.** It looks different from data-v1, but it is
   still model-written email. Real inboxes are messier and about 90% non-scheduling, while this
   set is 39% `none`. Report per-label precision and recall rather than accuracy alone.
-- **`needs_response` follows NR1 to NR4,** and an independent re-check of all 298 messages
-  backs it up. The close calls are listed above. The rules leave room for judgment on
-  "must reply" (P10, P11), so expect some disagreement from a human reader.
+- **`needs_response` follows NR1 to NR8 (v1.1).** Two independent re-checks of all 298 messages
+  back it up, and the close calls are listed above. Expect some disagreement from a human
+  reader on "must reply".
 - **`category` is the writer's tag** and wasn't changed when a label changed (e.g.
   `eval_02/t002/4` keeps `implicit_reschedule`).
 - **Writer style tracks the label mix.** 39 of the 40 `auto` messages are `none` (the

@@ -1,0 +1,112 @@
+[
+ {
+  "user_id": "eval_01",
+  "thread_id": "t012",
+  "position": 1,
+  "field": "label",
+  "old": "new_request",
+  "new": "proposed_times",
+  "rule": "E16",
+  "why": "the assistant invites the user to pick a slot through Dr. Ashcombe's booking link",
+  "rules_version": "1.1"
+ },
+ {
+  "user_id": "eval_02",
+  "thread_id": "t004",
+  "position": 0,
+  "field": "label",
+  "old": "new_request",
+  "new": "proposed_times",
+  "rule": "E16",
+  "why": "the applicant-tracking system invites the user to select an interview time through a scheduling link",
+  "rules_version": "1.1"
+ },
+ {
+  "user_id": "eval_02",
+  "thread_id": "t004",
+  "position": 0,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR5",
+  "why": "a scheduling-link invite: the user must pick a slot",
+  "rules_version": "1.1"
+ },
+ {
+  "user_id": "eval_01",
+  "thread_id": "t028",
+  "position": 2,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR8",
+  "why": "a catch-up suggestion from a real person writing to the user personally",
+  "rules_version": "1.1"
+ },
+ {
+  "user_id": "eval_02",
+  "thread_id": "t032",
+  "position": 2,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR8",
+  "why": "a catch-up suggestion from a real person writing to the user personally",
+  "rules_version": "1.1"
+ },
+ {
+  "user_id": "eval_03",
+  "thread_id": "t001",
+  "position": 2,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR3",
+  "why": "confirms the time and waits for the user to send the invitation",
+  "rules_version": "1.1"
+ },
+ {
+  "user_id": "eval_03",
+  "thread_id": "t005",
+  "position": 1,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR3",
+  "why": "confirms the time and asks the user to send the meeting link",
+  "rules_version": "1.1"
+ },
+ {
+  "user_id": "eval_03",
+  "thread_id": "t008",
+  "position": 3,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR3",
+  "why": "confirms the date and asks the user to book the room and send the hybrid link",
+  "rules_version": "1.1"
+ },
+ {
+  "user_id": "eval_03",
+  "thread_id": "t010",
+  "position": 3,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR3",
+  "why": "confirms the time and asks the user to send the meeting link",
+  "rules_version": "1.1"
+ },
+ {
+  "user_id": "eval_03",
+  "thread_id": "t019",
+  "position": 2,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR3",
+  "why": "confirms the time and asks the user to send the meeting invitation",
+  "rules_version": "1.1"
+ }
+]
