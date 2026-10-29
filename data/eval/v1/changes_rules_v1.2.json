@@ -1,0 +1,79 @@
+[
+ {
+  "user_id": "eval_01",
+  "thread_id": "t002",
+  "position": 2,
+  "field": "label",
+  "old": "assistant_handoff",
+  "new": "new_request",
+  "rule": "E17",
+  "why": "Odile introduces Talia to the CRC Rosalind, who will meet her herself",
+  "rules_version": "1.2"
+ },
+ {
+  "user_id": "eval_02",
+  "thread_id": "t023",
+  "position": 1,
+  "field": "label",
+  "old": "assistant_handoff",
+  "new": "new_request",
+  "rule": "E17",
+  "why": "Devon introduces Sunniva to Ravi, who will take her into his own case session",
+  "rules_version": "1.2"
+ },
+ {
+  "user_id": "eval_03",
+  "thread_id": "t017",
+  "position": 1,
+  "field": "label",
+  "old": "assistant_handoff",
+  "new": "new_request",
+  "rule": "E17",
+  "why": "the advisor introduces Noor to the postdoc Saoirse, who will sit through the practice run herself",
+  "rules_version": "1.2"
+ },
+ {
+  "user_id": "eval_04",
+  "thread_id": "t019",
+  "position": 1,
+  "field": "label",
+  "old": "assistant_handoff",
+  "new": "new_request",
+  "rule": "E17",
+  "why": "the advisor hands Jalen to the coordinator Caspian, who will see him instead",
+  "rules_version": "1.2"
+ },
+ {
+  "user_id": "eval_01",
+  "thread_id": "t007",
+  "position": 2,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR9",
+  "why": "moves the onsite to a new date without asking, only saying to reply if it conflicts",
+  "rules_version": "1.2"
+ },
+ {
+  "user_id": "eval_03",
+  "thread_id": "t020",
+  "position": 0,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR9",
+  "why": "moves the committee sync to Wednesday 5pm, sent to the user and one other member, not a list",
+  "rules_version": "1.2"
+ },
+ {
+  "user_id": "eval_04",
+  "thread_id": "t025",
+  "position": 0,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR9",
+  "why": "moves practice to 6:30am, sent to the user and one teammate, not a list",
+  "rules_version": "1.2"
+ }
+]

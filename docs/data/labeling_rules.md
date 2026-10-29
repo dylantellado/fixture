@@ -1,6 +1,6 @@
 # Labeling rules
 
-**Version 1.1, 2026-10-29.** The single source of truth for the correct answer for every
+**Version 1.2, 2026-10-29.** The single source of truth for the correct answer for every
 message: its `label` and its `needs_response`. Any rule change must update this file, bump
 the version, add a change log entry, and re-check the messages it affects.
 
@@ -34,7 +34,7 @@ When a message has more than one scheduling part, pick the first label that appl
 ## 2. needs_response
 
 `needs_response` is about the mailbox owner (the user). A message the user sent is always
-`false` (NR1), even if another rule below would make it `true`. Otherwise NR2 to NR8 settle
+`false` (NR1), even if another rule below would make it `true`. Otherwise NR2 to NR9 settle
 the cases named in them, and NR1 covers everything else.
 
 - **NR1 (general):** `true` when the user must reply to move a meeting forward: propose,
@@ -54,10 +54,14 @@ the cases named in them, and NR1 covers everything else.
 - **NR7 (restated agreed time, E14):** `false`.
 - **NR8 (catch up sometime, E8):** `true` when a real person writes to the user personally.
   `false` when the message is automated, marketing or a mass email.
+- **NR9 (directive move):** a message that moves one of the user's meetings to a new time
+  without asking ("let's move it to 3pm") is `true`, even if it adds "let me know if that's a
+  problem". It doesn't cover notices sent to a mailing list or group address (E4, T3),
+  automated notices (NR4), or moves of meetings the user is only copied on.
 
 ## 3. Edge cases
 
-Specific rules come before the general ones. E1 to E10, E12 to E16 and the tie-breaks T1 to
+Specific rules come before the general ones. E1 to E10, E12 to E17 and the tie-breaks T1 to
 T3 (section 4) win over E11. When two scheduling parts remain, PR decides between them.
 
 - **E1 (logistics after confirmation):** logistics after a time is confirmed (video link,
@@ -96,8 +100,15 @@ T3 (section 4) win over E11. When two scheduling parts remain, PR decides betwee
   forwarded text.
 - **E16 (scheduling-link invites):** an invitation to pick a slot through a scheduling link
   ("pick a slot here") → `proposed_times`, because the link is the sender offering times. Its
-  `needs_response` is `true` (NR5). This holds whether a person or a system sends it. Marketing
-  and cold sales that link to a booking page stay `none` (E3, E9).
+  `needs_response` is `true` (NR5). This holds whether a person (e.g. an assistant) or a system
+  sends it. Marketing and cold sales that link to a booking page stay `none` (E3, E9).
+- **E17 (introductions):** an introduction suggesting two people meet → `new_request`. The
+  person introduced will hold the meeting themselves, e.g. "I'd like you to meet Leah, over
+  to you to find a time", or "copying Mateo so you two can set something up". Someone
+  coordinating on another person's behalf → `assistant_handoff` (D5), e.g. an assistant,
+  scheduler or recruiting coordinator arranging a meeting with someone else. Decide by what
+  the person will do, not by their title. That includes a co-TA or coordinator who will see
+  the student themselves, which E17 makes `new_request` despite D5's example list.
 
 ## 4. Tie-break rules
 
@@ -117,7 +128,7 @@ These are the general rules behind the writer and labeler disagreements settled 
   notice that changes only the room or other details, or a calendar-app notification
   reporting a change someone made, is `none` (E1, E2).
 
-## 5. Not adopted in v1.1
+## 5. Not adopted (as of v1.2)
 
 These were proposed while applying v1.0 and deliberately **not adopted in v1.1**. They are
 not in force, and the eval answers they would affect stay as the adopted rules give them.
@@ -125,10 +136,8 @@ To adopt one, move it into the sections above, bump the version, and re-check th
 messages. (P1, P2, P3, P5, P10 and P11 were adopted in v1.1 as E13, E14, E15, E16, NR8 and
 NR3, with the decisions recorded in the change log.)
 
-- **P4 (handoff to the meeting party):** asking a colleague to set up a meeting between
-  *that colleague* and the user would be `new_request`, because the colleague isn't scheduling
-  for someone else. D5 would apply only when the person taking over arranges the meeting for
-  someone else. Affects `eval_01/t002/2` (today `assistant_handoff`).
+- **P4 (handoff to the meeting party):** superseded in v1.2 by E17 (introductions), which
+  settles the same case (`eval_01/t002/2` is now `new_request`).
 - **P6 (we'll be in touch):** a sender's promise to set up a meeting later ("we'll be in touch
   in December to arrange a call") would be `none`. Concerns `eval_03/t003/0` (today `none`).
 - **P7 (anyone can take over):** D5 would cover anyone who takes over the scheduling, not only
@@ -142,17 +151,25 @@ NR3, with the decisions recorded in the change log.)
 
 ## 6. Training data (data-v1)
 
-Training labels and `needs_response` are maintained in PR #14 (`training-labels-v1.1`). That PR
-applies v1.1 to all 377 training messages:
-- 2 label corrections: `78c903101dc57a53` `none` → `new_request` (E11) and `ffbb97746b68b458`
-  `none` → `reschedule` (E4, T3).
-- `needs_response` for every message, in `data/source/annotations.jsonl` (108 `true`, 269 `false`).
+Training labels and `needs_response` follow this file as of v1.2 (PR #14). That PR covers all
+377 training messages:
 
-Left unchanged as judgment calls, listed in that PR:
-- `dedb6df0524a507a` (user_01/t024/0): a group email moving this week's office hours, with the TA covering. It leans `reschedule` under E4/T3, but stays `assistant_handoff`.
-- `166482ab09374bcc` (`assistant_handoff`)
-- `03783fec7a218790` and `9ec4921c2af5fb14`: introductions that are labeled inconsistently.
-- 11 `needs_response` values.
+- **Label corrections:** 14 in total.
+  - v1.1: `78c903101dc57a53` → `new_request` (E11) and `ffbb97746b68b458` → `reschedule` (E4, T3).
+  - v1.2: `dedb6df0524a507a` → `reschedule` (E4, T3), `166482ab09374bcc` → `acceptance` (D3, PR),
+    and 10 introductions `assistant_handoff` → `new_request` (E17): `03783fec7a218790`,
+    `93f25b0d0032ce69`, `6036baac6f4ce32a`, `9d817cdfb67a8e11`, `2b1bc892af42b94d`,
+    `5c59fc9c128c0aaa`, `2674fadcdafd1e36`, `3ba2c3724b1721c5`, `400cd99558be9f06` and
+    `7ed0ed3364919fee`.
+- **`needs_response`** for every message, in `data/source/annotations.jsonl`: 109 `true` and
+  268 `false`.
+
+These `needs_response` values are judgment calls that aren't directive moves, so NR9 doesn't
+settle them. They are kept as set:
+- `93f25b0d0032ce69`, `03783fec7a218790` and `9ec4921c2af5fb14` (`true`): introductions where
+  nobody is named to go first.
+- `72837e8226d6398f` (`true`): an interview invitation with no times.
+- `43a367a134dde704` (`false`): TAs splitting course sections, which is not a meeting.
 
 ## Change log
 
@@ -160,3 +177,4 @@ Left unchanged as judgment calls, listed in that PR:
 |---|---|---|---|
 | 2026-10-28 | 1.0 | Created this file. Moved D1 to D6, PR and E1 to E7 unchanged from `docs/data/generation/corpus_plan.md`. Added NR1 to NR4, E8 to E12 and T1 to T3. E8 and E9 replace eval v1's earlier "vague pleasantry → none" and "cold sales by intent" decisions. Re-checked all 298 eval v1 messages; training data not changed (section 6). | Eval v1: 16 messages, 18 changes (8 labels, 10 needs_response), listed in `data/eval/v1/README.md` and `data/eval/v1/changes_rules_v1.0.json`. Training: 0 changed, 2 conflicts listed. |
 | 2026-10-29 | 1.1 | Adopted P1 as E13 (still on? check-ins: `none`, NR6 `true`), P2 as E14 (restated agreed time: `none`, NR7 `false`), P3 as E15 (label only the new text; quoted agreement doesn't set the label), P5 as E16 (scheduling-link invites: `proposed_times`, NR5 `true`, replacing that part of NR4), P10 as NR8 (catch-ups: `true` from a real person writing personally, `false` from automated or mass mail) and P11 into NR3 (asking the user to send the invite makes it `true`). A message the user sent stays `false` (NR1) whatever the other rules say. P4, P6, P7, P8 and P9 were not adopted. Re-checked all 298 eval v1 messages and all 377 training messages. | Eval v1: 9 messages, 10 changes (2 labels, 8 needs_response), listed in `data/eval/v1/README.md` and `changes_rules_v1.1.json`. Training (PR #14): 2 labels changed, `needs_response` added to all 377 messages. |
+| 2026-10-29 | 1.2 | Added E17 (introductions: `new_request` when the person introduced will hold the meeting, `assistant_handoff` when someone coordinates on another person's behalf; decide by what the person will do, not their title) and NR9 (a directive move with no question asked is `true`, but not notices to a mailing list or group address). E16 keeps the broad reading: a booking link sent by a person is also `proposed_times`. P4 is superseded by E17. | Eval v1: 7 messages, 7 changes (4 labels, 3 needs_response), listed in `data/eval/v1/README.md` and `changes_rules_v1.2.json`. Training (PR #14): 12 labels and 1 needs_response. |
