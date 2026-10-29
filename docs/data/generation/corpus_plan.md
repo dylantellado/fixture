@@ -5,7 +5,7 @@ before it is written, so the data stays consistent and anyone (a person or an AI
 session) can pick up where the last one stopped.
 
 Files:
-- `corpus_plan.md` (this file): goals, format, label rules, writing rules
+- `corpus_plan.md` (this file): goals, format, writing rules (label rules are in `../labeling_rules.md`)
 - `shared_contacts.md`: people who appear in more than one user's inbox
 - `shared_messages.md`: mailing-list emails that appear word for word in several inboxes
 - `user_01.md` to `user_04.md`: one student each: who they are, their contacts
@@ -116,35 +116,7 @@ threads use this on purpose (marked `TZ` in the outlines).
 
 ## Labels
 
-One label per message, describing **that message's** main purpose:
-
-| Label | Use when the message... | Example |
-|---|---|---|
-| `new_request` | asks to set up a meeting but gives no specific times | "Could we find 20 minutes to talk about my project?" |
-| `proposed_times` | offers or counter-offers specific times | "I'm free Tue 2-4 or Wed after 1." |
-| `acceptance` | confirms a specific time (including picking one of the offered times) | "Tuesday at 2:30 works, see you then." |
-| `reschedule` | moves or cancels a meeting that was **already confirmed** | "Something came up, can we move Thursday to Friday?" |
-| `assistant_handoff` | hands scheduling to someone else (an assistant, coordinator, lab manager, co-TA) | "Copying Tess, who will find a time with you." |
-| `none` | anything else | newsletters, deadlines, thank-yous, logistics for a meeting already set |
-
-**Priority rule for mixed messages** (pick the first that applies):
-1. `reschedule`: it moves an already-confirmed meeting, even if it also proposes new times.
-2. `acceptance`: it confirms a time, even if it also mentions a backup.
-3. `assistant_handoff`: it hands scheduling to someone else, even if it also asks to meet.
-4. `proposed_times`: it contains specific times, even if it is also the first request.
-5. `new_request`
-6. `none`
-
-**Edge cases (decided, so every writer labels the same way):**
-- Logistics after a time is confirmed (video link, phone number, agenda, address) → `none`.
-- Automated confirmations, calendar invite text, registrations, reminders → `none`.
-- Announcements of events, deadlines or office hours sent to a group → `none`.
-- A group announcement that moves an already-set recurring meeting (e.g. "lab meeting
-  moves to Wednesdays") → `reschedule`.
-- Out-of-office auto-replies → `none`.
-- A thank-you after a meeting → `none`, unless it also asks for or offers another meeting.
-- Turning down all offered times *without* offering new ones → `new_request` ("none of
-  those work, could you send a few more?").
+Label definitions, the priority rule and edge cases are in [`docs/data/labeling_rules.md`](../labeling_rules.md), the single source of truth for labels.
 
 ## Cleanup features (the `Clean` column in the outlines)
 

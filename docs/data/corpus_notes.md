@@ -96,7 +96,7 @@ classifier scores measured on this corpus will look better than they would on
 real mail.
 
 Label rules, including the priority order for mixed messages, are in
-[`generation/corpus_plan.md`](generation/corpus_plan.md#labels).
+[`labeling_rules.md`](labeling_rules.md), the single source of truth for labels.
 
 ## Example queries for the retrieval demo
 

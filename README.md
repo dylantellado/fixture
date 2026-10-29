@@ -22,7 +22,8 @@ Where each Milestone 2 requirement lives in this repo:
 ## Layout
 
 ```
-data/        data/source/ holds the data-v1 inputs (in git); everything else in data/ is local and git-ignored
+data/        data/source/ holds the data-v1 inputs (in git); data/eval/v1/ is the held-out classifier
+             test set (in git, never tune on it); everything else in data/ is local and git-ignored
 docs/        data notes, evidence of pipeline runs, and the app mock-up
 samples/     fake sample data checked into the repo
 secrets/     local credentials (git-ignored)
@@ -110,6 +111,8 @@ Labels:
 | `reschedule` | A confirmed meeting needs to move. |
 | `assistant_handoff` | Someone hands scheduling to an assistant (e.g. a professor copying their assistant). |
 | `none` | Not about scheduling. |
+
+[`docs/data/labeling_rules.md`](docs/data/labeling_rules.md) is the source of truth for labels and `needs_response`: the exact definitions, priority rule and edge cases. Any rule change must update that file, bump its version, add a change log entry, and re-check the affected messages.
 
 ### Rules the search side depends on
 
