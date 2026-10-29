@@ -44,6 +44,7 @@ data/                data/source/ holds the data-v1 inputs (committed until DVC 
                      is the held-out classifier test set (committed; never tune or train on it, see its
                      README); everything else is local and git-ignored, e.g. fixture.db (the web app's
                      encrypted logins)
+experiments/         one-off experiments, each its own uv project (gemini_baseline/: Gemini on the training data)
 samples/             fake data safe to commit: users.json, messages_sample.jsonl (processed schema)
 secrets/             local credentials (git-ignored), see "Google access" below
 src/

@@ -25,6 +25,7 @@ Where each Milestone 2 requirement lives in this repo:
 data/        data/source/ holds the data-v1 inputs (in git); data/eval/v1/ is the held-out classifier
              test set (in git, never tune on it); everything else in data/ is local and git-ignored
 docs/        data notes, evidence of pipeline runs, and the app mock-up
+experiments/ one-off experiments, e.g. gemini_baseline/ (Gemini labeling the training data)
 samples/     fake sample data checked into the repo
 secrets/     local credentials (git-ignored)
 src/

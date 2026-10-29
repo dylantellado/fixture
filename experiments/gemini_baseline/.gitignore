@@ -1,0 +1,3 @@
+# Run outputs stay local, except each run's report.md.
+runs/*/*
+!runs/*/report.md
