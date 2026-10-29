@@ -127,4 +127,5 @@ uv run pytest
 - **Add tests for new features.**
 - **Work on a feature branch in its own git worktree:** Will and Dylan each work in a separate worktree so parallel sessions don't collide. Merge into `main` only through a pull request.
 - **Don't change the Data contract without telling the other person** (see "Milestone 2" above).
+- **`docs/data/labeling_rules.md` is the source of truth for labels and `needs_response`:** any rule change must update that file, bump its version, add a change log entry, and re-check the affected messages.
 - **Ask before making major design decisions:** see "Project status and flexibility" above.

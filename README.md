@@ -111,6 +111,8 @@ Labels:
 | `assistant_handoff` | Someone hands scheduling to an assistant (e.g. a professor copying their assistant). |
 | `none` | Not about scheduling. |
 
+[`docs/data/labeling_rules.md`](docs/data/labeling_rules.md) is the source of truth for labels and `needs_response`: the exact definitions, priority rule and edge cases. Any rule change must update that file, bump its version, add a change log entry, and re-check the affected messages.
+
 ### Rules the search side depends on
 
 - **`user_id` format:** lowercase letters, digits, and underscores only (e.g. `user_01`), because it becomes part of a ChromaDB collection name.

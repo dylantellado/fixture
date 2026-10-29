@@ -4,6 +4,7 @@ Usage (from the repo root, plain Python 3.12):
 
     python3 data/eval/v1/build.py merge UNLABELED_OUT
     python3 data/eval/v1/build.py finalize LABELER_LABELS
+    python3 data/eval/v1/build.py apply-changes CHANGES_JSON
 
 merge: reads every draft in data/eval/v1/work/<writer>.jsonl, renumbers the
 threads t001, t002, ... per user in order of their first message (so the id
@@ -17,6 +18,12 @@ label, note) and work/adjudications.json (decisions for every message where
 the writer and the labeler disagree), then writes:
   - threads.jsonl: the source-thread format from the Data contract, label = final label
   - annotations.jsonl: one line per message with the writer's notes and all three labels
+
+apply-changes: applies a list of rule-driven corrections (e.g. changes_rules_v1.0.json)
+to threads.jsonl and annotations.jsonl. Each change names the message, the field
+("label" or "needs_response"), the old and new value, and the rule from
+docs/data/labeling_rules.md. A change whose old value doesn't match the file stops
+everything, so nothing is applied twice or on top of the wrong data.
 """
 
 import json
@@ -122,11 +129,43 @@ def finalize(labels_path: Path) -> None:
     print(f"wrote {len(final_threads)} threads and {len(annotations)} annotations")
 
 
+def apply_changes(changes_path: Path) -> None:
+    changes = json.loads(changes_path.read_text())
+    threads = read_jsonl(EVAL_DIR / "threads.jsonl")
+    annotations = read_jsonl(EVAL_DIR / "annotations.jsonl")
+    by_key = {(a["user_id"], a["thread_id"], a["position"]): a for a in annotations}
+    messages = {(t["user_id"], t["thread_id"], p): m for t in threads for p, m in enumerate(t["messages"])}
+
+    # Check every change first, so a mismatch leaves both files untouched.
+    for change in changes:
+        key = (change["user_id"], change["thread_id"], change["position"])
+        current = by_key[key]["final_label" if change["field"] == "label" else "needs_response"]
+        if current != change["old"]:
+            sys.exit(f"{'/'.join(map(str, key))} {change['field']}: file has {current!r}, change expects {change['old']!r}")
+
+    for change in changes:
+        key = (change["user_id"], change["thread_id"], change["position"])
+        annotation = by_key[key]
+        if change["field"] == "label":
+            annotation["final_label"] = change["new"]
+            messages[key]["label"] = change["new"]
+            if change["new"] == "none" and annotation["difficulty"] == "easy":
+                annotation["difficulty"] = "hard"  # a none that used to be a scheduling label is a hard negative
+        else:
+            annotation["needs_response"] = change["new"]
+        annotation["rationale"] += f" Rules {change['rules_version']} ({change['rule']}): {change['field']} {json.dumps(change['old'])} -> {json.dumps(change['new'])}, {change['why']}"
+
+    version = changes[0]["rules_version"] if changes else None
+    for annotation in annotations:
+        annotation["rules_version"] = version or annotation.get("rules_version", "")
+    write_jsonl(EVAL_DIR / "threads.jsonl", threads)
+    write_jsonl(EVAL_DIR / "annotations.jsonl", annotations)
+    print(f"applied {len(changes)} changes")
+
+
 if __name__ == "__main__":
-    if len(sys.argv) != 3 or sys.argv[1] not in ("merge", "finalize"):
+    commands = {"merge": merge, "finalize": finalize, "apply-changes": apply_changes}
+    if len(sys.argv) != 3 or sys.argv[1] not in commands:
         print(__doc__)
         sys.exit(2)
-    if sys.argv[1] == "merge":
-        merge(Path(sys.argv[2]))
-    else:
-        finalize(Path(sys.argv[2]))
+    commands[sys.argv[1]](Path(sys.argv[2]))
