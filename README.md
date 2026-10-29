@@ -22,7 +22,8 @@ Where each Milestone 2 requirement lives in this repo:
 ## Layout
 
 ```
-data/        data/source/ holds the data-v1 inputs (in git); everything else in data/ is local and git-ignored
+data/        data/source/ holds the data-v1 inputs (in git); data/eval/v1/ is the held-out classifier
+             test set (in git, never tune on it); everything else in data/ is local and git-ignored
 docs/        data notes, evidence of pipeline runs, and the app mock-up
 samples/     fake sample data checked into the repo
 secrets/     local credentials (git-ignored)
