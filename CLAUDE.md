@@ -40,8 +40,10 @@ This is the starting layout, not a final architecture. Folders and services may 
 ```
 docker-compose.yml   runs all services together, in pipeline order (see README)
 .env.example         template for .env (copy it, never commit .env)
-data/                data/source/ holds the data-v1 inputs (committed until DVC is set up); everything
-                     else is local and git-ignored, e.g. fixture.db (the web app's encrypted logins)
+data/                data/source/ holds the data-v1 inputs (committed until DVC is set up); data/eval/v1/
+                     is the held-out classifier test set (committed; never tune or train on it, see its
+                     README); everything else is local and git-ignored, e.g. fixture.db (the web app's
+                     encrypted logins)
 samples/             fake data safe to commit: users.json, messages_sample.jsonl (processed schema)
 secrets/             local credentials (git-ignored), see "Google access" below
 src/
@@ -125,4 +127,5 @@ uv run pytest
 - **Add tests for new features.**
 - **Work on a feature branch in its own git worktree:** Will and Dylan each work in a separate worktree so parallel sessions don't collide. Merge into `main` only through a pull request.
 - **Don't change the Data contract without telling the other person** (see "Milestone 2" above).
+- **`docs/data/labeling_rules.md` is the source of truth for labels and `needs_response`:** any rule change must update that file, bump its version, add a change log entry, and re-check the affected messages.
 - **Ask before making major design decisions:** see "Project status and flexibility" above.

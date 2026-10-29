@@ -4,6 +4,11 @@
 # inputs, committed so a fresh clone runs end to end (until DVC is set up).
 /data/*
 !/data/source/
+# The held-out classifier test set is committed too, except the writers'
+# drafts and the pipeline output made when checking it.
+!/data/eval/
+/data/eval/*/work/
+/data/eval/*/processed/
 secrets/
 .env
 
