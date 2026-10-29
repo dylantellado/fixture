@@ -59,10 +59,10 @@ student society `committee@debatesoc.example`.
 | 05 | Sep 6 | Rail tickets | Booking confirmation, London to Edinburgh, Sat Sep 19 08:30 (hard negative) | none | FOOT | ☑ |
 | 06 | Sep 8 | Residence hall | Fire alarm test Wed Sep 9, 10:00 | none | FOOT, WS | ☑ |
 | 07 | Sep 9 | Rohan | Lena emails Rohan via the alumni network. Rohan: "happy to meet in person, I do Saturday mornings: Sat Sep 12, 10:00 at the Linden café?" Lena accepts. Rohan: "I'll grab a table at the back" | req, times, accept, none | SIG | ☑ |
-| 08 | Sep 11 | Owen, Mateo | Owen: Ruth suggests Lena meet Mateo, copying him. Mateo: Friday check-ins, Fri Sep 18, 4 pm London? Lena confirms | handoff, times, accept | Q | ☑ |
+| 08 | Sep 11 | Owen, Mateo | Owen: Ruth suggests Lena meet Mateo, copying him. Mateo: Friday check-ins, Fri Sep 18, 4 pm London? Lena confirms | req, times, accept | Q | ☑ |
 | 09 | Sep 13 | Fiona | Fiona offers advising slots, Lena takes Wed Sep 16 14:00. Fiona has to move it to Thu Sep 17 14:00. Lena confirms | times, accept, resched, accept | SIG, Q | ☑ |
 | 10 | Sep 15 | Jonas | Lena asks Jonas for a chat. Jonas: evenings only, Tue Sep 22, 7 pm Berlin (6 pm London). Lena confirms | req, times, accept | TZ, MOB | ☑ |
-| 11 | Sep 16 | Fiona | Course timetable change for the term (hard negative) | none | SIG | ☑ |
+| 11 | Sep 16 | Fiona | Course timetable change for the term: two recurring classes move to new times (a group move, rules v1.1 E4) | resched | SIG | ☑ |
 | 12 | Sep 18 | Dana | Lena asks for a second session about summer programs. Dana: Mon Sep 28, 8 am ET. Lena confirms. Dana is out sick and moves it to Mon Oct 5, 8 am ET. Lena confirms | req, times, accept, resched, accept | SIG, TZ | ☑ |
 | 13 | Sep 20 | Debate society | Social Thu Sep 24, 19:00 | none | FOOT | ☑ |
 | 14 | Sep 22 | Mateo | Mateo is at a conference: Fri Sep 25 check-in moves to Fri Oct 2, same time. Lena confirms | resched, accept | MOB | ☑ |
@@ -86,7 +86,7 @@ student society `committee@debatesoc.example`.
 | 32 | Oct 12 | Owen | Owen: Ruth wants Lena to present at lab meeting Thu Oct 22, and Mateo runs the lab-meeting schedule, copying him. Mateo: 10:30 am ET slot, by video. Lena accepts | handoff, times, accept | TZ | ☑ |
 | 33 | Oct 13 | Debate society | Inter-society tournament Sat Oct 24 | none | FOOT | ☑ |
 | 34 | Oct 14 | Hugo | Thank-you after lunch, no meeting | none | SIG | ☑ |
-| 35 | Oct 14 | Fiona | Fiona: mid-term feedback is handled by academic advisor Callum Reid, copying him. Callum: book a slot Oct 19 to 23. Lena asks for Tue Oct 20 at 14:00. Callum confirms | handoff, times, times, accept | SIG | ☑ |
+| 35 | Oct 14 | Fiona | Fiona: mid-term feedback is handled by academic advisor Callum Reid, copying him. Callum: book a slot Oct 19 to 23. Lena asks for Tue Oct 20 at 14:00. Callum confirms | req, times, times, accept | SIG | ☑ |
 | 36 | Oct 15 | Rohan | Rohan: "Sat Oct 17 at 10?" Lena asks if Sunday works. Rohan: "Saturdays are the only time I can do, Sat Oct 24?" Lena confirms | times, times, times, accept | SIG, Q | ☑ |
 | 37 | Oct 16 | Mama | Video call Sunday Oct 18, 18:00 Berlin (17:00 London)? Lena: yes. Mama: Papa has football, 19:00 Berlin instead? Lena: yes | times, accept, resched, accept | TZ, MOB | ☑ |
 | 38 | Oct 16 | Fiona | Notice: UK clocks go back Sun Oct 25, check your US meeting times (hard negative) | none | SIG | ☑ |

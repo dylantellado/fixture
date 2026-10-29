@@ -64,16 +64,16 @@ Labels: `req` new_request, `times` proposed_times, `accept` acceptance,
 | 12 | Sep 18 | Rohan | Priya asks for a follow-up call. Rohan: "mornings ET as always, Fri Sep 25 at 9?" Priya confirms. A deal runs late and Rohan moves it to Mon Sep 28, 8:30 am ET. Priya confirms | req, times, accept, resched, accept | Q | ☑ |
 | 13 | Sep 21 | Vasquez | Priya asks for a slot. Vasquez offers Tue Sep 22 at 4:00. Priya accepts. Vasquez moves it to Thu Sep 24 4:40 (faculty meeting). Priya confirms | req, times, accept, resched, accept | Q | ☑ |
 | 14 | Sep 23 | Ben | Long casual thread about the pitch competition: deadlines Oct 2 and Oct 9, judging rules. No meeting | none, none, none | MOB, WS | ☑ |
-| 15 | Sep 25 | Ben | Priya wants coffee to plan the pitch event. Ben is swamped and hands it to the club VP, Ada Lin. Ada suggests Thu Oct 1 at 10 at "Copper Kettle". Priya counters Fri Oct 2 at 10. Ada agrees | req, handoff, times, times, accept | MOB | ☑ |
+| 15 | Sep 25 | Ben | Priya wants coffee to plan the pitch event. Ben is swamped and hands it to the club VP, Ada Lin. Ada suggests Thu Oct 1 at 10 at "Copper Kettle". Priya counters Fri Oct 2 at 10. Ada agrees | req, req, times, times, accept | MOB | ☑ |
 | 16 | Sep 26 | Meridian newsletter | Monthly newsletter: panel on Oct 6, application windows | none | FOOT, LONG | ☑ |
 | 17 | Sep 28 | Claire | Priya asks to book October's call. Claire offers Sun Oct 18, 7 pm. Priya accepts. Claire moves it to Sun Oct 25 (travel). Priya confirms | req, times, accept, resched, accept | QO | ☑ |
 | 18 | Sep 30 | Theo Marsh | STAT 142 section room change this week (no meeting) | none | SIG | ☑ |
 | 19 | Oct 1 | Jordan, Tess | Jordan invites Priya to a 30-min video first round and copies Tess. Tess offers Tue Oct 6 3:00, Wed Oct 7 2:00, Thu Oct 8 10:00. Priya takes Wed 2:00. Tess sends the video link | req, handoff, times, accept, none | FOOT, SIG, Q | ☑ |
 | 20 | Oct 2 | Larkmoor no-reply | Info session announcement, Mon Oct 5 6 pm virtual | none | FOOT | ☑ |
-| 21 | Oct 3 | Dana | Priya asks for a mock interview before Larkmoor. Dana: mock interviews are run by peer coach Nadia Brooks, copying her. Nadia offers Tue Oct 6 at 3:30 in Wexley 214. Priya confirms | req, handoff, times, accept | SIG | ☑ |
+| 21 | Oct 3 | Dana | Priya asks for a mock interview before Larkmoor. Dana: mock interviews are run by peer coach Nadia Brooks, copying her. Nadia offers Tue Oct 6 at 3:30 in Wexley 214. Priya confirms | req, req, times, accept | SIG | ☑ |
 | 22 | Oct 4 | Maya (roommate) | "dinner sat 7?" "yes!!" then Maya: "wait can we push to 8" (no reply yet: thread ends open) | times, accept, resched | MOB | ☑ |
 | 23 | Oct 5 | Tess | Interviewer is travelling: Tess moves the Wed Oct 7 2:00 interview to Thu Oct 8 11:00 (only one option). Priya confirms | resched, accept | SIG, Q | ☑ |
-| 24 | Oct 6 | Vasquez | Vasquez is at a conference this week: office hours are cancelled and Theo will cover, email him. Priya emails Theo; Theo offers Wed Oct 7 5:20. Priya confirms | handoff, req, times, accept | Q | ☑ |
+| 24 | Oct 6 | Vasquez | Vasquez is at a conference this week: office hours are cancelled and Theo will cover, email him. Priya emails Theo; Theo offers Wed Oct 7 5:20. Priya confirms | resched, req, times, accept | Q | ☑ |
 | 25 | Oct 8 | Jordan, Tess | Jordan: passed to the superday, Tess will schedule. Tess offers Thu Oct 15 9:00, Fri Oct 16 9:00, Fri Oct 16 1:00. Priya takes Fri 9:00 | handoff, times, accept | FOOT, SIG | ☑ |
 | 26 | Oct 9 | Vasquez (class) | Midterm review session Mon Oct 12, 6 pm, Hall B, run by the TAs (Sofia, Alex). Midterm is Thu Oct 15, 7 to 9 pm (matches user_03) | none | SIG | ☑ |
 | 27 | Oct 10 | Ben | Ben: board meeting moves from Wed Oct 14 to Tue Oct 13, 8 pm this week (Thursday is the STAT 142 midterm). Priya: works | resched, accept | MOB | ☑ |

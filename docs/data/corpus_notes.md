@@ -67,11 +67,26 @@ per user, and ingest keeps every copy.
 
 | User | new_request | proposed_times | acceptance | reschedule | assistant_handoff | none | Total |
 |---|---|---|---|---|---|---|---|
-| user_01 | 15 | 20 | 25 | 9 | 5 | 26 | 100 |
-| user_02 | 9 | 20 | 24 | 9 | 7 | 28 | 97 |
-| user_03 | 7 | 19 | 26 | 12 | 5 | 21 | 90 |
-| user_04 | 9 | 20 | 25 | 9 | 4 | 23 | 90 |
-| **all** | **40** | **79** | **100** | **39** | **21** | **98** | **377** |
+| user_01 | 17 | 20 | 25 | 10 | 2 | 26 | 100 |
+| user_02 | 12 | 20 | 24 | 9 | 4 | 28 | 97 |
+| user_03 | 11 | 19 | 27 | 12 | 1 | 20 | 90 |
+| user_04 | 11 | 20 | 25 | 10 | 2 | 22 | 90 |
+| **all** | **51** | **79** | **101** | **41** | **9** | **96** | **377** |
+
+Labels follow `docs/data/labeling_rules.md` (v1.2). Rules v1.1 corrected 2 labels and v1.2 another 12,
+mostly introductions that were `assistant_handoff` and are now `new_request` (E17). The full list
+is in PR #14.
+
+**`needs_response`** (does the user have to reply to move a meeting forward?) is in
+`data/source/annotations.jsonl`, one line per message keyed by `user_id`, `thread_id` and
+`position`, set under labeling rules v1.2: 109 `true` and 268 `false`.
+
+| User | true | false |
+|---|---|---|
+| user_01 | 30 | 70 |
+| user_02 | 26 | 71 |
+| user_03 | 26 | 64 |
+| user_04 | 27 | 63 |
 
 About half of the `none` messages are hard negatives that mention dates or times
 but aren't scheduling (deadlines, event announcements, auto-confirmations, an

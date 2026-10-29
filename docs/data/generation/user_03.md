@@ -63,19 +63,19 @@ list `ds-seminar@lists.college.example`, Brightwater recruiting system
 | 11 | Sep 18 | Maya | Maya invites Sofia to a first-round case interview: Tue Sep 29 10:00 am CT or Wed Sep 30 1:00 pm CT. Sofia picks Wednesday, restating it as 2:00 pm ET | times, accept | SIG, TZ, QO | ☑ |
 | 12 | Sep 21 | Irene | Irene sets up recurring biweekly meetings with Achebe, Fridays 11:00, from Sep 25. Sofia confirms | times, accept | SIG | ☑ |
 | 13 | Sep 21 | Hannah | Sofia asks for a second lunch. Hannah: Tue Sep 29 12:30. Sofia has a conflict, suggests Thu Oct 1 12:00. Hannah confirms | req, times, times, accept | QO | ☑ |
-| 14 | Sep 22 | Leo | Leo asks for a slot. Sofia's Thursday hour is full, so she copies Alex. Alex: Wed Sep 23 3:00. Leo confirms. Leo has a lab conflict and asks to move. Alex: Wed Sep 30 3:00. Leo confirms | req, handoff, times, accept, resched, times, accept | QO, MOB | ☑ |
+| 14 | Sep 22 | Leo | Leo asks for a slot. Sofia's Thursday hour is full, so she copies Alex. Alex: Wed Sep 23 3:00. Leo confirms. Leo has a lab conflict and asks to move. Alex: Wed Sep 30 3:00. Leo confirms | req, req, times, accept, resched, times, accept | QO, MOB | ☑ |
 | 15 | Sep 24 | Vasquez | To TAs: "grades for PS1 due Sun Sep 27, 11:59 pm" (hard negative) | none | SIG | ☑ |
 | 16 | Sep 25 | Consulting club | Case competition Sat Oct 10, 9 am to 5 pm, register by Oct 2 | none | FOOT | ☑ |
 | 17 | Sep 27 | Maya | Interviewer conflict: Maya moves Wed Sep 30, offering Thu Oct 1 9:00 am CT or Fri Oct 2 11:00 am CT. Sofia picks Friday | resched, accept | SIG, QO | ☑ |
 | 18 | Sep 29 | Irene | Out-of-office: "Irene is out until Mon Oct 5" auto-reply (hard negative) | none | FOOT | ☑ |
-| 19 | Sep 30 | Hannah, friend | Sofia forwards Hannah's case-prep notes to a classmate (Clara Mendes, `clara.mendes@example.com`) | none | FWD | ☑ |
-| 20 | Oct 2 | Maya | Passed round 1. Maya: round 2 is with Arjun in Bangalore, who will send times himself. Arjun offers Thu Oct 8 8:30 am ET (6:00 pm IST) or Fri Oct 9 8:30 am ET. Sofia takes Thursday | handoff, times, accept | TZ, SIG | ☑ |
+| 19 | Sep 30 | Hannah, friend | Sofia forwards Hannah's case-prep notes to a classmate (Clara Mendes, `clara.mendes@example.com`) and asks to do practice cases this week | req | FWD | ☑ |
+| 20 | Oct 2 | Maya | Passed round 1. Maya: round 2 is with Arjun in Bangalore, who will send times himself. Arjun offers Thu Oct 8 8:30 am ET (6:00 pm IST) or Fri Oct 9 8:30 am ET. Sofia takes Thursday | req, times, accept | TZ, SIG | ☑ |
 | 21 | Oct 3 | Arjun | Arjun introduces himself, "6 pm my time Thursday", case format notes (logistics) | none | TZ, SIG | ☑ |
 | 22 | Oct 5 | Irene | Achebe is unwell: Fri Oct 9 meeting moves to Mon Oct 12, 2:00 pm. Sofia confirms | resched, accept | SIG, QO | ☑ |
 | 23 | Oct 6 | Alex | Alex: co-host the midterm review Mon Oct 12, 6 pm? Sofia: yes | times, accept | MOB | ☑ |
-| 24 | Oct 7 | Jamie, Alex | Jamie wants a slot before the midterm. Sofia is full and copies Alex, who has Wednesday slots. Alex offers Wed Oct 14 3:00. Jamie confirms | req, handoff, times, accept | QO | ☑ |
+| 24 | Oct 7 | Jamie, Alex | Jamie wants a slot before the midterm. Sofia is full and copies Alex, who has Wednesday slots. Alex offers Wed Oct 14 3:00. Jamie confirms | req, req, times, accept | QO | ☑ |
 | 25 | Oct 8 | Vasquez | Travelling again: Mon Oct 12 TA meeting moves to Thu Oct 15, 9 am. Sofia confirms | resched, accept | QO | ☑ |
-| 26 | Oct 9 | Maya | Final round at the Chicago office: Thu Oct 15 or Fri Oct 16, both 9:00 am CT. Sofia takes Friday. Maya hands travel and timing to coordinator Dev Shah | times, accept, handoff | SIG, LONG | ☑ |
+| 26 | Oct 9 | Maya | Final round at the Chicago office: Thu Oct 15 or Fri Oct 16, both 9:00 am CT. Sofia takes Friday. Maya hands travel and timing to coordinator Dev Shah | times, accept, accept | SIG, LONG | ☑ |
 | 27 | Oct 10 | WIDS Workshop | Paper deadline Nov 1, notifications Dec 1 (hard negative) | none | FOOT | ☑ |
 | 28 | Oct 11 | Hannah | Hannah: lunch Wed Oct 21 12:00 to debrief? Sofia accepts. Hannah moves it (client meeting). Sofia offers Thu Oct 22 12:00. Hannah confirms | times, accept, resched, times, accept | QO, LONG | ☑ |
 | 29 | Oct 12 | Vasquez (class) | Midterm room change to Hall C (logistics, hard negative) | none | SIG | ☑ |
