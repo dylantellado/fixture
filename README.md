@@ -76,6 +76,7 @@ This is the source of truth for how the data side (Will) and the search side (Dy
 |------|------------|----------|
 | `data/source/users.json` | data generation | The fake users: a JSON list of `{"user_id", "name", "email"}`. |
 | `data/source/generated_threads.jsonl` | data generation | One JSON object per thread: `user_id`, `thread_id`, `subject`, `participants`, `messages` (each: `sender`, `recipients`, `timestamp`, `body`, `label`). `timestamp` is the email "Date" header format, e.g. `Tue, 13 Oct 2026 09:12:00 -0400`. Committed to git for now (data-v1, fictional, ~300 KB) so a fresh clone runs end to end; DVC will take over once its storage bucket exists. |
+| `data/source/annotations.jsonl` | labeling | One line per source message, keyed by `user_id`, `thread_id` and `position` (0-based index in the thread): `needs_response` (bool), the `rule` that set it, `rationale` and `rules_version`, following `docs/data/labeling_rules.md`. Not read by the pipeline; it is the ground truth for scoring `needs_response`. |
 | `data/raw/threads.jsonl` | `ingest` | Same shape as the source threads, validated and deduplicated, sorted by `(user_id, thread_id)`, with `user_id` kept. Adds `source` (`"generated"`) and `provenance` (`file`, `line`, `sha256` of the thread). |
 | `data/processed/messages.jsonl` | `preprocess` | One JSON object per message (schema below). This is what `rag` indexes. |
 | `data/processed/manifest.json` | `preprocess` | Counts, file hashes, and provenance (below). |

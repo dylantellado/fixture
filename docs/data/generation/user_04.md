@@ -62,7 +62,7 @@ student society `committee@debatesoc.example`.
 | 08 | Sep 11 | Owen, Mateo | Owen: Ruth suggests Lena meet Mateo, copying him. Mateo: Friday check-ins, Fri Sep 18, 4 pm London? Lena confirms | handoff, times, accept | Q | ☑ |
 | 09 | Sep 13 | Fiona | Fiona offers advising slots, Lena takes Wed Sep 16 14:00. Fiona has to move it to Thu Sep 17 14:00. Lena confirms | times, accept, resched, accept | SIG, Q | ☑ |
 | 10 | Sep 15 | Jonas | Lena asks Jonas for a chat. Jonas: evenings only, Tue Sep 22, 7 pm Berlin (6 pm London). Lena confirms | req, times, accept | TZ, MOB | ☑ |
-| 11 | Sep 16 | Fiona | Course timetable change for the term (hard negative) | none | SIG | ☑ |
+| 11 | Sep 16 | Fiona | Course timetable change for the term: two recurring classes move to new times (a group move, rules v1.1 E4) | resched | SIG | ☑ |
 | 12 | Sep 18 | Dana | Lena asks for a second session about summer programs. Dana: Mon Sep 28, 8 am ET. Lena confirms. Dana is out sick and moves it to Mon Oct 5, 8 am ET. Lena confirms | req, times, accept, resched, accept | SIG, TZ | ☑ |
 | 13 | Sep 20 | Debate society | Social Thu Sep 24, 19:00 | none | FOOT | ☑ |
 | 14 | Sep 22 | Mateo | Mateo is at a conference: Fri Sep 25 check-in moves to Fri Oct 2, same time. Lena confirms | resched, accept | MOB | ☑ |

@@ -68,7 +68,7 @@ list `ds-seminar@lists.college.example`, Brightwater recruiting system
 | 16 | Sep 25 | Consulting club | Case competition Sat Oct 10, 9 am to 5 pm, register by Oct 2 | none | FOOT | ☑ |
 | 17 | Sep 27 | Maya | Interviewer conflict: Maya moves Wed Sep 30, offering Thu Oct 1 9:00 am CT or Fri Oct 2 11:00 am CT. Sofia picks Friday | resched, accept | SIG, QO | ☑ |
 | 18 | Sep 29 | Irene | Out-of-office: "Irene is out until Mon Oct 5" auto-reply (hard negative) | none | FOOT | ☑ |
-| 19 | Sep 30 | Hannah, friend | Sofia forwards Hannah's case-prep notes to a classmate (Clara Mendes, `clara.mendes@example.com`) | none | FWD | ☑ |
+| 19 | Sep 30 | Hannah, friend | Sofia forwards Hannah's case-prep notes to a classmate (Clara Mendes, `clara.mendes@example.com`) and asks to do practice cases this week | req | FWD | ☑ |
 | 20 | Oct 2 | Maya | Passed round 1. Maya: round 2 is with Arjun in Bangalore, who will send times himself. Arjun offers Thu Oct 8 8:30 am ET (6:00 pm IST) or Fri Oct 9 8:30 am ET. Sofia takes Thursday | handoff, times, accept | TZ, SIG | ☑ |
 | 21 | Oct 3 | Arjun | Arjun introduces himself, "6 pm my time Thursday", case format notes (logistics) | none | TZ, SIG | ☑ |
 | 22 | Oct 5 | Irene | Achebe is unwell: Fri Oct 9 meeting moves to Mon Oct 12, 2:00 pm. Sofia confirms | resched, accept | SIG, QO | ☑ |

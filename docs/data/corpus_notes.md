@@ -69,9 +69,23 @@ per user, and ingest keeps every copy.
 |---|---|---|---|---|---|---|---|
 | user_01 | 15 | 20 | 25 | 9 | 5 | 26 | 100 |
 | user_02 | 9 | 20 | 24 | 9 | 7 | 28 | 97 |
-| user_03 | 7 | 19 | 26 | 12 | 5 | 21 | 90 |
-| user_04 | 9 | 20 | 25 | 9 | 4 | 23 | 90 |
-| **all** | **40** | **79** | **100** | **39** | **21** | **98** | **377** |
+| user_03 | 8 | 19 | 26 | 12 | 5 | 20 | 90 |
+| user_04 | 9 | 20 | 25 | 10 | 4 | 22 | 90 |
+| **all** | **41** | **79** | **100** | **40** | **21** | **96** | **377** |
+
+Two labels were corrected under labeling rules v1.1: `78c903101dc57a53` (user_03/t019,
+`none` → `new_request`) and `ffbb97746b68b458` (user_04/t011, `none` → `reschedule`).
+
+**`needs_response`** (does the user have to reply to move a meeting forward?) is in
+`data/source/annotations.jsonl`, one line per message keyed by `user_id`, `thread_id` and
+`position`, set under labeling rules v1.1: 108 `true` and 269 `false`.
+
+| User | true | false |
+|---|---|---|
+| user_01 | 29 | 71 |
+| user_02 | 26 | 71 |
+| user_03 | 26 | 64 |
+| user_04 | 27 | 63 |
 
 About half of the `none` messages are hard negatives that mention dates or times
 but aren't scheduling (deadlines, event announcements, auto-confirmations, an
