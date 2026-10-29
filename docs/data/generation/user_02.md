@@ -67,20 +67,20 @@ department list `cs-announce@lists.college.example`, HackHarbor hackathon
 | 18 | Sep 26 | Tidewell updates | Product update newsletter with launch date | none | FOOT, LONG |☑ |
 | 19 | Sep 28 | Osei | Osei is away: Mon Oct 5 meeting moves to Mon Oct 12, 10 am ("Mondays only, as you know"). Marcus confirms | resched, accept | Q |☑ |
 | 20 | Sep 30 | Jordan, Tess | Jordan invites Marcus to a 60-min CoderPad first round, copies Tess. Tess offers Tue Oct 6 10:00, Tue Oct 6 2:00, Wed Oct 7 11:00. Marcus takes Tue 10:00. Tess sends CoderPad details | req, handoff, times, accept, none | FOOT, SIG |☑ |
-| 21 | Oct 1 | Dana | Marcus asks for a mock technical interview. Dana: peer coach Nadia Brooks runs these, copying her. Nadia: Fri Oct 9 at 11, Zoom. Marcus confirms | req, handoff, times, accept | SIG, WS |☑ |
+| 21 | Oct 1 | Dana | Marcus asks for a mock technical interview. Dana: peer coach Nadia Brooks runs these, copying her. Nadia: Fri Oct 9 at 11, Zoom. Marcus confirms | req, req, times, accept | SIG, WS |☑ |
 | 22 | Oct 2 | Kevin | Kevin offers a referral, "apps close Oct 15". No meeting | none, none | Q |☑ |
 | 23 | Oct 3 | Osei | Osei forwards a workshop call for papers, deadline Nov 1 | none | FWD |☑ |
 | 24 | Oct 4 | HackHarbor | Results newsletter with next event date | none | FOOT |☑ |
 | 25 | Oct 5 | Tess | Marcus has a midterm move to Tue Oct 6 morning, asks to reschedule. Tess offers Thu Oct 8 3:00, Fri Oct 9 1:00, Fri Oct 9 4:00. Marcus takes Fri 1:00 | resched, times, accept | SIG, Q |☑ |
 | 26 | Oct 6 | Pinecrest recruiting | Tech talk Wed Oct 14, 6 pm (hard negative) | none | FOOT |☑ |
 | 27 | Oct 7 | Tom, Gwen | Tom: final round, "Gwen will set it up". Gwen offers Tue Oct 13 (four 45-min blocks from 12:00) or Wed Oct 14 from 10:00. Marcus takes Tue. Gwen sends agenda | handoff, times, accept, none | SIG, LONG |☑ |
-| 28 | Oct 8 | Aisha | Aisha wants Marcus to meet her cofounder and hands it to him: Leah Moreno offers Fri Oct 16, 2 pm PT (5 pm ET). Marcus confirms | handoff, times, accept | TZ |☑ |
+| 28 | Oct 8 | Aisha | Aisha wants Marcus to meet her cofounder and hands it to him: Leah Moreno offers Fri Oct 16, 2 pm PT (5 pm ET). Marcus confirms | req, times, accept | TZ |☑ |
 | 29 | Oct 9 | Kevin | Marcus asks for a quick call about offers. Kevin offers Tue Oct 13 5 pm PT. Marcus accepts. Kevin is on call, moves to Wed Oct 14 6 pm PT. Marcus confirms | req, times, accept, resched, times, accept | Q, LONG |☑ |
 | 30 | Oct 10 | Landlord | Maintenance visit Tue Oct 13 between 9 am and noon (notification, hard negative) | none | FOOT |☑ |
 | 31 | Oct 11 | Gwen | Calendar-invite text: "Invitation: Final round, Pinecrest Labs @ Tue Oct 13, 2026 12pm - 3pm (EDT)" | none | FOOT |☑ |
 | 32 | Oct 12 | Jordan, Tess | Jordan: passed to the final round in New York, Tess will schedule. Tess offers Wed Oct 21, Thu Oct 22, Fri Oct 23 (all 9:00). Marcus takes Thu Oct 22 | handoff, times, accept | FOOT, SIG |☑ |
 | 33 | Oct 13 | Pinecrest recruiting | Offer letter, "please respond by Oct 27" (hard negative) | none | FOOT, LONG |☑ |
-| 34 | Oct 14 | Dana | Marcus wants offer-negotiation advice. Dana copies Grace Kim, the career center's offers specialist. Grace: Fri Oct 16 at 11, Zoom. Marcus confirms | req, handoff, times, accept | SIG |☑ |
+| 34 | Oct 14 | Dana | Marcus wants offer-negotiation advice. Dana copies Grace Kim, the career center's offers specialist. Grace: Fri Oct 16 at 11, Zoom. Marcus confirms | req, req, times, accept | SIG |☑ |
 | 35 | Oct 15 | Osei | Marcus has to move Mon Oct 19 (prep for Larkmoor). Osei: "Mondays only, so Oct 26 at 10". Marcus confirms | resched, times, accept | Q |☑ |
 | 36 | Oct 15 | Sam | Marcus: study session Thu 8 pm in the library? Sam: yes. Sam: "actually 9? practice runs late". Marcus: ok | times, accept, resched, accept | MOB |☑ |
 | 37 | Oct 16 | CS dept list | Colloquium Thu Oct 22, 4 pm | none | FOOT |☑ |
