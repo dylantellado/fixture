@@ -51,7 +51,8 @@ uv run pytest                             # tests, no API calls
 
 Flags: `--model` (default in `main.py`), `--limit N` (first N messages in user,
 thread, position order), `--concurrency` (default 4), `--users`, `--messages`,
-`--annotations`, `--project`, `--location`, `--price-input` / `--price-output`
+`--annotations`, `--project`, `--location`, `--thinking-budget N` (cap on thinking
+tokens per call; default: the model's own), `--price-input` / `--price-output`
 (US$ per 1M tokens, for models not in `scoring.PRICES`).
 
 Rate limits and transient errors (408, 429, 5xx, network) are retried up to 6
@@ -61,10 +62,12 @@ error, counted under "Failures" in the report and left out of the scores.
 ## The prompt
 
 - **System part:** short instructions (`prompt.INSTRUCTIONS`) plus the text of
-  `docs/data/labeling_rules.md`, read from the file at every run. The "Not adopted"
-  (proposals) and "Change log" sections are cut out; if either heading can't be
-  found the run stops, so a renamed section can't slip in. The exact text sent is
-  saved as `system_prompt.txt` in the run folder.
+  `docs/data/labeling_rules.md`, read from the file at every run. The sections in
+  `prompt.EXCLUDED_HEADINGS` ("Not adopted" and "Change log") are cut out; if a listed
+  heading can't be found the run stops, so a renamed section can't slip in. Tests check
+  that no training or eval message id, and no `eval_`, reaches any prompt. Each report
+  records the rules version and the sha256 of the exact rules text sent; the full system
+  part is saved as `system_prompt.txt` in the run folder.
 - **User part:** the mailbox owner, the subject, the earlier messages in the thread
   (oldest first, with From and Date), then the target message (From, To, Date) between
   `=== TARGET MESSAGE ===` markers. Later messages in the thread are never shown.
@@ -77,11 +80,78 @@ error, counted under "Failures" in the report and left out of the scores.
 | File | Contents |
 |---|---|
 | `predictions.jsonl` | one line per message: `message_id`, `user_id`, true and predicted label and `needs_response`, `reason`, latency, input/output/thinking tokens, attempts, error |
-| `report.md` | run info, label accuracy and per-label precision/recall/F1, confusion matrix, scheduling recall (scheduling email predicted `none` is the worst error), needs_response scores, results by user (user_01–03 vs user_04), tokens, cost and latency, and the 20 most informative mistakes |
+| `report.md` | run info (model, thinking budget, rules version and sha256 of the rules text sent, git commit), label accuracy and per-label precision/recall/F1, confusion matrix, scheduling recall (scheduling email predicted `none` is the worst error), needs_response scores, results by user (user_01–03 vs user_04), tokens, cost and latency, and the 20 most informative mistakes |
 | `system_prompt.txt` | the exact system part sent |
 
 Hard-negative accuracy is reported only if the annotations mark hard negatives
 (a `hard_negative` field); the v1.2 training annotations don't.
+
+## Results
+
+Three full runs of the 377 training messages with `gemini-3.8-flash` on `global`,
+temperature 0, concurrency 4, 0 failures each. The only differences are the rules
+text sent and the thinking budget.
+
+**The leak:** rules v1.2 had a section 6 listing specific training messages with their
+correct answers (label corrections and kept `needs_response` judgment calls), and the
+first run sent it to Gemini as part of the rules. Rules v1.3 moved it to
+`docs/data/training_conflicts.md`, so the clean runs see only rules in force.
+
+| | Leaked (rules v1.2) | Clean (rules v1.3) | Clean, thinking budget 128 |
+|---|---|---|---|
+| Run | [`20261029-190428Z`](runs/20261029-190428Z/report.md) | [`20261029-192758Z`](runs/20261029-192758Z/report.md) | [`20261029-194238Z`](runs/20261029-194238Z/report.md) |
+| Label accuracy | 0.992 (374/377) | 0.984 (371/377) | 0.989 (373/377) |
+| Scheduling recall | 0.996 (1 of 281 as `none`) | 0.993 (2 of 281 as `none`) | 0.996 (1 of 281 as `none`) |
+| False alarms (`none` → scheduling) | 0 of 96 | 1 of 96 | 1 of 96 |
+| needs_response accuracy | 1.000 | 0.997 | 0.992 |
+| needs_response precision | 1.000 | 0.991 | 0.973 |
+| needs_response recall | 1.000 | 1.000 | 1.000 |
+| Thinking tokens (total / median per call) | 124,055 / 189 | 131,129 / 189 | 2,412 / 0 |
+| Estimated cost | $1.55 | $1.42 | $0.95 |
+| Latency median / p95 | 3.5 s / 18.4 s | 3.8 s / 20.5 s | 2.4 s / 14.0 s |
+
+Costs use $0.75/1M input and $3.75/1M output and thinking (third-party list prices,
+no caching discount). The leaked run cost more despite less thinking because section 6
+made every prompt longer.
+
+**How much the leak mattered:** only 4 of 377 answers changed between the leaked and
+clean runs. Two are tied to section 6: `2b1bc892af42b94d` is listed there, and
+`b69c3b5f0b813da8` is in the thread its "TAs splitting course sections" note describes.
+The other two (`9d32fed4db2eaa52`, `b596f36dd0aba440`) aren't mentioned in it, so they
+are run-to-run variation or a side effect of the changed prompt. A difference of 2 or 3
+messages between runs is within that noise.
+
+### Mistakes in the clean run
+
+| message_id | true | predicted | Gemini's reason | Kind |
+|---|---|---|---|---|
+| `b596f36dd0aba440` | new_request | none | "The message inquires about career center services rather than asking to set up a meeting (D6)…" | **Model error.** "Does the career center do mock technical interviews? I'd really like to practice" asks for a session (D1, E11). |
+| `dedb6df0524a507a` | reschedule | none | "This is an announcement of office hours sent to a group mailing list, which is classified as none under E3…" | **Unclear rule:** E3 vs E4/T3 for office hours cancelled one week with a substitute (open question Q1). |
+| `b69c3b5f0b813da8` | none | acceptance | "The user confirms and agrees to the proposed section assignment and time (D3)…" | **Unclear rule:** no written rule says that agreeing who teaches which section isn't confirming a meeting time; that judgment was only in the leaked notes. |
+| `166482ab09374bcc` | acceptance | assistant_handoff | "The email provides the first notice handing coordination of the visit and schedule to recruiting coordinator Dev Shah (D5, T2) while restating the already agreed date (E14)…" | **Possibly wrong label.** The user had already picked Friday (D3), so "Friday it is!" restates an agreed time (E14) and hands over travel logistics (E1), which the written rules make `none`. Gemini's answer is wrong either way (PR ranks acceptance above handoff). |
+| `76885a71c68ac079` | proposed_times | assistant_handoff | "Irene is coordinating on Dr. Achebe's behalf as the initial notice of a handoff (D5, E17, T2, PR3)…" | **Unclear rule:** T2 scope, first handoff in the thread or in the mailbox (open question Q2). |
+| `9d32fed4db2eaa52` | proposed_times | assistant_handoff | "Owen is coordinating a meeting on Ruth's behalf as the initial scheduling contact (E17, T2, D5)…" | **Unclear rule:** T2 scope (Q2). |
+| `2b1bc892af42b94d` | new_request, needs_response false | new_request, needs_response **true** | "This is an introduction connecting the user with a specialist who will meet with him directly… the user must coordinate to set up a time under NR1." | **Unclear rule:** no needs_response rule covers introductions; the calls for them are only in `training_conflicts.md`. |
+
+1 model error, 5 unclear rules, 1 possibly wrong label. No labels or rules were changed.
+
+### Thinking budget
+
+The third run sets `--thinking-budget 128`. I picked it from the leaked run's thinking per
+call (25th percentile 136 tokens, median 189; the clean run's are 135 and 189): it sits below
+the 25th percentile, so it binds on most calls, and it caps the long tail (in the clean run,
+17 calls over 1,000 tokens produced 36% of all thinking). In practice the model
+treated 128 as "almost no thinking": the median was 0 and the total 2,412 tokens. Even so,
+label accuracy and scheduling recall held (0.989 and 0.996, within run-to-run noise of the
+clean run), cost fell 33% and median latency 37%. The cost was 3 extra `needs_response`
+= true on introductions (`6036baac6f4ce32a`, `9d817cdfb67a8e11`, `2b1bc892af42b94d`): the
+same rule gap as above, in the safer direction (an unneeded reply, never a missed one).
+
+**Recommendation:** use `--thinking-budget 128` for routine baseline runs: same label
+quality, a third cheaper and faster. Keep the model's default thinking when
+needs_response matters most, until the introduction gap gets a rule. The default in
+`main.py` stays unchanged until we decide. These are training numbers near the ceiling,
+so a thinking setting that matters on harder mail may not show up here.
 
 ## Files
 

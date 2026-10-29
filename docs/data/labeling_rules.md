@@ -171,12 +171,13 @@ them as eval-v1.1).
   readings. When the principal hands off again in a new thread, the message is
   `assistant_handoff` (`47af86117df33131`, `7ae0f9aeb1b22234`, `49ec03bc60f62177`). When an
   assistant the user already deals with writes first in a new thread, it is labeled by what it
-  does (`76885a71c68ac079`, today `proposed_times`). Suggested wording, added to T2: "T2 applies
+  does (`76885a71c68ac079` from Irene and `9d32fed4db2eaa52` from Owen, both today
+  `proposed_times`). Suggested wording, added to T2: "T2 applies
   per thread when someone hands the scheduling to another person. When the person taking over
   writes the notice themselves, it is `assistant_handoff` only if the user hasn't scheduled
-  through them before; otherwise label it by what it does." That keeps all four labels. A pure
+  through them before; otherwise label it by what it does." That keeps all five labels. A pure
   "first in the mailbox" reading would change the first three; a pure "first in the thread"
-  reading would change `76885a71c68ac079` to `assistant_handoff`.
+  reading would change `76885a71c68ac079` and `9d32fed4db2eaa52` to `assistant_handoff`.
 - **Q3 (a `hard_negative` field, Will's area):** add `hard_negative` (bool) to every line of
   `data/source/annotations.jsonl`: `true` for a `none` message that mentions dates, times or
   meetings but isn't a scheduling ask (deadlines, event announcements, automated confirmations,
