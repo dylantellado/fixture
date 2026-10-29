@@ -208,9 +208,11 @@ def render_report(df: pd.DataFrame, info: dict) -> str:
         "## Run",
         "",
         f"- Model: `{info['model']}` (served as {', '.join(f'`{v}`' for v in info['model_versions']) or 'n/a'}), "
-        f"Vertex AI `{info['project']}` / `{info['location']}`, temperature 0, structured JSON output",
+        f"Vertex AI `{info['project']}` / `{info['location']}`, temperature 0, structured JSON output, "
+        f"thinking budget {info.get('thinking_budget') if info.get('thinking_budget') is not None else 'model default'}",
         f"- Labeling rules: v{info['rules_version']} (`docs/data/labeling_rules.md`, without the "
         f"\"Not adopted\" and \"Change log\" sections); annotations follow v{info['annotation_rules_version']}",
+        f"- Rules text sent: sha256 `{info.get('rules_sha256', 'not recorded')}`",
         f"- Git commit: `{info['git_commit']}`",
         f"- Date: {info['date']}",
         f"- Messages: {len(df)}{' (--limit ' + str(info['limit']) + ')' if info.get('limit') else ''}, "

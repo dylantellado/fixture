@@ -65,13 +65,18 @@ def parse_answer(text: str) -> dict:
     return {"label": answer["label"], "needs_response": answer["needs_response"], "reason": str(answer.get("reason", ""))}
 
 
-def classify(client: genai.Client, model: str, system: str, user: str) -> dict:
-    """Label one message. Never raises: errors come back in the `error` field."""
+def classify(client: genai.Client, model: str, system: str, user: str, thinking_budget: int | None = None) -> dict:
+    """Label one message. Never raises: errors come back in the `error` field.
+
+    `thinking_budget` caps the model's thinking tokens (None: the model's default).
+    It is a soft cap: gemini-3.8-flash still thinks a little with a budget of 0.
+    """
     config = types.GenerateContentConfig(
         system_instruction=system,
         temperature=0,
         response_mime_type="application/json",
         response_schema=RESPONSE_SCHEMA,
+        thinking_config=types.ThinkingConfig(thinking_budget=thinking_budget) if thinking_budget is not None else None,
     )
 
     def call():

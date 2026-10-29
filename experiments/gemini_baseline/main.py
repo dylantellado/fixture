@@ -60,6 +60,7 @@ def parse_args(argv=None) -> argparse.Namespace:
     p.add_argument("--model", default=DEFAULT_MODEL, help=f"Gemini model id (default {DEFAULT_MODEL})")
     p.add_argument("--limit", type=int, help="only the first N messages (in user, thread, position order)")
     p.add_argument("--concurrency", type=int, default=4, help="parallel calls (default 4)")
+    p.add_argument("--thinking-budget", type=int, help="cap on thinking tokens per call (default: the model's own)")
     p.add_argument("--users", nargs="+", default=TRAINING_USERS, help="training users to run (default all four)")
     p.add_argument("--messages", type=Path, default=MESSAGES_PATH, help="processed messages.jsonl")
     p.add_argument("--annotations", type=Path, default=ANNOTATIONS_PATH, help="training annotations.jsonl")
@@ -100,10 +101,10 @@ def build_jobs(messages, owners, users, limit):
     ]
 
 
-def run(jobs, client, model, system, concurrency) -> list[dict]:
+def run(jobs, client, model, system, concurrency, thinking_budget=None) -> list[dict]:
     rows = []
     with ThreadPoolExecutor(max_workers=concurrency) as pool:
-        futures = {pool.submit(gemini.classify, client, model, system, user): m for m, user in jobs}
+        futures = {pool.submit(gemini.classify, client, model, system, user, thinking_budget): m for m, user in jobs}
         for done, future in enumerate(as_completed(futures), start=1):
             m = futures[future]
             result = future.result()
@@ -149,10 +150,13 @@ def main(argv=None) -> int:
     run_dir = RUNS_DIR / started.strftime("%Y%m%d-%H%M%SZ")
     run_dir.mkdir(parents=True)
     (run_dir / "system_prompt.txt").write_text(system, encoding="utf-8")
-    log.info("model %s, %d messages, concurrency %d -> %s", args.model, len(jobs), args.concurrency, run_dir)
+    log.info(
+        "model %s, %d messages, concurrency %d, thinking budget %s, rules v%s sha256 %s -> %s",
+        args.model, len(jobs), args.concurrency, args.thinking_budget, rules_version, prompt.text_sha256(rules_text)[:12], run_dir,
+    )  # fmt: skip
 
     client = gemini.make_client(args.project, args.location)
-    rows = run(jobs, client, args.model, system, args.concurrency)
+    rows = run(jobs, client, args.model, system, args.concurrency, args.thinking_budget)
 
     with open(run_dir / "predictions.jsonl", "w", encoding="utf-8") as f:
         for row in rows:
@@ -168,6 +172,8 @@ def main(argv=None) -> int:
         "project": args.project,
         "location": args.location,
         "rules_version": rules_version,
+        "rules_sha256": prompt.text_sha256(rules_text),
+        "thinking_budget": args.thinking_budget,
         "annotation_rules_version": ", ".join(sorted({m["annotation_rules_version"] for m in messages})),
         "git_commit": git_commit(),
         "date": started.strftime("%Y-%m-%d %H:%M UTC"),

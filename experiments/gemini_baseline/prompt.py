@@ -2,9 +2,10 @@
 
 The system part is short instructions plus docs/data/labeling_rules.md, read
 from the file at every run so the prompt always follows the current rules.
-The sections that aren't rules in force are cut out (see EXCLUDED_SECTIONS).
+The sections that aren't rules in force are cut out (see EXCLUDED_HEADINGS).
 """
 
+import hashlib
 import re
 from collections import Counter
 from email.utils import parseaddr
@@ -16,12 +17,10 @@ RULES_PATH = REPO_ROOT / "docs" / "data" / "labeling_rules.md"
 
 LABELS = ["new_request", "proposed_times", "acceptance", "reschedule", "assistant_handoff", "none"]
 
-# "## " sections of labeling_rules.md left out of the prompt, matched on the
-# heading: proposals that were not adopted (section 5) and the change log.
-EXCLUDED_SECTIONS = {
-    "proposed": re.compile(r"not adopted|proposed", re.IGNORECASE),
-    "change log": re.compile(r"change log", re.IGNORECASE),
-}
+# "## " sections of labeling_rules.md left out of the prompt: proposals and open
+# questions that are not in force, and the change log. Matched on the heading text
+# after any "5. " number, e.g. "## 5. Not adopted (as of v1.3)" -> "Not adopted".
+EXCLUDED_HEADINGS = ["Not adopted", "Change log"]
 
 INSTRUCTIONS = """\
 You label emails for Fixture, a scheduling assistant for students. Each email is \
@@ -60,24 +59,30 @@ def rules_version(text: str) -> str:
     return match.group(1)
 
 
-def strip_sections(text: str) -> str:
-    """Remove the EXCLUDED_SECTIONS (each runs from its '## ' heading to the next one).
+def heading_name(chunk: str) -> str:
+    """'## 5. Not adopted (as of v1.3)\n...' -> 'Not adopted (as of v1.3)'; '' if not a '## ' section."""
+    if not chunk.startswith("## "):
+        return ""
+    return re.sub(r"^\d+\.\s*", "", chunk.splitlines()[0][3:].strip())
 
-    Raises if one isn't found, so a renamed heading can't slip proposals or the
-    change log into the prompt unnoticed.
+
+def strip_sections(text: str, excluded: list[str] = EXCLUDED_HEADINGS) -> str:
+    """Remove the `excluded` sections (each runs from its '## ' heading to the next one).
+
+    Raises if a listed heading isn't found, so a renamed section can't slip
+    into the prompt unnoticed.
     """
-    chunks = re.split(r"(?m)^(?=## )", text)
     kept, found = [], set()
-    for chunk in chunks:
-        heading = chunk.splitlines()[0] if chunk.startswith("## ") else ""
-        matched = [name for name, pattern in EXCLUDED_SECTIONS.items() if heading and pattern.search(heading)]
+    for chunk in re.split(r"(?m)^(?=## )", text):
+        name = heading_name(chunk)
+        matched = [heading for heading in excluded if name.startswith(heading)]
         if matched:
             found.update(matched)
         else:
             kept.append(chunk)
-    missing = set(EXCLUDED_SECTIONS) - found
+    missing = [heading for heading in excluded if heading not in found]
     if missing:
-        raise ValueError(f"labeling rules have no section matching {sorted(missing)}; update EXCLUDED_SECTIONS")
+        raise ValueError(f"labeling rules have no '## ' section headed {missing}; update EXCLUDED_HEADINGS")
     return "".join(kept).strip() + "\n"
 
 
@@ -85,6 +90,11 @@ def load_rules(path: Path = RULES_PATH) -> tuple[str, str]:
     """Return (rules text for the prompt, rules version)."""
     text = Path(path).read_text(encoding="utf-8")
     return strip_sections(text), rules_version(text)
+
+
+def text_sha256(text: str) -> str:
+    """Hash of the exact rules text sent, recorded in each report."""
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def system_prompt(rules_text: str) -> str:

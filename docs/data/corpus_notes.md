@@ -75,7 +75,7 @@ per user, and ingest keeps every copy.
 
 Labels follow `docs/data/labeling_rules.md` (v1.2). Rules v1.1 corrected 2 labels and v1.2 another 12,
 mostly introductions that were `assistant_handoff` and are now `new_request` (E17). The full list
-is in PR #14.
+is in PR #14 and [`training_conflicts.md`](training_conflicts.md).
 
 **`needs_response`** (does the user have to reply to move a meeting forward?) is in
 `data/source/annotations.jsonl`, one line per message keyed by `user_id`, `thread_id` and
