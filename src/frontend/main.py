@@ -1,4 +1,5 @@
-"""Fixture demo web app: sign in with Google, then see your calendar and inbox.
+"""Fixture demo web app: sign in with Google, then see your calendar and inbox,
+with each recent email labeled by the classifier service (Gemini).
 The /search page searches fake demo mailboxes through the Fixture API, and /about
 explains the pipeline with live status. Neither needs sign-in.
 
@@ -6,6 +7,7 @@ Run from src/frontend with:
     uv run uvicorn main:app --port 8501 --reload
 """
 
+import logging
 import os
 import sys
 from pathlib import Path
@@ -24,6 +26,8 @@ from starlette.middleware.sessions import SessionMiddleware
 
 import api_client
 import google_data
+import live_labels
+from classification_cache import ClassificationCache
 from credential_store import CredentialStore
 
 # This file lives in src/frontend/, so the repo root is three levels up.
@@ -34,6 +38,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # Read settings from .env at the repo root. Docker passes them in directly instead.
 load_dotenv(REPO_ROOT / ".env")
+
+# Our own log lines (e.g. which message ids were classified) at INFO. Never log email text.
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 
 def require_env(name: str, how_to_generate: str) -> str:
@@ -118,6 +125,8 @@ try:
     store = CredentialStore(DATA_DIR / "fixture.db", TOKEN_ENCRYPTION_KEY)
 except ValueError:
     sys.exit("TOKEN_ENCRYPTION_KEY is not a valid key. Generate a new one (see .env.example).")
+# Gemini's labels for real emails, by account and Gmail message id (no email text), in the same file.
+label_cache = ClassificationCache(DATA_DIR / "fixture.db")
 
 app = FastAPI(title="Fixture")
 # The signed browser cookie holds only the user's email; Google tokens stay in the database.
@@ -171,7 +180,7 @@ def home(request: Request):
 
     # Load each service separately so one failing doesn't hide the other.
     calendar = {"items": [], "calendars": [], "skipped": [], "error": None}
-    inbox = {"items": [], "error": None}
+    inbox = {"items": [], "error": None, "labels": None}
     try:
         calendar.update(google_data.fetch_events(creds))
     except HttpError as e:
@@ -180,6 +189,9 @@ def home(request: Request):
         inbox["items"] = google_data.fetch_emails(creds)
     except HttpError as e:
         inbox["error"] = e.reason
+    if inbox["items"]:
+        # Label each email with Gemini (cached), or fall back to keywords if the classifier is down.
+        inbox["labels"] = live_labels.label_emails(creds, inbox["items"], label_cache, request.session["email"])
 
     return templates.TemplateResponse(
         request,
@@ -297,9 +309,10 @@ def callback(request: Request):
 
 @app.get("/auth/logout")
 def logout(request: Request):
-    """Sign out and delete this user's stored credentials (in every browser)."""
+    """Sign out and delete this user's stored credentials (in every browser) and cached labels."""
     email = request.session.get("email")
     if email:
         store.delete(email)
+        label_cache.delete_account(email)
     request.session.clear()
     return RedirectResponse("/")

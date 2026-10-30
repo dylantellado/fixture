@@ -18,7 +18,7 @@ Fixture is a Harvard AC215 course project by Dylan Tellado and Will Sherwood. It
 - **Prefer simple, easy-to-change solutions** so we can pivot without large rewrites.
 - **Keep this file current:** if a request changes the project's direction, update CLAUDE.md to match.
 
-**What exists so far:** a Google connection proof of concept and the Milestone 2 search pipeline on fake data. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail, plus a "Search past threads" page over the demo mailboxes. Everything is read-only; nothing writes to a calendar or sends email yet. `ingest` and `preprocess` are working one-shot jobs over a generated, fictional email corpus of 4 users (see `docs/data/corpus_notes.md`; plan in `docs/data/generation/`); `rag` indexes each user's messages into their own ChromaDB collection; `api` answers `GET /health`, `GET /users`, and `POST /search`, which searches one user's collection only.
+**What exists so far:** a Google connection proof of concept and the Milestone 2 search pipeline on fake data. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail, plus a "Search past threads" page over the demo mailboxes. The dashboard labels the signed-in user's 20 most recent emails with the `classifier` service (Gemini on Vertex AI, following `docs/data/labeling_rules.md`): a label, a "Needs response" badge and a one-line reason, cached per account and Gmail message id in `data/fixture.db` (deleted on sign-out), with the old keyword match as a fallback when the classifier is down. Everything is read-only; nothing writes to a calendar or sends email yet. `ingest` and `preprocess` are working one-shot jobs over a generated, fictional email corpus of 4 users (see `docs/data/corpus_notes.md`; plan in `docs/data/generation/`); `rag` indexes each user's messages into their own ChromaDB collection; `api` answers `GET /health`, `GET /users`, and `POST /search`, which searches one user's collection only; `classifier` answers `GET /health` and `POST /classify`.
 
 ## Milestone 2
 
@@ -28,7 +28,7 @@ Fixture is a Harvard AC215 course project by Dylan Tellado and Will Sherwood. It
 
 **Ownership:**
 - **Will:** data generation, `src/ingest`, `src/preprocess`, DVC, labels, test scenarios
-- **Dylan:** `src/rag`, `src/api`, the frontend search page, the `chromadb` service, the mockup
+- **Dylan:** `src/rag`, `src/api`, `src/classifier`, the frontend (search page and live labels), the `chromadb` and `classifier` services, the mockup
 - **Both:** `docker-compose.yml` (each edits only their own services), `README.md`, `docs/` and evidence
 
 Will and Dylan build in parallel with separate Claude Code sessions. Stay inside your owner's area; if a change is needed in the other person's area, say so instead of making it.
@@ -54,14 +54,20 @@ src/
   rag/          indexes each user's messages into ChromaDB (messages_<user_id>); query.py searches from the command line
   api/          FastAPI app (port 8000): GET /health, GET /users, POST /search; ChromaDB access in chroma_store.py
   (chromadb)    ChromaDB server from a pinned image, no folder (host port 8001)
+  classifier/   FastAPI service (port 8002): POST /classify labels one email in its thread with Gemini
+                on Vertex AI (label, needs_response, reason); prompt.py builds the prompt from
+                docs/data/labeling_rules.md minus "Not adopted", "Training data" and "Change log"
+                (it fails at startup if one of those headings is missing), gemini.py calls the model; uses gcloud application-default
+                credentials, never logs or saves email text
   frontend/     FastAPI web app (port 8501): Sign in with Google, then a dashboard of
-                upcoming events (all checked calendars) and recent emails with a
-                keyword-based scheduling filter; /search searches the demo mailboxes
+                upcoming events (all checked calendars) and recent emails labeled by
+                the classifier (keyword fallback when it's down), with Scheduling and
+                Needs response filters; /search searches the demo mailboxes
                 through the api and /about shows the pipeline and live status, both
                 with no sign-in; one shared top bar (templates/_nav.html)
 ```
 
-Inside `src/frontend/`: `main.py` (routes and sign-in), `google_data.py` (Google API calls and formatting), `credential_store.py` (encrypted SQLite storage for users' Google logins), `api_client.py` (calls to the api for the search page), `templates/` (Jinja HTML), `static/` (CSS), `test_*.py` (tests), and `conftest.py` (throwaway settings for tests).
+Inside `src/frontend/`: `main.py` (routes and sign-in), `google_data.py` (Google API calls and formatting), `credential_store.py` (encrypted SQLite storage for users' Google logins), `api_client.py` (calls to the api for the search page), `classifier_client.py` (calls to the classifier), `live_labels.py` (labels the dashboard's emails: cache, parallel calls, fallback), `classification_cache.py` (the label cache in `data/fixture.db`: a hash of the account's email, message id, label, needs_response, reason, model, rules version, time; never email text; deleted on sign-out), `cleaning.py` (copied from `src/preprocess/cleaning.py`; keep in sync by hand), `templates/` (Jinja HTML), `static/` (CSS), `test_*.py` (tests), and `conftest.py` (throwaway settings for tests).
 
 For Milestone 2, the pipeline is ingest → preprocess → rag (one-shot jobs) → api → frontend, as described in the README's Data contract.
 
@@ -71,7 +77,7 @@ Each service under `src/` is currently self-contained, with its own `Dockerfile`
 
 - Google Cloud project: `fixture-ac215-96dhbm`. Calendar and Gmail APIs are enabled.
 - The OAuth consent screen is in Testing mode, so only listed test users can sign in, and logins expire after about 7 days.
-- Permissions are listed in one `SCOPES` list per service: `src/ingest/google_auth.py` (read-only Calendar) and `src/frontend/main.py` (read-only Calendar and Gmail, plus basic profile). Ask before adding write permissions.
+- Permissions are listed in one `SCOPES` list per service: `src/ingest/google_auth.py` (read-only Calendar) and `src/frontend/main.py` (read-only Calendar and Gmail, plus basic profile). Ask before adding write permissions. The classifier uses no Google user permissions: it gets email text from the web app and calls Vertex AI with gcloud application-default credentials (`aiplatform.googleapis.com` is enabled; Docker mounts `~/.config/gcloud` read-only).
 - Files in `secrets/` (never commit them; get them from a teammate privately):
   - `credentials.json`: "Fixture Desktop" OAuth client, used by `src/ingest`
   - `web_credentials.json`: "Fixture Web" OAuth client, used by `src/frontend` (redirect URI `http://localhost:8501/auth/callback`)
@@ -115,7 +121,13 @@ API (from `src/api`; then open http://localhost:8000/health):
 uv run uvicorn main:app --port 8000 --reload
 ```
 
-Tests (from any service folder: `src/ingest`, `src/preprocess`, `src/rag`, `src/api`, or `src/frontend`):
+Classifier (from `src/classifier`; needs `gcloud auth application-default login` once; then open http://localhost:8002/health). Run the web app as above and it finds the classifier at `CLASSIFIER_URL` (default `http://localhost:8002`):
+
+```sh
+GOOGLE_CLOUD_PROJECT=fixture-ac215-96dhbm uv run uvicorn main:app --port 8002 --reload
+```
+
+Tests (from any service folder: `src/ingest`, `src/preprocess`, `src/rag`, `src/api`, `src/classifier`, or `src/frontend`):
 
 ```sh
 uv run pytest
@@ -124,6 +136,7 @@ uv run pytest
 ## Working rules
 
 - **Never commit secrets:** that includes `.env`, credentials, API keys, tokens, and personal email or calendar data. Use fake data in `samples/`.
+- **Real email stays private:** live classification sends the signed-in user's email text to Gemini in our own GCP project. Never log or save real email bodies, subjects or senders (logs may hold message ids, labels and timing), and never put real email in tests, samples or commits.
 - **Keep code simple, readable, and commented:** both team members must be able to explain any part of it.
 - **Add tests for new features.**
 - **Work on a feature branch in its own git worktree:** Will and Dylan each work in a separate worktree so parallel sessions don't collide. Merge into `main` only through a pull request.

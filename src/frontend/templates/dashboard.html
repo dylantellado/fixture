@@ -64,7 +64,9 @@
     </section>
 
     <section class="card">
-      {% set scheduling_count = inbox["items"] | selectattr("scheduling_match") | list | length %}
+      {% set labels = inbox.labels %}
+      {% set scheduling_count = inbox["items"] | selectattr("is_scheduling") | list | length %}
+      {% set needs_response_count = inbox["items"] | selectattr("needs_response") | list | length %}
       <header class="card-head">
         <h2>Recent emails</h2>
         {% if inbox["items"] %}
@@ -72,9 +74,23 @@
         <div class="segmented" role="group" aria-label="Filter emails">
           <button type="button" data-filter="all" aria-pressed="true">All <span>{{ inbox["items"] | length }}</span></button>
           <button type="button" data-filter="scheduling" aria-pressed="false">Scheduling <span>{{ scheduling_count }}</span></button>
+          {% if labels and labels.mode == "gemini" %}
+          <button type="button" data-filter="needs-response" aria-pressed="false">Needs response <span>{{ needs_response_count }}</span></button>
+          {% endif %}
         </div>
         {% endif %}
       </header>
+      {% if labels %}
+      {# Where the tags come from, and anything that didn't work. #}
+      {% if labels.mode == "fallback" %}
+      <p class="label-notice notice-warn">The Gemini classifier isn't reachable, so the Scheduling tags below come from simple keyword rules.</p>
+      {% else %}
+      <p class="label-notice">Labeled by Gemini ({{ labels.model }}) using labeling rules v{{ labels.rules_version }}. Hover or open an email to see why.
+        {%- if labels.pending %} {{ labels.pending }} still classifying; <a href="/">reload</a> in a moment.{% endif %}
+        {%- if labels.errors %} <span class="warn">{{ labels.errors }} couldn't be classified and show keyword tags instead.</span>{% endif %}
+      </p>
+      {% endif %}
+      {% endif %}
       {% if inbox.error %}
       <p class="empty">Couldn't load your inbox: {{ inbox.error }}</p>
       {% elif not inbox["items"] %}
@@ -82,7 +98,8 @@
       {% else %}
       <ul class="list" id="email-list" data-filter="all">
         {% for m in inbox["items"] %}
-        <li class="email {{ 'unread' if m.unread }} {{ 'is-scheduling' if m.scheduling_match }}">
+        {% set ai = m.ai or {"state": "off"} %}
+        <li class="email {{ 'unread' if m.unread }} {{ 'is-scheduling' if m.is_scheduling }} {{ 'needs-response' if m.needs_response }}">
           {# <details> expands on click with no JavaScript. #}
           <details>
             <summary class="row">
@@ -92,26 +109,40 @@
               </div>
               <div class="meta">
                 <span class="date">{{ m.date }}</span>
-                {% if m.scheduling_match %}<span class="tag">Scheduling</span>{% endif %}
+                {% if ai.state == "done" %}
+                <span class="label-chip label-{{ ai.label }}" title="{{ ai.reason }}">{{ ai.label_name }}</span>
+                {% if ai.needs_response %}<span class="tag tag-respond">Needs response</span>{% endif %}
+                {% elif ai.state == "pending" %}
+                <span class="tag tag-pending">Classifying…</span>
+                {% elif m.scheduling_match %}
+                <span class="tag" title="Keyword match: “{{ m.scheduling_match }}”">Scheduling</span>
+                {% endif %}
               </div>
               <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </summary>
             <div class="preview">
               <p>{{ m.snippet or "No preview available." }}</p>
+              {% if ai.state == "done" %}
+              <p class="why">Gemini: <strong>{{ ai.label_name }}</strong>{% if ai.needs_response %}, needs your response{% endif %}. {{ ai.reason }}</p>
+              {% elif ai.state == "pending" %}
+              <p class="why">Gemini is still classifying this email. Reload in a moment.</p>
+              {% else %}
+              {% if ai.state == "error" %}<p class="why">Gemini couldn't classify this email.</p>{% endif %}
               {% if m.scheduling_match %}
-              <p class="why">Tagged as scheduling because it mentions <strong>“{{ m.scheduling_match }}”</strong>.</p>
+              <p class="why">Tagged as scheduling by keyword rules because it mentions <strong>“{{ m.scheduling_match }}”</strong>.</p>
+              {% endif %}
               {% endif %}
             </div>
           </details>
         </li>
         {% endfor %}
       </ul>
-      <p class="empty empty-filtered">No scheduling emails in your last {{ inbox["items"] | length }} messages.</p>
+      <p class="empty empty-filtered">No matching emails in your last {{ inbox["items"] | length }} messages.</p>
       {% endif %}
     </section>
   </div>
 
-  <p class="footnote">Read-only demo. Showing your next 10 events across your checked calendars and 20 most recent inbox emails (headers and Gmail's short preview only). Scheduling tags come from simple keyword rules.</p>
+  <p class="footnote">Read-only demo. Showing your next 10 events across your checked calendars and 20 most recent inbox emails (headers and Gmail's short preview on screen). To label them, each email's thread is sent to Gemini in Fixture's own Google Cloud project; labels are cached per account by message id (never the email text) and deleted when you sign out. If the classifier is down, tags come from simple keyword rules.</p>
 </main>
 
 <script>

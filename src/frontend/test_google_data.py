@@ -43,6 +43,8 @@ def test_email_with_display_name():
         },
     }
     assert format_email(message) == {
+        "id": "",
+        "thread_id": "",
         "sender": "Jane Recruiter",
         "address": "jane@example.com",
         "subject": "Interview times",

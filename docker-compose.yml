@@ -3,6 +3,7 @@
 #   chromadb                      vector database; rag waits until it is healthy
 #   api                           starts after rag finishes
 #   frontend                      starts after api is healthy
+#   classifier                    independent; the frontend falls back to keyword tags while it's down
 #
 # Each service is owned by one person (see CLAUDE.md); edit only your own.
 
@@ -89,6 +90,30 @@ services:
       timeout: 3s
       retries: 20
 
+  # Labels the web app's real Gmail emails with Gemini on Vertex AI (see src/classifier/README.md).
+  # Uses your gcloud application-default credentials (gcloud auth application-default login),
+  # mounted read-only. No .env and no secrets/ folder. Email text goes to Gemini in our own
+  # GCP project and is never logged or saved.
+  classifier:
+    build: ./src/classifier
+    environment:
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-fixture-ac215-96dhbm}
+      - GOOGLE_CLOUD_LOCATION=${GOOGLE_CLOUD_LOCATION:-global}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.8-flash}
+      - GEMINI_THINKING_BUDGET=${GEMINI_THINKING_BUDGET:-128}
+      - RULES_PATH=/rules/labeling_rules.md
+    ports:
+      - "8002:8002"
+    volumes:
+      - ~/.config/gcloud:/root/.config/gcloud:ro
+      # The labeling rules are read from the repo, so the prompt always matches docs/.
+      - ./docs/data/labeling_rules.md:/rules/labeling_rules.md:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
   # --- Web app ---
 
   frontend:
@@ -98,6 +123,7 @@ services:
       - SECRETS_DIR=/run/secrets
       - DATA_DIR=/data
       - API_URL=http://api:8000
+      - CLASSIFIER_URL=http://classifier:8002
     ports:
       - "8501:8501"
     depends_on:
