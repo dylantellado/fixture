@@ -61,7 +61,7 @@ list `ds-seminar@lists.college.example`, Brightwater recruiting system
 | 09 | Sep 15 | Alex | Alex proposes a grading session Thu Sep 17 7 pm. Sofia accepts. Alex moves it to Fri Sep 18 7 pm. Sofia confirms. Alex moves it again to Sat Sep 19 11 am. Sofia confirms, gently teasing him | times, accept, resched, accept, resched, accept | MOB, QO | ☑ |
 | 10 | Sep 7 | Vasquez (class) | STAT 142 announcement: problem set 1 due Thu Sep 17, office hours Tue/Thu 4 to 5. **Identical to user_01 t004** (she TAs, so she gets it too) | none | SIG | ☑ |
 | 11 | Sep 18 | Maya | Maya invites Sofia to a first-round case interview: Tue Sep 29 10:00 am CT or Wed Sep 30 1:00 pm CT. Sofia picks Wednesday, restating it as 2:00 pm ET | times, accept | SIG, TZ, QO | ☑ |
-| 12 | Sep 21 | Irene | Irene sets up recurring biweekly meetings with Achebe, Fridays 11:00, from Sep 25. Sofia confirms | times, accept | SIG | ☑ |
+| 12 | Sep 21 | Irene | Irene sets up recurring biweekly meetings with Achebe, Fridays 11:00, from Sep 25. Sofia confirms | handoff, accept | SIG | ☑ |
 | 13 | Sep 21 | Hannah | Sofia asks for a second lunch. Hannah: Tue Sep 29 12:30. Sofia has a conflict, suggests Thu Oct 1 12:00. Hannah confirms | req, times, times, accept | QO | ☑ |
 | 14 | Sep 22 | Leo | Leo asks for a slot. Sofia's Thursday hour is full, so she copies Alex. Alex: Wed Sep 23 3:00. Leo confirms. Leo has a lab conflict and asks to move. Alex: Wed Sep 30 3:00. Leo confirms | req, req, times, accept, resched, times, accept | QO, MOB | ☑ |
 | 15 | Sep 24 | Vasquez | To TAs: "grades for PS1 due Sun Sep 27, 11:59 pm" (hard negative) | none | SIG | ☑ |

@@ -1,0 +1,13 @@
+[
+  {
+    "user_id": "eval_03",
+    "thread_id": "t029",
+    "position": 2,
+    "field": "label",
+    "old": "assistant_handoff",
+    "new": "none",
+    "rule": "T2",
+    "why": "Graham's message t029/1 already told Noor that Philippa would come back with alternatives, so this is not the first notice in the mailbox; Philippa's own message only says she will come back with options (no times, no ask)",
+    "rules_version": "1.4"
+  }
+]

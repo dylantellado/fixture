@@ -1,0 +1,200 @@
+[
+ {
+  "user_id": "eval_01",
+  "thread_id": "t015",
+  "position": 1,
+  "field": "label",
+  "old": "none",
+  "new": "new_request",
+  "rule": "E8",
+  "why": "\"Let's do this again sometime\" is a catch-up-sometime ask",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_01",
+  "thread_id": "t021",
+  "position": 0,
+  "field": "label",
+  "old": "proposed_times",
+  "new": "none",
+  "rule": "E9",
+  "why": "cold sales call offer from an admissions-coaching firm (hard negative)",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_01",
+  "thread_id": "t021",
+  "position": 1,
+  "field": "label",
+  "old": "new_request",
+  "new": "none",
+  "rule": "E9",
+  "why": "cold sales follow-up asking for 15 minutes (hard negative)",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_01",
+  "thread_id": "t028",
+  "position": 2,
+  "field": "label",
+  "old": "none",
+  "new": "new_request",
+  "rule": "E8",
+  "why": "adds \"we should get the whole lab out for coffee sometime\" to a holding reply (E11: that part decides)",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_02",
+  "thread_id": "t032",
+  "position": 0,
+  "field": "label",
+  "old": "none",
+  "new": "new_request",
+  "rule": "E8",
+  "why": "\"We should catch up sometime!\"",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_02",
+  "thread_id": "t032",
+  "position": 2,
+  "field": "label",
+  "old": "none",
+  "new": "new_request",
+  "rule": "E8",
+  "why": "declines next week and suggests coffee sometime in the new year",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_03",
+  "thread_id": "t033",
+  "position": 0,
+  "field": "label",
+  "old": "new_request",
+  "new": "none",
+  "rule": "E9",
+  "why": "cold catering sales pitch asking for a call (hard negative)",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_04",
+  "thread_id": "t026",
+  "position": 0,
+  "field": "label",
+  "old": "none",
+  "new": "acceptance",
+  "rule": "D3",
+  "why": "the recruiter's message is the only place in the thread that sets the final-round time, so it confirms a specific time rather than restating an earlier agreement (E1)",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_01",
+  "thread_id": "t007",
+  "position": 2,
+  "field": "needs_response",
+  "old": true,
+  "new": false,
+  "rule": "NR1",
+  "why": "the onsite is moved to a fixed new date and the user only replies if it conflicts",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_01",
+  "thread_id": "t015",
+  "position": 1,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR1",
+  "why": "the user must answer the suggestion to meet again",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_01",
+  "thread_id": "t018",
+  "position": 1,
+  "field": "needs_response",
+  "old": true,
+  "new": false,
+  "rule": "NR1",
+  "why": "the professor's assistant will reach out to arrange the call",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_02",
+  "thread_id": "t004",
+  "position": 0,
+  "field": "needs_response",
+  "old": true,
+  "new": false,
+  "rule": "NR4",
+  "why": "automated interview invitation from an applicant-tracking system (see proposed P5)",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_02",
+  "thread_id": "t012",
+  "position": 2,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR3",
+  "why": "confirms the time and asks for a phone number or a video link preference",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_02",
+  "thread_id": "t022",
+  "position": 2,
+  "field": "needs_response",
+  "old": true,
+  "new": false,
+  "rule": "NR2",
+  "why": "cancels with no new time and no invitation to propose one",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_02",
+  "thread_id": "t032",
+  "position": 0,
+  "field": "needs_response",
+  "old": false,
+  "new": true,
+  "rule": "NR1",
+  "why": "the user must answer the suggestion to catch up",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_03",
+  "thread_id": "t029",
+  "position": 1,
+  "field": "needs_response",
+  "old": true,
+  "new": false,
+  "rule": "NR2",
+  "why": "cancels with no new time; the chief of staff will follow up with options",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_03",
+  "thread_id": "t031",
+  "position": 1,
+  "field": "needs_response",
+  "old": true,
+  "new": false,
+  "rule": "NR2",
+  "why": "cancels with no new time; the sender will write again",
+  "rules_version": "1.0"
+ },
+ {
+  "user_id": "eval_04",
+  "thread_id": "t024",
+  "position": 0,
+  "field": "needs_response",
+  "old": true,
+  "new": false,
+  "rule": "NR1",
+  "why": "the coach's assistant will send options; nothing for the user to answer",
+  "rules_version": "1.0"
+ }
+]

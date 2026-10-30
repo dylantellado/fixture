@@ -56,7 +56,7 @@ Labels: `req` new_request, `times` proposed_times, `accept` acceptance,
 | 04 | Sep 7 | Vasquez (class) | STAT 142 announcement: problem set 1 due Thu Sep 17, office hours Tue/Thu 4 to 5. Identical to user_03 t010 | none | SIG | ☑ |
 | 05 | Sep 9 | Vasquez | Priya asks for an office-hours slot about PS1. Vasquez offers Thu Sep 10, 4:20 to 4:40. Priya confirms | req, times, accept | Q | ☑ |
 | 06 | Sep 10 | Larkmoor no-reply | Application received for the Summer Analyst role, "we'll be in touch by early October" | none | FOOT | ☑ |
-| 07 | Sep 11 | Rohan | Priya cold-emails Rohan via the alumni directory. Rohan: happy to talk by phone, mornings ET work, Mon Sep 14 8:30 or Tue Sep 15 8:00. Priya takes Monday. Rohan sends his number | req, times, accept, none | SIG, TZ | ☑ |
+| 07 | Sep 11 | Rohan | Priya cold-emails Rohan via the alumni directory. Rohan: happy to talk by phone, mornings ET work, Mon Sep 14 8:30 or Tue Sep 15 8:00. Priya takes Monday. Rohan sends his number | req, times, accept, accept | SIG, TZ | ☑ |
 | 08 | Sep 13 | Claire | Claire introduces herself as Priya's mentor and suggests Sun Sep 20, 7 pm. Priya accepts. Claire moves it to Sun Sep 27 (family event). Priya confirms | times, accept, resched, accept | Q, LONG | ☑ |
 | 09 | Sep 15 | Ben | Priya forwards a speaker-series email (talk on Oct 1) to Ben. Ben: "nice, let's put it in the newsletter" | none, none | FWD | ☑ |
 | 10 | Sep 16 | Dana | Dana sends resume notes after the Sep 8 meeting and reminds Priya about the Sep 24 fair | none | SIG, LONG | ☑ |
@@ -68,7 +68,7 @@ Labels: `req` new_request, `times` proposed_times, `accept` acceptance,
 | 16 | Sep 26 | Meridian newsletter | Monthly newsletter: panel on Oct 6, application windows | none | FOOT, LONG | ☑ |
 | 17 | Sep 28 | Claire | Priya asks to book October's call. Claire offers Sun Oct 18, 7 pm. Priya accepts. Claire moves it to Sun Oct 25 (travel). Priya confirms | req, times, accept, resched, accept | QO | ☑ |
 | 18 | Sep 30 | Theo Marsh | STAT 142 section room change this week (no meeting) | none | SIG | ☑ |
-| 19 | Oct 1 | Jordan, Tess | Jordan invites Priya to a 30-min video first round and copies Tess. Tess offers Tue Oct 6 3:00, Wed Oct 7 2:00, Thu Oct 8 10:00. Priya takes Wed 2:00. Tess sends the video link | req, handoff, times, accept, none | FOOT, SIG, Q | ☑ |
+| 19 | Oct 1 | Jordan, Tess | Jordan invites Priya to a 30-min video first round and copies Tess. Tess offers Tue Oct 6 3:00, Wed Oct 7 2:00, Thu Oct 8 10:00. Priya takes Wed 2:00. Tess sends the video link | req, handoff, times, accept, accept | FOOT, SIG, Q | ☑ |
 | 20 | Oct 2 | Larkmoor no-reply | Info session announcement, Mon Oct 5 6 pm virtual | none | FOOT | ☑ |
 | 21 | Oct 3 | Dana | Priya asks for a mock interview before Larkmoor. Dana: mock interviews are run by peer coach Nadia Brooks, copying her. Nadia offers Tue Oct 6 at 3:30 in Wexley 214. Priya confirms | req, req, times, accept | SIG | ☑ |
 | 22 | Oct 4 | Maya (roommate) | "dinner sat 7?" "yes!!" then Maya: "wait can we push to 8" (no reply yet: thread ends open) | times, accept, resched | MOB | ☑ |

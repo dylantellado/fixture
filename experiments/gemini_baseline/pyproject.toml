@@ -1,0 +1,15 @@
+[project]
+name = "gemini-baseline"
+version = "0.1.0"
+description = "One-off Gemini baseline on the training data"
+requires-python = ">=3.12"
+dependencies = [
+    "google-genai>=2.34.0",
+    "pandas>=3.1.0",
+    "scikit-learn>=1.9.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
