@@ -50,6 +50,10 @@ ANNOTATION_FIELDS = [
     "needs_response", "intended_label", "labeler_label", "final_label", "rationale",
 ]
 MIN_PER_LABEL = 30
+# v1.1 only: shortfalls accepted on purpose (see README.md, "Counts"). Rules v1.5 changed one
+# assistant_handoff answer to none, leaving 29. A count at or above the accepted floor is a
+# warning instead of an error; anything lower is still an error.
+ACCEPTED_BELOW_MIN = {"assistant_handoff": 29}
 MIN_HARD_SHARE_OF_NONE = 0.70
 
 # Phone-looking numbers must be in the fictional ranges: US 555-01xx, UK 020 7946 0xxx, UK 07700 900xxx.
@@ -335,7 +339,11 @@ def check_final(users: dict) -> int:
 
     for label in sorted(ALLOWED_LABELS):
         if labels[label] < MIN_PER_LABEL:
-            errors.append(f"label {label}: only {labels[label]} messages (need at least {MIN_PER_LABEL})")
+            message = f"label {label}: only {labels[label]} messages (need at least {MIN_PER_LABEL})"
+            if labels[label] >= ACCEPTED_BELOW_MIN.get(label, MIN_PER_LABEL):
+                warnings.append(message + ", accepted for v1.1 (see README.md)")
+            else:
+                errors.append(message)
     if none_rows and hard_none / len(none_rows) < MIN_HARD_SHARE_OF_NONE:
         errors.append(f"hard negatives are {hard_none}/{len(none_rows)} of 'none' (need at least {MIN_HARD_SHARE_OF_NONE:.0%})")
 

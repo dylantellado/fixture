@@ -68,15 +68,21 @@ Checked and unchanged:
 `needs_response`: 68 `true`, 230 `false`, the same as v1. Hard negatives are 83 of 118 `none`
 (70%).
 
+**`assistant_handoff` is 29, one below the set's target of 30, and that is accepted on
+purpose.** The one answer that changed under rules v1.5 (`eval_03/t029/2`, see above) was a
+handoff. Adding a new message to make up the count would change the set for a reason other than
+the rules, so v1.1 keeps 29. Decided by Dylan on 2026-10-29.
+
 ## Checks
 
 - `src/ingest/validate.py` (contract checks): 0 errors, 0 warnings.
 - `ingest` and `preprocess` on a copy (below): all 140 threads and 298 messages kept, no empty
   body.
-- `check.py final`: **1 error. `assistant_handoff` has 29 messages, below the 30 the set
-  requires** (`MIN_PER_LABEL`). Everything else passes, including the 70% hard-negative share
-  (exactly at the limit). The limit was left as it is. Raising the count needs new eval
-  messages, or a decision to accept 29 for v1.1.
+- `check.py final`: passes with 0 errors and 1 warning. `assistant_handoff` at 29 is reported
+  as a warning, not an error, because this copy of `check.py` lists it in `ACCEPTED_BELOW_MIN`
+  (accepted at 29 or more). Any other label under 30, or `assistant_handoff` under 29, is still
+  an error. `MIN_PER_LABEL` stays 30, and v1's `check.py` is unchanged. The 70% hard-negative
+  share is exactly at its limit.
 
 To rerun the pipeline without touching `data/raw/` or `data/processed/`:
 
