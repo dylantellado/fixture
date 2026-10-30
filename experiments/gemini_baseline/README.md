@@ -88,31 +88,35 @@ Hard-negative accuracy is reported only if the annotations mark hard negatives
 
 ## Results
 
-Three full runs of the 377 training messages with `gemini-3.8-flash` on `global`,
-temperature 0, concurrency 4, 0 failures each. The only differences are the rules
-text sent and the thinking budget.
+Four full runs of the 377 training messages with `gemini-3.8-flash` on `global`,
+temperature 0, concurrency 4, 0 failures each. The first three differ only in the rules
+text sent and the thinking budget. The fourth uses labeling rules v1.4, which changed both
+the rules and 7 training answers, so its column isn't directly comparable with the others.
 
 **The leak:** rules v1.2 had a section 6 listing specific training messages with their
 correct answers (label corrections and kept `needs_response` judgment calls), and the
 first run sent it to Gemini as part of the rules. Rules v1.3 moved it to
 `docs/data/training_conflicts.md`, so the clean runs see only rules in force.
 
-| | Leaked (rules v1.2) | Clean (rules v1.3) | Clean, thinking budget 128 |
-|---|---|---|---|
-| Run | [`20261029-190428Z`](runs/20261029-190428Z/report.md) | [`20261029-192758Z`](runs/20261029-192758Z/report.md) | [`20261029-194238Z`](runs/20261029-194238Z/report.md) |
-| Label accuracy | 0.992 (374/377) | 0.984 (371/377) | 0.989 (373/377) |
-| Scheduling recall | 0.996 (1 of 281 as `none`) | 0.993 (2 of 281 as `none`) | 0.996 (1 of 281 as `none`) |
-| False alarms (`none` → scheduling) | 0 of 96 | 1 of 96 | 1 of 96 |
-| needs_response accuracy | 1.000 | 0.997 | 0.992 |
-| needs_response precision | 1.000 | 0.991 | 0.973 |
-| needs_response recall | 1.000 | 1.000 | 1.000 |
-| Thinking tokens (total / median per call) | 124,055 / 189 | 131,129 / 189 | 2,412 / 0 |
-| Estimated cost | $1.55 | $1.42 | $0.95 |
-| Latency median / p95 | 3.5 s / 18.4 s | 3.8 s / 20.5 s | 2.4 s / 14.0 s |
+| | Leaked (rules v1.2) | Clean (rules v1.3) | Clean, thinking budget 128 | **Rules v1.4, budget 128 (current defaults)** |
+|---|---|---|---|---|
+| Run | [`20261029-190428Z`](runs/20261029-190428Z/report.md) | [`20261029-192758Z`](runs/20261029-192758Z/report.md) | [`20261029-194238Z`](runs/20261029-194238Z/report.md) | [`20261030-020451Z`](runs/20261030-020451Z/report.md) |
+| Label accuracy | 0.992 (374/377) | 0.984 (371/377) | 0.989 (373/377) | **0.989 (373/377)** |
+| Scheduling recall | 0.996 (1 of 281 as `none`) | 0.993 (2 of 281 as `none`) | 0.996 (1 of 281 as `none`) | **1.000 (0 of 285 as `none`)** |
+| False alarms (`none` → scheduling) | 0 of 96 | 1 of 96 | 1 of 96 | **0 of 92** |
+| needs_response accuracy | 1.000 | 0.997 | 0.992 | **1.000** |
+| needs_response precision | 1.000 | 0.991 | 0.973 | **1.000** |
+| needs_response recall | 1.000 | 1.000 | 1.000 | **1.000** |
+| Thinking tokens (total / median per call) | 124,055 / 189 | 131,129 / 189 | 2,412 / 0 | 3,033 / 0 |
+| Estimated cost | $1.55 | $1.42 | $0.95 | $1.12 |
+| Latency median / p95 | 3.5 s / 18.4 s | 3.8 s / 20.5 s | 2.4 s / 14.0 s | 2.7 s / 42.4 s |
 
 Costs use $0.75/1M input and $3.75/1M output and thinking (third-party list prices,
 no caching discount). The leaked run cost more despite less thinking because section 6
-made every prompt longer.
+made every prompt longer. The v1.4 run costs more than the third for the same reason: the
+new rules add about 580 input tokens per call (1.36M input tokens vs 1.14M). Its p95
+latency is server-side: the slowest calls took 60 to 108 s with no thinking, and 7 calls
+were retried.
 
 **How much the leak mattered:** only 4 of 377 answers changed between the leaked and
 clean runs. Two are tied to section 6: `2b1bc892af42b94d` is listed there, and
@@ -133,7 +137,23 @@ messages between runs is within that noise.
 | `9d32fed4db2eaa52` | proposed_times | assistant_handoff | "Owen is coordinating a meeting on Ruth's behalf as the initial scheduling contact (E17, T2, D5)…" | **Unclear rule:** T2 scope (Q2). |
 | `2b1bc892af42b94d` | new_request, needs_response false | new_request, needs_response **true** | "This is an introduction connecting the user with a specialist who will meet with him directly… the user must coordinate to set up a time under NR1." | **Unclear rule:** no needs_response rule covers introductions; the calls for them are only in `training_conflicts.md`. |
 
-1 model error, 5 unclear rules, 1 possibly wrong label. No labels or rules were changed.
+1 model error, 5 unclear rules, 1 possibly wrong label. Rules v1.4 then settled the five
+unclear rules and the possibly wrong label (E18, T2, E19, NR10, E20), and Gemini got all six
+right in the v1.4 run.
+
+### Mistakes in the v1.4 run (current defaults)
+
+| message_id | true | predicted | Gemini's reason | Kind |
+|---|---|---|---|---|
+| `47af86117df33131` | new_request | assistant_handoff | "Jordan hands off scheduling to Tess under D5/T2…" | **Model error, from missing context:** under the new T2 this isn't the first notice, because Tess was named as scheduler in t019. The prompt shows only the current thread, so Gemini can't know that. |
+| `7ae0f9aeb1b22234` | new_request | assistant_handoff | "Tom hands scheduling of the final round over to Gwen, making this an assistant handoff per D5 and PR3…" | **Model error, from missing context:** Gwen was named in t011, outside this thread. |
+| `49ec03bc60f62177` | new_request | assistant_handoff | "Jordan hands off scheduling the final round interviews to Tess (D5, T2)…" | **Model error, from missing context:** Tess was named in t020, outside this thread. |
+| `e3f8c97e38dafbee` | proposed_times | reschedule | "The target message cancels/reschedules an existing recurring meeting occurrence to October 26 at 10:00 as a directive move under D4 and NR9." | **Unclear rule:** Marcus already moved the meeting ("would it be ok to skip our mon 10/19 meeting?"), so Prof. Osei's "Mondays only, so October 26 at 10:00" is a reply inside the move (T1: `proposed_times`). The new E18 ("cancelling one occurrence and offering a new time → `reschedule`") doesn't say it covers only the message that makes the move. Both runs on v1.3 rules got this right. |
+
+3 model errors (all from the new T2 needing mailbox history the prompt doesn't include), 1
+unclear rule, 0 possibly wrong labels. Gemini can't get the three T2 cases right unless the
+prompt says who the user already schedules through, e.g. by listing earlier handoffs in the
+mailbox.
 
 ### Thinking budget
 
@@ -147,11 +167,12 @@ clean run), cost fell 33% and median latency 37%. The cost was 3 extra `needs_re
 = true on introductions (`6036baac6f4ce32a`, `9d817cdfb67a8e11`, `2b1bc892af42b94d`): the
 same rule gap as above, in the safer direction (an unneeded reply, never a missed one).
 
-**Recommendation:** use `--thinking-budget 128` for routine baseline runs: same label
-quality, a third cheaper and faster. Keep the model's default thinking when
-needs_response matters most, until the introduction gap gets a rule. The default in
-`main.py` stays unchanged until we decide. These are training numbers near the ceiling,
-so a thinking setting that matters on harder mail may not show up here.
+**Decision (v1.4): the default is now `--thinking-budget 128`** (`DEFAULT_THINKING_BUDGET` in
+`main.py`). It gave the same label quality at a third less cost and latency, and its
+needs_response gap on introductions is closed by NR10: the v1.4 run scores 1.000 on
+needs_response. Use `--thinking-budget default` for the model's own thinking. These are
+training numbers near the ceiling, so a thinking setting that matters on harder mail may not
+show up here.
 
 ## Files
 
