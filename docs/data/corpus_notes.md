@@ -67,20 +67,20 @@ per user, and ingest keeps every copy.
 
 | User | new_request | proposed_times | acceptance | reschedule | assistant_handoff | none | Total |
 |---|---|---|---|---|---|---|---|
-| user_01 | 18 | 20 | 27 | 10 | 1 | 24 | 100 |
-| user_02 | 14 | 20 | 26 | 9 | 2 | 26 | 97 |
-| user_03 | 11 | 19 | 27 | 12 | 1 | 20 | 90 |
+| user_01 | 17 | 20 | 27 | 10 | 2 | 24 | 100 |
+| user_02 | 12 | 20 | 26 | 9 | 4 | 26 | 97 |
+| user_03 | 11 | 18 | 27 | 12 | 2 | 20 | 90 |
 | user_04 | 11 | 20 | 25 | 10 | 2 | 22 | 90 |
-| **all** | **54** | **79** | **105** | **41** | **6** | **92** | **377** |
+| **all** | **51** | **78** | **105** | **41** | **10** | **92** | **377** |
 
-Labels follow `docs/data/labeling_rules.md` (v1.4). Rules v1.1 corrected 2 labels, v1.2 another 12
-(mostly introductions that were `assistant_handoff` and are now `new_request`, E17) and v1.4
-another 7 (E20 and T2). The full list is in [`training_conflicts.md`](training_conflicts.md)
+Labels follow `docs/data/labeling_rules.md` (v1.5). Rules v1.1 corrected 2 labels, v1.2 another 12
+(mostly introductions that were `assistant_handoff` and are now `new_request`, E17), v1.4
+another 7 (E20 and T2) and v1.5 another 4 (T2 per thread, reverting v1.4's 3 T2 changes). The full list is in [`training_conflicts.md`](training_conflicts.md)
 (and PRs #14 and #15).
 
 **`needs_response`** (does the user have to reply to move a meeting forward?) is in
 `data/source/annotations.jsonl`, one line per message keyed by `user_id`, `thread_id` and
-`position`, set under labeling rules v1.2 and re-checked under v1.4 (no changes): 109 `true` and
+`position`, set under labeling rules v1.2 and re-checked under v1.4 and v1.5 (no changes): 109 `true` and
 268 `false`.
 
 | User | true | false |

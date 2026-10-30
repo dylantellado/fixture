@@ -22,16 +22,16 @@ EVAL_DIR = REPO_ROOT / "data" / "eval"
 
 TRAINING_USERS = ["user_01", "user_02", "user_03", "user_04"]
 
-# Counts for the full training set under labeling rules v1.4 (PR #15). If the
+# Counts for the full training set under labeling rules v1.5 (PR #15). If the
 # refreshed data doesn't match, the data is stale or changed: stop, don't score.
 EXPECTED_TOTAL = 377
 EXPECTED_LABEL_COUNTS = {
     "acceptance": 105,
     "none": 92,
-    "proposed_times": 79,
-    "new_request": 54,
+    "proposed_times": 78,
+    "new_request": 51,
     "reschedule": 41,
-    "assistant_handoff": 6,
+    "assistant_handoff": 10,
 }
 EXPECTED_NEEDS_RESPONSE = {True: 109, False: 268}
 

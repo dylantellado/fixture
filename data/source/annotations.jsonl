@@ -1,377 +1,377 @@
-{"user_id": "user_01", "thread_id": "t001", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Career center mass announcement of events/drop-in hours; no personal scheduling ask", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t002", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for advising appointment, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t002", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Tue 3:00 or 3:30; user must pick", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t002", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks 3:00 Tuesday; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t003", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Proposes Wed Sep 9 8pm, asks if it works", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t003", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms Wed at 8; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t004", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Class-list announcement of problem set deadline and office hours", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t005", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for office-hours slot, no time; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t005", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Thu 4:20-4:40; user must confirm", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t005", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User confirms Thu 4:20; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t006", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated application-received notice", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t007", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks alum for a call, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t007", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Mon 14 Sep 8:30 or Tue 15 Sep 8:00 ET", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t007", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Monday 8:30; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t007", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Restates Monday and gives phone logistics; optional offer to dial out, no answer required Rules 1.4 (E20): label none -> acceptance. needs_response stays false under NR3 (no question the user must answer).", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t008", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Mentor proposes Sun Sep 20 7pm and asks for number", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t008", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms Sep 20 7pm; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t008", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Sep 20 call to Sep 27; user must confirm new time", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t008", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts Sep 27; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t009", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User forwards speaker event to Ben, non-scheduling ask; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t009", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Asks for a newsletter blurb; non-scheduling ask", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t010", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Resume notes after meeting; offers written comments, not another meeting", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t011", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated career fair registration", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t012", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks for follow-up call next week, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t012", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Fri 25 Sep 9am ET", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t012", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User confirms Fri 25th 9am; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t012", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Fri call to Mon 28 Sep; user must confirm", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t012", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts Mon 28th; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t013", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for slot tomorrow, no specific time; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t013", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Tue 4:00-4:20", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t013", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User confirms 4:00 tomorrow; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t013", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Cancels confirmed Tue slot, offers Thu 4:40; user must confirm", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t013", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts Thu 4:40; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t014", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Pitch comp rules and deadlines; asks for opinions, not scheduling", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t014", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User's opinion on rules; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t014", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "Rules settled; non-scheduling question about midterms", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t015", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for coffee next week, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t015", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Ben hands scheduling to Ada; Ada asked to find the time, user need not reply Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t015", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Ada proposes Thu Oct 1 10am", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t015", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Fri Oct 2 10am; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t015", "position": 4, "needs_response": false, "rule": "NR3", "rationale": "Ada accepts Fri at 10; no further ask", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t016", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Member newsletter", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t017", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks to schedule October call, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t017", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Sun Oct 18 7pm", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t017", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User confirms Oct 18; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t017", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Oct 18 call to Oct 25", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t017", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 25; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t018", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group notice changing only the room for one section", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t019", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Interview invite, no times; asks user to reply to confirm so it can be scheduled", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t019", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Hands scheduling to coordinator Tess, who will send times", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t019", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Tess offers three interview slots", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t019", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User picks Wed Oct 7 2pm; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t019", "position": 4, "needs_response": false, "rule": "NR3", "rationale": "Confirms already-chosen slot and sends video link Rules 1.4 (E20): label none -> acceptance. needs_response stays false under NR3 (no question the user must answer).", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t020", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated info-session announcement", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t021", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for a mock interview before Wednesday, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t021", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Dana copies peer coach Nadia so the two of them find a time; no one designated to move next, user is a party Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t021", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Nadia offers Tue Oct 6 3:30", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t021", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts Tue 3:30; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t022", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Proposes dinner Sat 7", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t022", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User says yes to Sat 7; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t022", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Sat 7 dinner to 8 and asks if ok", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t023", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Oct 7 interview to Oct 8 11am, asks reply within 24h", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t023", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 8 11am; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t024", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group notice moving this week's recurring Tue/Thu office hours to Wed 5-6 with TA covering; E4/T3 reschedule, and PR puts reschedule above the handoff to Theo; mass email, no reply owed Rules 1.2 (E4, T3): label assistant_handoff -> reschedule.", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t024", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User asks Theo for a slot, no specific time; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t024", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Theo offers Wed 5:20-5:40", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t024", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts 5:20; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t025", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Superday invite; Tess will be in touch with times Rules 1.4 (T2): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t025", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Tess offers three Superday start times", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t025", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Fri Oct 16 9am; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t026", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Class-wide announcement of review session and midterm", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t027", "position": 0, "needs_response": true, "rule": "NR9", "rationale": "Moves set board meeting from Wed to Tue 8pm; only asks to hear back if Tue is a problem Rules 1.2 (NR9): needs_response false -> true, moves the board meeting to Tuesday without asking; \"lmk if tues is a problem\" is not a question", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t027", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User agrees to Tue 8; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t028", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for a slot this week, no time; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t028", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Thursday 4:00", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t028", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User takes Thu 4:00; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t029", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for a call before Oct 16, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t029", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Wed 14 Oct 8am ET", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t029", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Wed 8am; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t029", "position": 3, "needs_response": false, "rule": "NR7", "rationale": "Phone number logistics after confirmation", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t030", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for appointment next week, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t030", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Tue Oct 20 3:00 or 3:30", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t030", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks 3:00 on the 20th; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t030", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User cancels confirmed Oct 20 slot and asks for another time; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t030", "position": 4, "needs_response": true, "rule": "NR1", "rationale": "Counter-offer of Tue Oct 27 3:30 after user's move", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t030", "position": 5, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 27 3:30; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t031", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Rejection notice, no-reply", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t032", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated one-way video interview invite with deadline; no slot to pick, not E16", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t033", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Agenda and logistics for confirmed Superday", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t034", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Good-luck note; agreement only in quoted text", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t034", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User's thank-you; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t035", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Proposes coffee Mon 9 Nov 8am", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t035", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Nov 9 8am; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t035", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Nov 9 coffee to Tue 10 Nov 8am", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t036", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Thank-you after Superday, decisions by Oct 30; no meeting ask", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t037", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Club mailing-list weekly roundup", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t038", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Marketing webinar promo", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t039", "position": 0, "needs_response": true, "rule": "NR8", "rationale": "Friend: let's grab dinner sometime next week, personal", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t039", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User asks Ben to send days the week of the 26th, no specific times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_01", "thread_id": "t040", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Member newsletter with group circle sign-ups", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t001", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Career center mass announcement", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t002", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks advisor to meet, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t002", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Mon Sep 14 10:30", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t002", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User confirms Mon 9/14 10:30; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t003", "position": 0, "needs_response": true, "rule": "NR6", "rationale": "Packing list plus 'still doing the 10am prep sat?' check on an agreed prep", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t003", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User restates 10am prep plan and logistics; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t004", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User cold-asks founder for 20 min chat, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t004", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Fri Sep 11 2pm PT", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t004", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Fri 9/11; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t004", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "Video link for confirmed call", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t005", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Mom about booking flights; not a meeting", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t005", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User reply about flights; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t006", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Catch-up with a specific time Thu 9/10 4pm PT; not a timeless E8 ask", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t006", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Thu 4pm PT; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t006", "position": 2, "needs_response": true, "rule": "NR2", "rationale": "Cancels confirmed call, 'can we push? I'm off tomorrow' invites user to propose a time", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t006", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Fri 9/11 noon PT; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t006", "position": 4, "needs_response": false, "rule": "NR3", "rationale": "Kevin accepts Fri noon PT", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t007", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated online assessment invite", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t008", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for advising appointment; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t008", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Fri Sep 18 11am Zoom", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t008", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Fri 9/18; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t009", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Post-meeting notes that propose next Mon Sep 21 10:30", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t009", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Mon 9/21 10:30; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t010", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "CI failure notification", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t011", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Hiring manager asks for 30 minutes, no times", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t011", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Adds EA Gwen to find the time", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t011", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Gwen offers Tue 9/22 1pm or Wed 9/23 4pm", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t011", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User picks Wed 9/23 4pm; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t012", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User forwards job post asking thoughts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t012", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Friend's comment", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t013", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Moves agreed 10am prep to 2", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t013", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts 2; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t014", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated application received", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t015", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "EA moves confirmed Sep 23 call to Mon Sep 28 3pm", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t015", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Mon 9/28; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t016", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for second chat, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t016", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Fri Oct 2 3pm PT", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t016", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Wed Sep 30; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t016", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Aisha accepts Wed Sep 30", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t016", "position": 4, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Sep 30 to Fri Oct 2", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t016", "position": 5, "needs_response": false, "rule": "NR1", "rationale": "User accepts Fri 10/2; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t017", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Department list deadline reminder", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t018", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Product marketing newsletter", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t019", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Advisor skips standing Oct 5 meeting and sets Oct 12 10:00; directive, but a new time the user would confirm", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t019", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User acknowledges Mon 10/12 at 10; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t020", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Interview invitation with no times and no explicit reply request", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t020", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Hands to Tess, who will reach out with times", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t020", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Tess offers three slots", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t020", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User picks Oct 6 10am; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t020", "position": 4, "needs_response": false, "rule": "NR3", "rationale": "Confirmation with CoderPad and video links Rules 1.4 (E20): label none -> acceptance. needs_response stays false under NR3 (no question the user must answer).", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t021", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks about mock interview; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t021", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Dana asks Nadia to find a time with the user Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t021", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Nadia offers Fri Oct 9 11am", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t021", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts Fri 10/9 11; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t022", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Referral offer, asks for resume; non-scheduling", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t022", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User sends resume; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t023", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Forwarded CFP, mentions already-set meeting on the 12th; no scheduling ask", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t024", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Hackathon results mass email", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t025", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks to move confirmed Oct 6 interview; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t025", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Tess offers three new slots after user's move", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t025", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Fri Oct 9 1pm; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t026", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated tech-talk invite, no RSVP", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t027", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Final-round invite; Gwen will set it up Rules 1.4 (T2): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t027", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Gwen offers Tue Oct 13 or Wed Oct 14", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t027", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Tue Oct 13; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t027", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Agenda for confirmed final round Rules 1.4 (E20): label none -> acceptance. needs_response stays false under NR3 (no question the user must answer).", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t028", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Aisha hands to Leah to find a time Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t028", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Leah proposes Fri Oct 16 2pm PT", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t028", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t029", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for a call next week; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t029", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Tue 10/13 5pm PT", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t029", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Tue 5pm PT; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t029", "position": 3, "needs_response": false, "rule": "NR2", "rationale": "Cancels confirmed Tue call, no new time; 'let me check the schedule' = sender will follow up", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t029", "position": 4, "needs_response": true, "rule": "NR1", "rationale": "Follow-up offers Wed 10/14 6pm PT", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t029", "position": 5, "needs_response": false, "rule": "NR1", "rationale": "User accepts Wed 6pm PT; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t030", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated building maintenance notice", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t031", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Calendar invitation text for confirmed final round", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t032", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Final-round invite; Tess will schedule Rules 1.4 (T2): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t032", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Tess offers three dates at 9am", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t032", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Thu Oct 22; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t033", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Offer letter; reply deadline is not a meeting", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t034", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks to meet about negotiation; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t034", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Dana hands to Grace Kim Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t034", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Grace proposes Fri Oct 16 11am", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t034", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t035", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks to skip set Mon 10/19 meeting; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t035", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Advisor sets Oct 26 10:00 after user's cancellation; directive tone, user would confirm", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t035", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts 10/26; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t036", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User proposes 8pm study session; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t036", "position": 1, "needs_response": false, "rule": "NR3", "rationale": "Sam accepts 8pm", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t036", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves agreed 8pm to 9", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t036", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts 9; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t037", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Department colloquium announcement", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t038", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Travel itinerary for confirmed final round", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t039", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Congratulations note", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t039", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User thanks; user-sent", "rules_version": "1.4"}
-{"user_id": "user_02", "thread_id": "t040", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated candidate survey", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t001", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Professor proposes weekly Monday 9am starting Sep 14 and asks if it works", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t001", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms Mondays 9am; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t002", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Co-TA asks to split section assignments; course sections, not a meeting between them", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t002", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User agrees on section split; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t003", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Graduate career office mass email", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t004", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks supervisor for first meeting, no specific times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t004", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Professor copies Irene, who will find a time", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t004", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Irene offers Thu Sep 10 or Fri Sep 11", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t004", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User picks Thu Sep 10; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t005", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Student asks to meet sometime this week", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t005", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User proposes Thu Sep 10 2pm; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t005", "position": 2, "needs_response": false, "rule": "NR3", "rationale": "Student accepts Thu 2", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t005", "position": 3, "needs_response": true, "rule": "NR2", "rationale": "Student cancels confirmed slot, asks 'any other time I could come by?'", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t006", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Firm recruiting info-session invite, register online", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t007", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Professor moves set weekly TA meeting to Thu Sep 24; directive, user would confirm", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t007", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms the change; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t008", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User cold-asks alum for 20 min, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t008", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Wed 16th 12:15", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t008", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Wed 12:15; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t009", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Co-TA proposes Thu 7pm grading", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t009", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Thu 7pm; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t009", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Thu to Fri 7pm", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t009", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts Fri 7pm; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t009", "position": 4, "needs_response": true, "rule": "NR1", "rationale": "Moves newly confirmed Fri to Sat 11am", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t009", "position": 5, "needs_response": false, "rule": "NR1", "rationale": "User confirms Sat 11; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t010", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Class-list announcement of problem set and office hours", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t011", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Recruiter offers two interview slots", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t011", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User picks Option 2; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t012", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "EA proposes biweekly Fri 11am, asks to confirm", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t012", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms standing arrangement; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t013", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks for a second lunch; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t013", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Tue 29th 12:30", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t013", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Thu Oct 1 noon; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t013", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Hannah accepts Thu Oct 1", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t014", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Student asks for office-hours slot this week", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t014", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User hands student to co-TA Alex; user-sent Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t014", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "Alex offers Leo Wed 3:00; user only cc'd, not a party", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t014", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Leo accepts Wed 3; user cc'd", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t014", "position": 4, "needs_response": false, "rule": "NR2", "rationale": "Leo cancels confirmed slot with Alex; invite to propose is to Alex, not the user", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t014", "position": 5, "needs_response": false, "rule": "NR1", "rationale": "Alex offers Leo Sep 30; user not a party", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t014", "position": 6, "needs_response": false, "rule": "NR3", "rationale": "Leo accepts Sep 30; user not a party", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t015", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Grading deadline after meeting", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t016", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Club case-competition announcement", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t017", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Recruiter moves confirmed Sep 30 interview, offers two options", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t017", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User picks Option 2; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t018", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Out-of-office auto-reply", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t019", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User forward of notes whose own text asks to do practice cases this week, no times (E10 own text, E11 ask decides); user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t020", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Round-2 invite; Arjun will send times Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t020", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Arjun offers Thu Oct 8 or Fri Oct 9", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t020", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Thu Oct 8; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t021", "position": 0, "needs_response": false, "rule": "NR7", "rationale": "Restates agreed Thursday time with agenda and join link", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t022", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "EA moves confirmed Oct 9 meeting to Mon Oct 12 2pm, asks to confirm", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t022", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms Oct 12; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t023", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Co-TA proposes co-hosting review Mon Oct 12 6pm", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t023", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 12 6pm; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t024", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Student asks for a slot before the midterm", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t024", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User hands student to co-TA Alex; user-sent Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t024", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "Alex offers Jamie Wed Oct 14 3:00; user only cc'd", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t024", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Jamie accepts; user cc'd", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t025", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Professor moves set Mon Oct 12 TA meeting to Thu Oct 15; directive, user would confirm", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t025", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t026", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Recruiter offers two final-round dates at 9am CT", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t026", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User picks Fri Oct 16; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t026", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "'Friday it is' then hands travel and timing of the day to coordinator Dev; could be read as post-confirmation logistics (E1 none) Rules 1.2 (D3, PR): label assistant_handoff -> acceptance.", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t027", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Call-for-papers list mail", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t028", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Proposes lunch Wed 21st noon", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t028", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 21 noon; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t028", "position": 2, "needs_response": true, "rule": "NR2", "rationale": "Cancels confirmed lunch with no new time; 'Can we find another day that week?' invites user to propose", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t028", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Thu Oct 22 noon plus availability; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t028", "position": 4, "needs_response": false, "rule": "NR3", "rationale": "Hannah accepts Thu 22nd", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t029", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Class notice changing only the midterm room", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t030", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group notice moving weekly lab meeting to Wednesdays; no reply needed", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t031", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Oct 16 final round, offers two options", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t031", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User picks Option 1; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t031", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User tells professor she'll join set TA meeting by video, asks for link; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t032", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated status update", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t033", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for 15 minutes sometime soon; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t033", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Thu Oct 15 9:45", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t033", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts 9:45; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t034", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Sister proposes Sat 2pm Lagos call", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t034", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t034", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves agreed call to 4pm Lagos", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t034", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts 4pm Lagos; user-sent", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t035", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Thank-you after interview, no meeting ask", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t036", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Student thank-you", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t037", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Seminar list announcement", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t038", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Recruiting event invite, RSVP via portal", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t039", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Day schedule and logistics for confirmed final round", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t040", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Grading split proposal; not a meeting", "rules_version": "1.4"}
-{"user_id": "user_03", "thread_id": "t040", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User agrees to grading split; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t001", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Career center mass announcement", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t002", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group orientation-day announcement; asks for mobile number (non-scheduling)", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t003", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for a video advising appointment, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t003", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Mon Sep 14 8am ET", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t003", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Sep 14; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t004", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks professor for a short video conversation; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t004", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Professor copies lab manager Owen, who will find a time", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t004", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Owen offers Thu Sep 10 10 or 11am ET", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t004", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User picks 10am; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t005", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated train booking confirmation", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t006", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Hall-wide fire alarm test notice", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t007", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks alum for a conversation, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t007", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Sat 12 Sep 10:00 at Linden", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t007", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t007", "position": 3, "needs_response": false, "rule": "NR7", "rationale": "How to find him, see you tomorrow; after confirmation", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t008", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Lab manager passes scheduling to PhD student Mateo so the two set something up directly; could also be read as an intro asking to meet (D1); no one designated to move next Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t008", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Mateo proposes Fri Sep 18 4pm London", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t008", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t009", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Coordinator offers four check-in slots", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t009", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User picks Wed 16 Sep 14:00; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t009", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Wed check-in to Thu 17 Sep 14:00", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t009", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts Thu; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t010", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks alum for half-hour video call; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t010", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Tue 22nd 19:00 Berlin", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t010", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t011", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group notice moving a recurring class to a new time; reply only if a clash", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t012", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks for a second appointment; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t012", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Mon Sep 28 8am ET", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t012", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Sep 28; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t012", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Cancels confirmed Sep 28 slot, proposes Oct 5 same time", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t012", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 5; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t013", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Society welcome social announcement", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t014", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Moves set weekly Friday check-in (Sep 25) to Oct 2", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t014", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 2; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t015", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User forwards reading list to friend, no scheduling ask; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t016", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks to meet again, no times; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t016", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Sat 3 Oct 10:00", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t016", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t016", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Sat 10:00 to 11:00", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t016", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts 11:00; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t017", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated visa appointment confirmation", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t018", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Mass webinar announcement to students abroad", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t019", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Lab manager proposes Thu Oct 8 10am ET", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t019", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t020", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group day-trip itinerary", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t021", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks for follow-up call; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t021", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Tue Oct 6 19:00 Berlin", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t021", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t021", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Tue call to Wed Oct 7", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t021", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts Wed; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t022", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Fellowship deadline reminder; mentions set Monday talk", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t023", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Paper to skim before the set check-in", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t023", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User thanks; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t024", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Lab manager moves confirmed Oct 8 check-in to Thu Oct 15", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t024", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 15; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t025", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Lab list seminar announcement", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t026", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Intro of Lena and Hugo, 'I'll leave you to find a time'; introducer is not a party, so a request to meet with no times rather than a handoff, though D5 is arguable; user is one of the two expected to arrange it", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t026", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Hugo proposes lunch Wed 14 Oct 12:30", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t026", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t027", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks for one more session; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t027", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Mon Oct 26 8am ET", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t027", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t028", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Hall survey mass email", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t029", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks to move set Friday check-in; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t029", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User offers two alternatives; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t029", "position": 2, "needs_response": false, "rule": "NR3", "rationale": "Mateo accepts Thu 4pm", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t030", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated refund notice", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t031", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Job posting tip", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t031", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User thanks; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t032", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Asks user to present Oct 22; Mateo will give a slot", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t032", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Mateo offers the 10:30 slot on the 22nd", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t032", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t033", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Society tournament announcement; volunteer ask is non-scheduling", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t034", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thank-you after lunch; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t035", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Hands feedback meeting to Callum, who will book Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t035", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers week of 19 Oct, 10:00-17:00, asks user to pick", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t035", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User proposes Tue 20 Oct 14:00; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t035", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Callum accepts Tue 14:00", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t036", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Catch-up with a specific time Sat 17 Oct 10; not a timeless E8 ask", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t036", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Sunday 10 or 11; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t036", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Counter-offers Sat 24 Oct 10:00", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t036", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t037", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Mother proposes Sunday 18:00 call", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t037", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t037", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves agreed call to 19:00 Berlin", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t037", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t038", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group clock-change reminder", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t039", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Oct 22 slot from 10:30 to 11:00; directive, user would confirm", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t039", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts 11:00; user-sent", "rules_version": "1.4"}
-{"user_id": "user_04", "thread_id": "t040", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Out-of-office auto-reply", "rules_version": "1.4"}
+{"user_id": "user_01", "thread_id": "t001", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Career center mass announcement of events/drop-in hours; no personal scheduling ask", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t002", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for advising appointment, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t002", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Tue 3:00 or 3:30; user must pick", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t002", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks 3:00 Tuesday; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t003", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Proposes Wed Sep 9 8pm, asks if it works", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t003", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms Wed at 8; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t004", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Class-list announcement of problem set deadline and office hours", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t005", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for office-hours slot, no time; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t005", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Thu 4:20-4:40; user must confirm", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t005", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User confirms Thu 4:20; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t006", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated application-received notice", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t007", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks alum for a call, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t007", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Mon 14 Sep 8:30 or Tue 15 Sep 8:00 ET", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t007", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Monday 8:30; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t007", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Restates Monday and gives phone logistics; optional offer to dial out, no answer required Rules 1.4 (E20): label none -> acceptance. needs_response stays false under NR3 (no question the user must answer).", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t008", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Mentor proposes Sun Sep 20 7pm and asks for number", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t008", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms Sep 20 7pm; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t008", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Sep 20 call to Sep 27; user must confirm new time", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t008", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts Sep 27; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t009", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User forwards speaker event to Ben, non-scheduling ask; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t009", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Asks for a newsletter blurb; non-scheduling ask", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t010", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Resume notes after meeting; offers written comments, not another meeting", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t011", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated career fair registration", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t012", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks for follow-up call next week, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t012", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Fri 25 Sep 9am ET", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t012", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User confirms Fri 25th 9am; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t012", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Fri call to Mon 28 Sep; user must confirm", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t012", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts Mon 28th; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t013", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for slot tomorrow, no specific time; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t013", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Tue 4:00-4:20", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t013", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User confirms 4:00 tomorrow; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t013", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Cancels confirmed Tue slot, offers Thu 4:40; user must confirm", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t013", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts Thu 4:40; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t014", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Pitch comp rules and deadlines; asks for opinions, not scheduling", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t014", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User's opinion on rules; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t014", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "Rules settled; non-scheduling question about midterms", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t015", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for coffee next week, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t015", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Ben hands scheduling to Ada; Ada asked to find the time, user need not reply Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t015", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Ada proposes Thu Oct 1 10am", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t015", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Fri Oct 2 10am; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t015", "position": 4, "needs_response": false, "rule": "NR3", "rationale": "Ada accepts Fri at 10; no further ask", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t016", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Member newsletter", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t017", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks to schedule October call, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t017", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Sun Oct 18 7pm", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t017", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User confirms Oct 18; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t017", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Oct 18 call to Oct 25", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t017", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 25; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t018", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group notice changing only the room for one section", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t019", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Interview invite, no times; asks user to reply to confirm so it can be scheduled", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t019", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Hands scheduling to coordinator Tess, who will send times", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t019", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Tess offers three interview slots", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t019", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User picks Wed Oct 7 2pm; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t019", "position": 4, "needs_response": false, "rule": "NR3", "rationale": "Confirms already-chosen slot and sends video link Rules 1.4 (E20): label none -> acceptance. needs_response stays false under NR3 (no question the user must answer).", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t020", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated info-session announcement", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t021", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for a mock interview before Wednesday, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t021", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Dana copies peer coach Nadia so the two of them find a time; no one designated to move next, user is a party Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t021", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Nadia offers Tue Oct 6 3:30", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t021", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts Tue 3:30; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t022", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Proposes dinner Sat 7", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t022", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User says yes to Sat 7; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t022", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Sat 7 dinner to 8 and asks if ok", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t023", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Oct 7 interview to Oct 8 11am, asks reply within 24h", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t023", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 8 11am; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t024", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group notice moving this week's recurring Tue/Thu office hours to Wed 5-6 with TA covering; E4/T3 reschedule, and PR puts reschedule above the handoff to Theo; mass email, no reply owed Rules 1.2 (E4, T3): label assistant_handoff -> reschedule.", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t024", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User asks Theo for a slot, no specific time; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t024", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Theo offers Wed 5:20-5:40", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t024", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts 5:20; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t025", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Superday invite; Tess will be in touch with times Rules 1.4 (T2): label assistant_handoff -> new_request. Rules 1.5 (T2): label new_request -> assistant_handoff (reverts the 1.4 change; first handoff to Tess in this thread).", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t025", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Tess offers three Superday start times", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t025", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Fri Oct 16 9am; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t026", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Class-wide announcement of review session and midterm", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t027", "position": 0, "needs_response": true, "rule": "NR9", "rationale": "Moves set board meeting from Wed to Tue 8pm; only asks to hear back if Tue is a problem Rules 1.2 (NR9): needs_response false -> true, moves the board meeting to Tuesday without asking; \"lmk if tues is a problem\" is not a question", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t027", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User agrees to Tue 8; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t028", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for a slot this week, no time; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t028", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Thursday 4:00", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t028", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User takes Thu 4:00; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t029", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for a call before Oct 16, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t029", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Wed 14 Oct 8am ET", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t029", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Wed 8am; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t029", "position": 3, "needs_response": false, "rule": "NR7", "rationale": "Phone number logistics after confirmation", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t030", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for appointment next week, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t030", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Tue Oct 20 3:00 or 3:30", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t030", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks 3:00 on the 20th; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t030", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User cancels confirmed Oct 20 slot and asks for another time; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t030", "position": 4, "needs_response": true, "rule": "NR1", "rationale": "Counter-offer of Tue Oct 27 3:30 after user's move", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t030", "position": 5, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 27 3:30; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t031", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Rejection notice, no-reply", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t032", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated one-way video interview invite with deadline; no slot to pick, not E16", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t033", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Agenda and logistics for confirmed Superday", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t034", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Good-luck note; agreement only in quoted text", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t034", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User's thank-you; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t035", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Proposes coffee Mon 9 Nov 8am", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t035", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Nov 9 8am; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t035", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Nov 9 coffee to Tue 10 Nov 8am", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t036", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Thank-you after Superday, decisions by Oct 30; no meeting ask", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t037", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Club mailing-list weekly roundup", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t038", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Marketing webinar promo", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t039", "position": 0, "needs_response": true, "rule": "NR8", "rationale": "Friend: let's grab dinner sometime next week, personal", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t039", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User asks Ben to send days the week of the 26th, no specific times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_01", "thread_id": "t040", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Member newsletter with group circle sign-ups", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t001", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Career center mass announcement", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t002", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks advisor to meet, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t002", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Mon Sep 14 10:30", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t002", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User confirms Mon 9/14 10:30; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t003", "position": 0, "needs_response": true, "rule": "NR6", "rationale": "Packing list plus 'still doing the 10am prep sat?' check on an agreed prep", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t003", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User restates 10am prep plan and logistics; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t004", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User cold-asks founder for 20 min chat, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t004", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Fri Sep 11 2pm PT", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t004", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Fri 9/11; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t004", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "Video link for confirmed call", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t005", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Mom about booking flights; not a meeting", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t005", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User reply about flights; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t006", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Catch-up with a specific time Thu 9/10 4pm PT; not a timeless E8 ask", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t006", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Thu 4pm PT; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t006", "position": 2, "needs_response": true, "rule": "NR2", "rationale": "Cancels confirmed call, 'can we push? I'm off tomorrow' invites user to propose a time", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t006", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Fri 9/11 noon PT; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t006", "position": 4, "needs_response": false, "rule": "NR3", "rationale": "Kevin accepts Fri noon PT", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t007", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated online assessment invite", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t008", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for advising appointment; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t008", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Fri Sep 18 11am Zoom", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t008", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Fri 9/18; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t009", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Post-meeting notes that propose next Mon Sep 21 10:30", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t009", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Mon 9/21 10:30; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t010", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "CI failure notification", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t011", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Hiring manager asks for 30 minutes, no times", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t011", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Adds EA Gwen to find the time", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t011", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Gwen offers Tue 9/22 1pm or Wed 9/23 4pm", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t011", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User picks Wed 9/23 4pm; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t012", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User forwards job post asking thoughts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t012", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Friend's comment", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t013", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Moves agreed 10am prep to 2", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t013", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts 2; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t014", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated application received", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t015", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "EA moves confirmed Sep 23 call to Mon Sep 28 3pm", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t015", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Mon 9/28; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t016", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for second chat, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t016", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Fri Oct 2 3pm PT", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t016", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Wed Sep 30; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t016", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Aisha accepts Wed Sep 30", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t016", "position": 4, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Sep 30 to Fri Oct 2", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t016", "position": 5, "needs_response": false, "rule": "NR1", "rationale": "User accepts Fri 10/2; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t017", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Department list deadline reminder", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t018", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Product marketing newsletter", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t019", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Advisor skips standing Oct 5 meeting and sets Oct 12 10:00; directive, but a new time the user would confirm", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t019", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User acknowledges Mon 10/12 at 10; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t020", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Interview invitation with no times and no explicit reply request", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t020", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Hands to Tess, who will reach out with times", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t020", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Tess offers three slots", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t020", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User picks Oct 6 10am; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t020", "position": 4, "needs_response": false, "rule": "NR3", "rationale": "Confirmation with CoderPad and video links Rules 1.4 (E20): label none -> acceptance. needs_response stays false under NR3 (no question the user must answer).", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t021", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks about mock interview; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t021", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Dana asks Nadia to find a time with the user Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t021", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Nadia offers Fri Oct 9 11am", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t021", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts Fri 10/9 11; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t022", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Referral offer, asks for resume; non-scheduling", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t022", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User sends resume; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t023", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Forwarded CFP, mentions already-set meeting on the 12th; no scheduling ask", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t024", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Hackathon results mass email", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t025", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks to move confirmed Oct 6 interview; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t025", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Tess offers three new slots after user's move", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t025", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Fri Oct 9 1pm; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t026", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated tech-talk invite, no RSVP", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t027", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Final-round invite; Gwen will set it up Rules 1.4 (T2): label assistant_handoff -> new_request. Rules 1.5 (T2): label new_request -> assistant_handoff (reverts the 1.4 change; first handoff to Gwen in this thread).", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t027", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Gwen offers Tue Oct 13 or Wed Oct 14", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t027", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Tue Oct 13; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t027", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Agenda for confirmed final round Rules 1.4 (E20): label none -> acceptance. needs_response stays false under NR3 (no question the user must answer).", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t028", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Aisha hands to Leah to find a time Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t028", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Leah proposes Fri Oct 16 2pm PT", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t028", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t029", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for a call next week; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t029", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Tue 10/13 5pm PT", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t029", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Tue 5pm PT; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t029", "position": 3, "needs_response": false, "rule": "NR2", "rationale": "Cancels confirmed Tue call, no new time; 'let me check the schedule' = sender will follow up", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t029", "position": 4, "needs_response": true, "rule": "NR1", "rationale": "Follow-up offers Wed 10/14 6pm PT", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t029", "position": 5, "needs_response": false, "rule": "NR1", "rationale": "User accepts Wed 6pm PT; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t030", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated building maintenance notice", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t031", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Calendar invitation text for confirmed final round", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t032", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Final-round invite; Tess will schedule Rules 1.4 (T2): label assistant_handoff -> new_request. Rules 1.5 (T2): label new_request -> assistant_handoff (reverts the 1.4 change; first handoff to Tess in this thread).", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t032", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Tess offers three dates at 9am", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t032", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Thu Oct 22; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t033", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Offer letter; reply deadline is not a meeting", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t034", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks to meet about negotiation; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t034", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Dana hands to Grace Kim Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t034", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Grace proposes Fri Oct 16 11am", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t034", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t035", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks to skip set Mon 10/19 meeting; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t035", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Advisor sets Oct 26 10:00 after user's cancellation; directive tone, user would confirm", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t035", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts 10/26; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t036", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User proposes 8pm study session; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t036", "position": 1, "needs_response": false, "rule": "NR3", "rationale": "Sam accepts 8pm", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t036", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves agreed 8pm to 9", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t036", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts 9; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t037", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Department colloquium announcement", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t038", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Travel itinerary for confirmed final round", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t039", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Congratulations note", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t039", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User thanks; user-sent", "rules_version": "1.5"}
+{"user_id": "user_02", "thread_id": "t040", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated candidate survey", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t001", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Professor proposes weekly Monday 9am starting Sep 14 and asks if it works", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t001", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms Mondays 9am; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t002", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Co-TA asks to split section assignments; course sections, not a meeting between them", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t002", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User agrees on section split; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t003", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Graduate career office mass email", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t004", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks supervisor for first meeting, no specific times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t004", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Professor copies Irene, who will find a time", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t004", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Irene offers Thu Sep 10 or Fri Sep 11", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t004", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User picks Thu Sep 10; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t005", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Student asks to meet sometime this week", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t005", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User proposes Thu Sep 10 2pm; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t005", "position": 2, "needs_response": false, "rule": "NR3", "rationale": "Student accepts Thu 2", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t005", "position": 3, "needs_response": true, "rule": "NR2", "rationale": "Student cancels confirmed slot, asks 'any other time I could come by?'", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t006", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Firm recruiting info-session invite, register online", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t007", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Professor moves set weekly TA meeting to Thu Sep 24; directive, user would confirm", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t007", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms the change; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t008", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User cold-asks alum for 20 min, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t008", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Wed 16th 12:15", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t008", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Wed 12:15; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t009", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Co-TA proposes Thu 7pm grading", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t009", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Thu 7pm; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t009", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Thu to Fri 7pm", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t009", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts Fri 7pm; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t009", "position": 4, "needs_response": true, "rule": "NR1", "rationale": "Moves newly confirmed Fri to Sat 11am", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t009", "position": 5, "needs_response": false, "rule": "NR1", "rationale": "User confirms Sat 11; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t010", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Class-list announcement of problem set and office hours", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t011", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Recruiter offers two interview slots", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t011", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User picks Option 2; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t012", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "EA proposes biweekly Fri 11am, asks to confirm Rules 1.5 (T2): label proposed_times -> assistant_handoff (first message in this thread telling the user to write to Irene rather than Dr. Achebe; outranks proposed_times under PR).", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t012", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms standing arrangement; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t013", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks for a second lunch; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t013", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Tue 29th 12:30", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t013", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Thu Oct 1 noon; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t013", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Hannah accepts Thu Oct 1", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t014", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Student asks for office-hours slot this week", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t014", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User hands student to co-TA Alex; user-sent Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t014", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "Alex offers Leo Wed 3:00; user only cc'd, not a party", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t014", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Leo accepts Wed 3; user cc'd", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t014", "position": 4, "needs_response": false, "rule": "NR2", "rationale": "Leo cancels confirmed slot with Alex; invite to propose is to Alex, not the user", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t014", "position": 5, "needs_response": false, "rule": "NR1", "rationale": "Alex offers Leo Sep 30; user not a party", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t014", "position": 6, "needs_response": false, "rule": "NR3", "rationale": "Leo accepts Sep 30; user not a party", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t015", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Grading deadline after meeting", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t016", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Club case-competition announcement", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t017", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Recruiter moves confirmed Sep 30 interview, offers two options", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t017", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User picks Option 2; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t018", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Out-of-office auto-reply", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t019", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User forward of notes whose own text asks to do practice cases this week, no times (E10 own text, E11 ask decides); user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t020", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Round-2 invite; Arjun will send times Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t020", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Arjun offers Thu Oct 8 or Fri Oct 9", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t020", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User picks Thu Oct 8; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t021", "position": 0, "needs_response": false, "rule": "NR7", "rationale": "Restates agreed Thursday time with agenda and join link", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t022", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "EA moves confirmed Oct 9 meeting to Mon Oct 12 2pm, asks to confirm", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t022", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms Oct 12; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t023", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Co-TA proposes co-hosting review Mon Oct 12 6pm", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t023", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 12 6pm; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t024", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Student asks for a slot before the midterm", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t024", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User hands student to co-TA Alex; user-sent Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t024", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "Alex offers Jamie Wed Oct 14 3:00; user only cc'd", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t024", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Jamie accepts; user cc'd", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t025", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Professor moves set Mon Oct 12 TA meeting to Thu Oct 15; directive, user would confirm", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t025", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User confirms; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t026", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Recruiter offers two final-round dates at 9am CT", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t026", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User picks Fri Oct 16; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t026", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "'Friday it is' then hands travel and timing of the day to coordinator Dev; could be read as post-confirmation logistics (E1 none) Rules 1.2 (D3, PR): label assistant_handoff -> acceptance.", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t027", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Call-for-papers list mail", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t028", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Proposes lunch Wed 21st noon", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t028", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 21 noon; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t028", "position": 2, "needs_response": true, "rule": "NR2", "rationale": "Cancels confirmed lunch with no new time; 'Can we find another day that week?' invites user to propose", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t028", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Thu Oct 22 noon plus availability; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t028", "position": 4, "needs_response": false, "rule": "NR3", "rationale": "Hannah accepts Thu 22nd", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t029", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Class notice changing only the midterm room", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t030", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group notice moving weekly lab meeting to Wednesdays; no reply needed", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t031", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Oct 16 final round, offers two options", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t031", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User picks Option 1; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t031", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User tells professor she'll join set TA meeting by video, asks for link; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t032", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated status update", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t033", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for 15 minutes sometime soon; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t033", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Thu Oct 15 9:45", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t033", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts 9:45; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t034", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Sister proposes Sat 2pm Lagos call", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t034", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t034", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves agreed call to 4pm Lagos", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t034", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts 4pm Lagos; user-sent", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t035", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Thank-you after interview, no meeting ask", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t036", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Student thank-you", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t037", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Seminar list announcement", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t038", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Recruiting event invite, RSVP via portal", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t039", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Day schedule and logistics for confirmed final round", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t040", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Grading split proposal; not a meeting", "rules_version": "1.5"}
+{"user_id": "user_03", "thread_id": "t040", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User agrees to grading split; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t001", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Career center mass announcement", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t002", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group orientation-day announcement; asks for mobile number (non-scheduling)", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t003", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks for a video advising appointment, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t003", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers Mon Sep 14 8am ET", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t003", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Sep 14; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t004", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks professor for a short video conversation; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t004", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "Professor copies lab manager Owen, who will find a time", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t004", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Owen offers Thu Sep 10 10 or 11am ET", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t004", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User picks 10am; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t005", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated train booking confirmation", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t006", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Hall-wide fire alarm test notice", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t007", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks alum for a conversation, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t007", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Sat 12 Sep 10:00 at Linden", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t007", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t007", "position": 3, "needs_response": false, "rule": "NR7", "rationale": "How to find him, see you tomorrow; after confirmation", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t008", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Lab manager passes scheduling to PhD student Mateo so the two set something up directly; could also be read as an intro asking to meet (D1); no one designated to move next Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t008", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Mateo proposes Fri Sep 18 4pm London", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t008", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t009", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Coordinator offers four check-in slots", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t009", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User picks Wed 16 Sep 14:00; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t009", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Wed check-in to Thu 17 Sep 14:00", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t009", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts Thu; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t010", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks alum for half-hour video call; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t010", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Tue 22nd 19:00 Berlin", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t010", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t011", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group notice moving a recurring class to a new time; reply only if a clash", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t012", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks for a second appointment; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t012", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Mon Sep 28 8am ET", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t012", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts Sep 28; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t012", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Cancels confirmed Sep 28 slot, proposes Oct 5 same time", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t012", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 5; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t013", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Society welcome social announcement", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t014", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Moves set weekly Friday check-in (Sep 25) to Oct 2", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t014", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 2; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t015", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User forwards reading list to friend, no scheduling ask; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t016", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks to meet again, no times; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t016", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Sat 3 Oct 10:00", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t016", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t016", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Sat 10:00 to 11:00", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t016", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts 11:00; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t017", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated visa appointment confirmation", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t018", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Mass webinar announcement to students abroad", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t019", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Lab manager proposes Thu Oct 8 10am ET", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t019", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t020", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group day-trip itinerary", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t021", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks for follow-up call; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t021", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Tue Oct 6 19:00 Berlin", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t021", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t021", "position": 3, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Tue call to Wed Oct 7", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t021", "position": 4, "needs_response": false, "rule": "NR1", "rationale": "User accepts Wed; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t022", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Fellowship deadline reminder; mentions set Monday talk", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t023", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Paper to skim before the set check-in", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t023", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User thanks; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t024", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Lab manager moves confirmed Oct 8 check-in to Thu Oct 15", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t024", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts Oct 15; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t025", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Lab list seminar announcement", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t026", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Intro of Lena and Hugo, 'I'll leave you to find a time'; introducer is not a party, so a request to meet with no times rather than a handoff, though D5 is arguable; user is one of the two expected to arrange it", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t026", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Hugo proposes lunch Wed 14 Oct 12:30", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t026", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t027", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thanks and asks for one more session; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t027", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Proposes Mon Oct 26 8am ET", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t027", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t028", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Hall survey mass email", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t029", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User asks to move set Friday check-in; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t029", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User offers two alternatives; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t029", "position": 2, "needs_response": false, "rule": "NR3", "rationale": "Mateo accepts Thu 4pm", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t030", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Automated refund notice", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t031", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Job posting tip", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t031", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User thanks; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t032", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Asks user to present Oct 22; Mateo will give a slot", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t032", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Mateo offers the 10:30 slot on the 22nd", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t032", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t033", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Society tournament announcement; volunteer ask is non-scheduling", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t034", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "User thank-you after lunch; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t035", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Hands feedback meeting to Callum, who will book Rules 1.2 (E17): label assistant_handoff -> new_request.", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t035", "position": 1, "needs_response": true, "rule": "NR1", "rationale": "Offers week of 19 Oct, 10:00-17:00, asks user to pick", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t035", "position": 2, "needs_response": false, "rule": "NR1", "rationale": "User proposes Tue 20 Oct 14:00; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t035", "position": 3, "needs_response": false, "rule": "NR3", "rationale": "Callum accepts Tue 14:00", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t036", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Catch-up with a specific time Sat 17 Oct 10; not a timeless E8 ask", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t036", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User counter-offers Sunday 10 or 11; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t036", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Counter-offers Sat 24 Oct 10:00", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t036", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t037", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Mother proposes Sunday 18:00 call", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t037", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t037", "position": 2, "needs_response": true, "rule": "NR1", "rationale": "Moves agreed call to 19:00 Berlin", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t037", "position": 3, "needs_response": false, "rule": "NR1", "rationale": "User accepts; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t038", "position": 0, "needs_response": false, "rule": "NR1", "rationale": "Group clock-change reminder", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t039", "position": 0, "needs_response": true, "rule": "NR1", "rationale": "Moves confirmed Oct 22 slot from 10:30 to 11:00; directive, user would confirm", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t039", "position": 1, "needs_response": false, "rule": "NR1", "rationale": "User accepts 11:00; user-sent", "rules_version": "1.5"}
+{"user_id": "user_04", "thread_id": "t040", "position": 0, "needs_response": false, "rule": "NR4", "rationale": "Out-of-office auto-reply", "rules_version": "1.5"}

@@ -1,6 +1,6 @@
 # Labeling rules
 
-**Version 1.4, 2026-10-29.** The single source of truth for the correct answer for every
+**Version 1.5, 2026-10-29.** The single source of truth for the correct answer for every
 message: its `label` and its `needs_response`. Any rule change must update this file, bump
 the version, add a change log entry, and re-check the messages it affects.
 
@@ -142,19 +142,23 @@ These are the general rules behind the writer and labeler disagreements settled 
   what they do: a counter-offer is `proposed_times`, turning down the new times without
   offering others is `new_request` (E7), and agreeing is `acceptance`. A message that moves
   a time that has been confirmed since then is again `reschedule`.
-- **T2 (first notice of a handoff):** only the first message in the mailbox that tells the
-  user scheduling goes through a given person is `assistant_handoff`, e.g. "Owen keeps my
-  calendar, so I'm copying him." That holds when the sender is the person taking over ("I
-  manage his calendar") and when the message also asks for availability. Later messages that
-  hand scheduling to the same person, in any thread, and later messages from that person are
-  labeled by what they do: "Tess will be in touch with times" in a later thread is
-  `new_request` (D1), and Tess proposing times is `proposed_times`.
+- **T2 (first notice of a handoff):** the first message in a thread that tells the user
+  scheduling goes through someone else is `assistant_handoff`, e.g. "Owen keeps my calendar,
+  so I'm copying him." Each thread is judged on its own, without looking at other threads, so
+  a handoff to the same person in a new thread counts again, and a handoff to a different
+  person later in the same thread also counts. That holds when the sender is the person taking
+  over ("I manage his calendar", "please write to me rather than to Dr. Achebe") and when the
+  message also asks for availability. If the first notice has a label that ranks higher under
+  PR (e.g. a `reschedule` that copies the assistant), it still counts as the notice. Later
+  messages in that thread are labeled by what they do: Tess proposing times is
+  `proposed_times`. A message that only arranges a meeting for someone, without saying that
+  scheduling goes through the sender, is also labeled by what it does.
 - **T3 (notices that move a recurring meeting):** a group or automated notice that moves an
   already-set recurring meeting, including a class, to a new time is `reschedule` (E4). A
   notice that changes only the room or other details, or a calendar-app notification
   reporting a change someone made, is `none` (E1, E2).
 
-## 5. Not adopted (as of v1.4)
+## 5. Not adopted (as of v1.5)
 
 These were proposed while applying v1.0 and deliberately **not adopted in v1.1**. They are
 not in force, and the eval answers they would affect stay as the adopted rules give them.
@@ -178,7 +182,8 @@ NR3, with the decisions recorded in the change log.)
 ### Questions from the Gemini baseline (v1.3, decided in v1.4)
 
 Q1 (recurring sessions) and Q2 (T2 scope) were adopted in v1.4 as E18 and the new T2, along
-with three more decisions (E19, NR10, E20); see the change log. Not adopted for now:
+with three more decisions (E19, NR10, E20). v1.5 changed T2's scope from the mailbox to the
+thread; see the change log. Not adopted for now:
 
 - **Q3 (a `hard_negative` field, Will's area):** would add `hard_negative` (bool) to every
   line of `data/source/annotations.jsonl`: `true` for a `none` message that mentions dates, times or
@@ -201,3 +206,4 @@ with three more decisions (E19, NR10, E20); see the change log. Not adopted for 
 | 2026-10-29 | 1.2 | Added E17 (introductions: `new_request` when the person introduced will hold the meeting, `assistant_handoff` when someone coordinates on another person's behalf; decide by what the person will do, not their title) and NR9 (a directive move with no question asked is `true`, but not notices to a mailing list or group address). E16 keeps the broad reading: a booking link sent by a person is also `proposed_times`. P4 is superseded by E17. | Eval v1: 7 messages, 7 changes (4 labels, 3 needs_response), listed in `data/eval/v1/README.md` and `changes_rules_v1.2.json`. Training (PR #14): 12 labels and 1 needs_response. |
 | 2026-10-29 | 1.3 | Moved training-specific notes to training_conflicts.md; no rule changes. Added open questions Q1 to Q3 for Will to section 5 (not in force). | None. |
 | 2026-10-29 | 1.4 | Decided by Dylan, for Will to review. Adopted Q1 as E18 (recurring sessions are already-set meetings; cancelling one occurrence with a substitute session or new time is `reschedule`) and Q2 into T2 (only the first message in the mailbox that names a given scheduler is `assistant_handoff`; later ones are labeled by what they do). Added E19 (dividing tasks with no meeting is `none`), NR10 (`needs_response` for introductions: `true` when the user is asked to reach out, `false` when the other person is) and E20 (the other person's first reply confirming a time the user chose is `acceptance`, even with logistics), and reworded E14 to match E20. Q3 (`hard_negative` field) not adopted for now. Re-checked all 377 training messages; for eval, every message the new rules could reach. | Training: 7 labels (4 `none` → `acceptance` under E20, 3 `assistant_handoff` → `new_request` under T2), listed in `training_conflicts.md`. Eval: 1 label (`eval_03/t029/2` `assistant_handoff` → `none`, T2), in the new `data/eval/v1.1/`; eval-v1 is unchanged. |
+| 2026-10-29 | 1.5 | Changed T2's scope from the mailbox to the thread: the first message in a thread that tells the user scheduling goes through someone else is `assistant_handoff`, judged without looking at other threads (a handoff to a different person later in the same thread also counts; a first notice with a higher-ranking label still counts as the notice). Why: the classifier sees one thread at a time, so a label that depends on other threads can't be learned or predicted from its input. The mailbox scope caused all 3 Gemini mistakes on the v1.4 training data and lowered `assistant_handoff` to 6 in training and 29 in eval-v1.1. Also stated that a message that only arranges a meeting for someone, without saying scheduling goes through the sender, is labeled by what it does. | Training: 4 labels (the 3 v1.4 T2 changes reverted to `assistant_handoff`, and `76885a71c68ac079` `proposed_times` → `assistant_handoff`), listed in `training_conflicts.md`. Eval: no further change; eval-v1.1 keeps its one change (`eval_03/t029/2`, still `none` under the thread scope). |

@@ -74,7 +74,7 @@ Labels: `req` new_request, `times` proposed_times, `accept` acceptance,
 | 22 | Oct 4 | Maya (roommate) | "dinner sat 7?" "yes!!" then Maya: "wait can we push to 8" (no reply yet: thread ends open) | times, accept, resched | MOB | ☑ |
 | 23 | Oct 5 | Tess | Interviewer is travelling: Tess moves the Wed Oct 7 2:00 interview to Thu Oct 8 11:00 (only one option). Priya confirms | resched, accept | SIG, Q | ☑ |
 | 24 | Oct 6 | Vasquez | Vasquez is at a conference this week: office hours are cancelled and Theo will cover, email him. Priya emails Theo; Theo offers Wed Oct 7 5:20. Priya confirms | resched, req, times, accept | Q | ☑ |
-| 25 | Oct 8 | Jordan, Tess | Jordan: passed to the superday, Tess will schedule. Tess offers Thu Oct 15 9:00, Fri Oct 16 9:00, Fri Oct 16 1:00. Priya takes Fri 9:00 | req, times, accept | FOOT, SIG | ☑ |
+| 25 | Oct 8 | Jordan, Tess | Jordan: passed to the superday, Tess will schedule. Tess offers Thu Oct 15 9:00, Fri Oct 16 9:00, Fri Oct 16 1:00. Priya takes Fri 9:00 | handoff, times, accept | FOOT, SIG | ☑ |
 | 26 | Oct 9 | Vasquez (class) | Midterm review session Mon Oct 12, 6 pm, Hall B, run by the TAs (Sofia, Alex). Midterm is Thu Oct 15, 7 to 9 pm (matches user_03) | none | SIG | ☑ |
 | 27 | Oct 10 | Ben | Ben: board meeting moves from Wed Oct 14 to Tue Oct 13, 8 pm this week (Thursday is the STAT 142 midterm). Priya: works | resched, accept | MOB | ☑ |
 | 28 | Oct 11 | Vasquez | Priya asks for a slot before the midterm. Vasquez: Thu Oct 15 at 4:00. Priya takes it | req, times, accept | Q | ☑ |

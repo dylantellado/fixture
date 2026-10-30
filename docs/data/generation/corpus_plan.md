@@ -42,10 +42,10 @@ every user has all six labels):
 |---|---|---|
 | `acceptance` | 105 (28%) | High because nearly every negotiation ends with one |
 | `none` | 92 (24%) | About half are hard negatives (deadlines, events, auto-confirmations, newsletters with dates) |
-| `proposed_times` | 79 (21%) | |
-| `new_request` | 54 (14%) | Lower than you might expect: first emails that already include times count as `proposed_times` (see priority rule) |
+| `proposed_times` | 78 (21%) | |
+| `new_request` | 51 (14%) | Lower than you might expect: first emails that already include times count as `proposed_times` (see priority rule) |
 | `reschedule` | 41 (11%) | |
-| `assistant_handoff` | 6 (2%) | |
+| `assistant_handoff` | 10 (3%) | |
 
 If an outline changes, recount (a small script reads the Labels column) and update this table.
 

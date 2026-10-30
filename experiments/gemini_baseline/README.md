@@ -21,8 +21,8 @@ anything is read or sent.
    (cd src/ingest && uv run python main.py) && (cd src/preprocess && uv run python main.py)
    ```
 
-   Expected (labeling rules v1.4): 377 messages; acceptance 105, none 92, proposed_times 79,
-   new_request 54, reschedule 41, assistant_handoff 6; needs_response 109 true, 268 false.
+   Expected (labeling rules v1.5): 377 messages; acceptance 105, none 92, proposed_times 78,
+   new_request 51, reschedule 41, assistant_handoff 10; needs_response 109 true, 268 false.
 
 2. Sign in for Vertex AI with application-default credentials (no API keys, no `.env`):
 

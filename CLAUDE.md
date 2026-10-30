@@ -42,7 +42,7 @@ docker-compose.yml   runs all services together, in pipeline order (see README)
 .env.example         template for .env (copy it, never commit .env)
 data/                data/source/ holds the data-v1 inputs (committed until DVC is set up); data/eval/v1/
                      is the held-out classifier test set (committed; never tune or train on it, see its
-                     README), frozen at tag eval-v1; data/eval/v1.1/ is the same set under labeling rules v1.4; everything else is local and git-ignored, e.g. fixture.db (the web app's
+                     README), frozen at tag eval-v1; data/eval/v1.1/ is the same set under labeling rules v1.5; everything else is local and git-ignored, e.g. fixture.db (the web app's
                      encrypted logins)
 experiments/         one-off experiments, each its own uv project (gemini_baseline/: Gemini on the training data)
 samples/             fake data safe to commit: users.json, messages_sample.jsonl (processed schema)

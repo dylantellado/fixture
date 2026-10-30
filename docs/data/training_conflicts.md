@@ -71,3 +71,30 @@ Kept as they were (judgment calls under v1.4):
 
 Counts after v1.4: acceptance 105, none 92, proposed_times 79, new_request 54, reschedule 41,
 assistant_handoff 6; `needs_response` 109 `true` and 268 `false`.
+
+## Rules v1.5 (PR #15)
+
+v1.5 judges T2 per thread instead of per mailbox (see the change log in `labeling_rules.md`).
+All 377 training messages were re-checked against v1.5, and `rules_version` is now `1.5`
+everywhere. The check covered every message that tells the user, in words, that scheduling
+goes through someone else, and every first message from a scheduler in each thread.
+
+**4 label changes**, no `needs_response` changes:
+
+| message_id | user / thread / position | field | old → new | rule |
+|---|---|---|---|---|
+| `47af86117df33131` | user_01 / t025 / 0 | label | `new_request` → `assistant_handoff` | T2: reverts v1.4; first handoff to Tess in this thread |
+| `7ae0f9aeb1b22234` | user_02 / t027 / 0 | label | `new_request` → `assistant_handoff` | T2: reverts v1.4; first handoff to Gwen in this thread |
+| `49ec03bc60f62177` | user_02 / t032 / 0 | label | `new_request` → `assistant_handoff` | T2: reverts v1.4; first handoff to Tess in this thread |
+| `76885a71c68ac079` | user_03 / t012 / 0 | label | `proposed_times` → `assistant_handoff` | T2: Irene's first message in this thread says "please write to me rather than to Dr. Achebe directly", and a handoff ranks above `proposed_times` (PR). Under v1.2 to v1.4 it stayed `proposed_times` because Irene was introduced in t004. |
+
+Net effect of v1.4 and v1.5 on training: the 4 E20 changes and `76885a71c68ac079`.
+
+Kept as they were:
+- `9d32fed4db2eaa52` stays `proposed_times`. Owen relays Ruth's request with a time, but never
+  says scheduling goes through him, so T2 labels it by what it does.
+- The 6 other `assistant_handoff` messages are each the first handoff notice in their own
+  thread. Every later message in those threads is labeled by what it does.
+
+Counts after v1.5: acceptance 105, none 92, proposed_times 78, new_request 51, reschedule 41,
+assistant_handoff 10; `needs_response` 109 `true` and 268 `false`.
