@@ -56,9 +56,10 @@ src/
   (chromadb)    ChromaDB server from a pinned image, no folder (host port 8001)
   classifier/   FastAPI service (port 8002): POST /classify labels one email in its thread with Gemini
                 on Vertex AI (label, needs_response, reason); prompt.py builds the prompt from
-                docs/data/labeling_rules.md minus "Not adopted", "Training data" and "Change log"
-                (it fails at startup if one of those headings is missing), gemini.py calls the model; uses gcloud application-default
-                credentials, never logs or saves email text
+                docs/data/labeling_rules.md minus "Not adopted" and "Change log" (it fails at
+                startup if one of those headings is missing; training_conflicts.md is never read),
+                gemini.py calls the model; uses gcloud application-default credentials, never
+                logs or saves email text
   frontend/     FastAPI web app (port 8501): Sign in with Google, then a dashboard of
                 upcoming events (all checked calendars) and recent emails labeled by
                 the classifier (keyword fallback when it's down), with Scheduling and

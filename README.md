@@ -189,9 +189,9 @@ Labels:
 
 Labels live Gmail emails for the web app; it doesn't read the pipeline's files. Details and examples: `src/classifier/README.md`.
 
-- `GET /health` → `{"status": "ok", "model": "gemini-3.8-flash", "rules_version": "1.2"}`. `rules_version` comes from `docs/data/labeling_rules.md`.
+- `GET /health` → `{"status": "ok", "model": "gemini-3.8-flash", "rules_version": "1.5"}`. `rules_version` comes from `docs/data/labeling_rules.md`.
 - `POST /classify` with `{"thread": [{"from", "date", "subject", "body", "to"?, "from_user"?}], "target_index": int, "message_id"?: str}` returns `{"label", "needs_response", "reason", "model", "rules_version", "latency_ms"}`. `label` is one of the six labels above. Earlier messages are context; messages after `target_index` are ignored. Errors (`422`, `502`, `503`) never include a label.
 - The web app caches answers in `data/fixture.db` (table `classifications`), keyed by account (sha256 of the signed-in email) and Gmail message id, classifies again when `rules_version` changes, and deletes the account's rows on sign-out.
-- The prompt includes `docs/data/labeling_rules.md` except its "Not adopted", "Training data" and "Change log" sections; the classifier won't start if one of those headings is missing, so moving a section means updating `EXCLUDED_SECTIONS` in `src/classifier/prompt.py`.
+- The prompt includes `docs/data/labeling_rules.md` except its "Not adopted" and "Change log" sections (`docs/data/training_conflicts.md` is never sent); the classifier won't start if one of those headings is missing, so moving a section means updating `EXCLUDED_SECTIONS` in `src/classifier/prompt.py`.
 
 Inside Docker, `rag` and `api` reach ChromaDB at `CHROMA_HOST=chromadb`, `CHROMA_PORT=8000`, the frontend reaches the API at `API_URL=http://api:8000`, and the classifier at `CLASSIFIER_URL=http://classifier:8002`.

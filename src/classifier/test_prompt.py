@@ -35,17 +35,13 @@ NR1 text.
 
 P6 should not appear.
 
-## 6. Training data
-
-`abcdef0123456789` should not appear.
-
-## 7. Glossary
+## 6. Glossary
 
 Kept.
 
 ## Change log
 
-| 2026 | 3.4 | should not appear |
+| 2026 | 3.4 | `abcdef0123456789` should not appear |
 """
 
 
@@ -55,25 +51,25 @@ def test_rules_version():
         prompt.rules_version("# Rules with no version")
 
 
-def test_strip_sections_drops_proposed_rules_training_data_and_change_log():
+def test_strip_sections_drops_proposed_rules_and_change_log():
     text = prompt.strip_sections(RULES)
     assert "D1 text." in text and "NR1 text." in text and "Kept." in text
     assert "Version 3.4" in text  # the intro stays
     assert "P6" not in text and "Not adopted" not in text
-    assert "Training data" not in text and "abcdef0123456789" not in text
+    assert "abcdef0123456789" not in text
     assert "Change log" not in text and "should not appear" not in text
 
 
-@pytest.mark.parametrize("heading", ["## 5. Not adopted (as of v3.4)", "## 6. Training data", "## Change log"])
+@pytest.mark.parametrize("heading", ["## 5. Not adopted (as of v3.4)", "## Change log"])
 def test_missing_excluded_heading_fails_loudly(heading):
-    # e.g. rules v1.3 moves "Training data" to its own file: the list must be updated on purpose.
+    # e.g. if the rules file is reorganized: the list must be updated on purpose.
     with pytest.raises(ValueError, match="EXCLUDED_SECTIONS"):
         prompt.strip_sections(RULES.replace(heading, "## Renamed section"))
 
 
 def test_duplicate_excluded_heading_fails_loudly():
     with pytest.raises(ValueError, match="found 2"):
-        prompt.strip_sections(RULES + "\n## 8. More training data\n\nx\n")
+        prompt.strip_sections(RULES + "\n## Change log (older)\n\nx\n")
 
 
 def test_real_rules_file_loads():
@@ -96,14 +92,16 @@ def training_message_ids() -> set[str]:
 
 
 def test_no_training_message_id_reaches_the_prompt():
+    # The rules file plus the training notes moved out of it in rules v1.3.
     full_rules = prompt.RULES_PATH.read_text(encoding="utf-8")
+    full_rules += (prompt.RULES_PATH.parent / "training_conflicts.md").read_text(encoding="utf-8")
     rules_text, _ = prompt.load_rules()
     built = prompt.system_prompt(rules_text) + prompt.user_prompt([{"from": "a@example.com", "body": "hi"}], 0)
 
     training_ids = training_message_ids()
     assert len(training_ids) > 300  # the check really ran over the training set
     assert not {i for i in training_ids if i in built}
-    # Every id-like string in the rules file (e.g. section 6's corrections) stays out,
+    # Every id-like string in those files (e.g. training corrections) stays out,
     # and so does anything that looks like a message id or an eval message reference.
     mentioned = set(re.findall(r"\b[0-9a-f]{16}\b", full_rules))
     assert mentioned and not {i for i in mentioned if i in built}
