@@ -32,7 +32,8 @@ src/
   preprocess/  cleans threads into one record per message
   rag/         indexes messages into ChromaDB (one-shot job)
   api/         HTTP API: health check and search
-  frontend/    web app: Google sign-in, dashboard, search page
+  classifier/  labels one email with Gemini (label, needs_response, reason)
+  frontend/    web app: Google sign-in, dashboard with live email labels, search page
 ```
 
 eval-v1 is frozen at tag eval-v1. Never used for tuning. Rule changes create eval-v1.1.
@@ -53,19 +54,26 @@ Each service under `src/` is its own [uv](https://docs.astral.sh/uv/) project wi
    GIT_COMMIT=$(git rev-parse HEAD) docker compose up --build
    ```
 
-Startup order: `ingest` → `preprocess` → `rag` run once and exit, each waiting for the previous one to succeed. `rag` also waits for `chromadb` to be healthy. `api` starts after `rag` finishes, and `frontend` starts after `api` is healthy.
+Startup order: `ingest` → `preprocess` → `rag` run once and exit, each waiting for the previous one to succeed. `rag` also waits for `chromadb` to be healthy. `api` starts after `rag` finishes, and `frontend` starts after `api` is healthy. `classifier` starts on its own; until it's up, the dashboard uses keyword tags.
+
+The `classifier` needs Google application-default credentials for Vertex AI. Run `gcloud auth application-default login` once; Docker mounts `~/.config/gcloud` read-only. Without them the app still runs and the dashboard falls back to keyword tags.
+
+**Privacy:** live classification sends the signed-in user's email text (the 20 most recent inbox emails and their threads, quoted replies and signatures removed) to Gemini in our own GCP project (`fixture-ac215-96dhbm`). Email text is never logged or saved; `data/fixture.db` keeps only a hash of the account's email and each message id's label, `needs_response`, reason, model, rules version and time, and signing out deletes that account's rows.
 
 | Service  | Host URL               |
 |----------|------------------------|
 | frontend | http://localhost:8501  |
 | api      | http://localhost:8000  |
 | chromadb | http://localhost:8001  |
+| classifier | http://localhost:8002 |
 
 To work on a single service locally, run it from its folder (e.g. `src/rag`):
 
 ```sh
 uv run main.py                                      # one-shot jobs
 uv run uvicorn main:app --port 8000 --reload        # api
+GOOGLE_CLOUD_PROJECT=fixture-ac215-96dhbm \
+  uv run uvicorn main:app --port 8002 --reload      # classifier (the web app finds it at CLASSIFIER_URL, default http://localhost:8002)
 uv add <package>                                    # add a dependency
 ```
 
@@ -176,4 +184,13 @@ Labels:
 
   See `src/api/README.md` for examples.
 
-Inside Docker, `rag` and `api` reach ChromaDB at `CHROMA_HOST=chromadb`, `CHROMA_PORT=8000`, and the frontend reaches the API at `API_URL=http://api:8000`.
+### Classifier
+
+Labels live Gmail emails for the web app; it doesn't read the pipeline's files. Details and examples: `src/classifier/README.md`.
+
+- `GET /health` → `{"status": "ok", "model": "gemini-3.8-flash", "rules_version": "1.2"}`. `rules_version` comes from `docs/data/labeling_rules.md`.
+- `POST /classify` with `{"thread": [{"from", "date", "subject", "body", "to"?, "from_user"?}], "target_index": int, "message_id"?: str}` returns `{"label", "needs_response", "reason", "model", "rules_version", "latency_ms"}`. `label` is one of the six labels above. Earlier messages are context; messages after `target_index` are ignored. Errors (`422`, `502`, `503`) never include a label.
+- The web app caches answers in `data/fixture.db` (table `classifications`), keyed by account (sha256 of the signed-in email) and Gmail message id, classifies again when `rules_version` changes, and deletes the account's rows on sign-out.
+- The prompt includes `docs/data/labeling_rules.md` except its "Not adopted", "Training data" and "Change log" sections; the classifier won't start if one of those headings is missing, so moving a section means updating `EXCLUDED_SECTIONS` in `src/classifier/prompt.py`.
+
+Inside Docker, `rag` and `api` reach ChromaDB at `CHROMA_HOST=chromadb`, `CHROMA_PORT=8000`, the frontend reaches the API at `API_URL=http://api:8000`, and the classifier at `CLASSIFIER_URL=http://classifier:8002`.
