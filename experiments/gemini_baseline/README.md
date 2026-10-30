@@ -21,8 +21,8 @@ anything is read or sent.
    (cd src/ingest && uv run python main.py) && (cd src/preprocess && uv run python main.py)
    ```
 
-   Expected: 377 messages; acceptance 101, none 96, proposed_times 79, new_request 51,
-   reschedule 41, assistant_handoff 9; needs_response 109 true, 268 false.
+   Expected (labeling rules v1.4): 377 messages; acceptance 105, none 92, proposed_times 79,
+   new_request 54, reschedule 41, assistant_handoff 6; needs_response 109 true, 268 false.
 
 2. Sign in for Vertex AI with application-default credentials (no API keys, no `.env`):
 
@@ -52,7 +52,7 @@ uv run pytest                             # tests, no API calls
 Flags: `--model` (default in `main.py`), `--limit N` (first N messages in user,
 thread, position order), `--concurrency` (default 4), `--users`, `--messages`,
 `--annotations`, `--project`, `--location`, `--thinking-budget N` (cap on thinking
-tokens per call; default: the model's own), `--price-input` / `--price-output`
+tokens per call, default 128; `default` for the model's own thinking), `--price-input` / `--price-output`
 (US$ per 1M tokens, for models not in `scoring.PRICES`).
 
 Rate limits and transient errors (408, 429, 5xx, network) are retried up to 6

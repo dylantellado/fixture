@@ -44,6 +44,9 @@ log = logging.getLogger("gemini_baseline")
 
 # Newest Flash model that answered on this project (checked 2026-10-29).
 DEFAULT_MODEL = "gemini-3.8-flash"
+# A small thinking budget kept label quality on the training data at a third less
+# cost and latency (README, "Thinking budget"). "--thinking-budget default" turns it off.
+DEFAULT_THINKING_BUDGET = 128
 RUNS_DIR = Path(__file__).resolve().parent / "runs"
 
 # Fields written to predictions.jsonl, in this order.
@@ -55,12 +58,22 @@ PREDICTION_FIELDS = [
 ]  # fmt: skip
 
 
+def parse_budget(value: str) -> int | None:
+    """'128' -> 128; 'default' -> None (the model decides how much to think)."""
+    return None if value == "default" else int(value)
+
+
 def parse_args(argv=None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--model", default=DEFAULT_MODEL, help=f"Gemini model id (default {DEFAULT_MODEL})")
     p.add_argument("--limit", type=int, help="only the first N messages (in user, thread, position order)")
     p.add_argument("--concurrency", type=int, default=4, help="parallel calls (default 4)")
-    p.add_argument("--thinking-budget", type=int, help="cap on thinking tokens per call (default: the model's own)")
+    p.add_argument(
+        "--thinking-budget",
+        type=parse_budget,
+        default=DEFAULT_THINKING_BUDGET,
+        help=f"cap on thinking tokens per call (default {DEFAULT_THINKING_BUDGET}); 'default' for the model's own",
+    )
     p.add_argument("--users", nargs="+", default=TRAINING_USERS, help="training users to run (default all four)")
     p.add_argument("--messages", type=Path, default=MESSAGES_PATH, help="processed messages.jsonl")
     p.add_argument("--annotations", type=Path, default=ANNOTATIONS_PATH, help="training annotations.jsonl")

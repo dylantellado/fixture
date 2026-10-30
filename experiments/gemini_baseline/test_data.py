@@ -13,6 +13,7 @@ from data import EVAL_DIR, REPO_ROOT, DataError, check_counts, load_training, me
     [
         EVAL_DIR / "v1" / "threads.jsonl",
         EVAL_DIR / "v1" / "processed" / "messages.jsonl",
+        EVAL_DIR / "v1.1" / "threads.jsonl",  # later versions of the eval set too
         REPO_ROOT / "data" / "source" / ".." / "eval" / "v1" / "annotations.jsonl",  # sneaks in via ..
         "/somewhere/else/data/eval/v2/messages.jsonl",  # a copy of the repo elsewhere
     ],
@@ -55,6 +56,12 @@ def test_cli_exits_on_eval_data(argv, monkeypatch, capsys):
     monkeypatch.setattr(main.gemini, "make_client", lambda *a: pytest.fail("reached the API"))
     assert main.main(argv) == 1
     assert "eval" in capsys.readouterr().err
+
+
+def test_thinking_budget_default_and_override():
+    assert main.parse_args([]).thinking_budget == main.DEFAULT_THINKING_BUDGET == 128
+    assert main.parse_args(["--thinking-budget", "512"]).thinking_budget == 512
+    assert main.parse_args(["--thinking-budget", "default"]).thinking_budget is None
 
 
 def write_jsonl(path, rows):

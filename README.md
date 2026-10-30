@@ -36,7 +36,7 @@ src/
   frontend/    web app: Google sign-in, dashboard, search page
 ```
 
-eval-v1 is frozen at tag eval-v1. Never used for tuning. Rule changes create eval-v1.1.
+eval-v1 is frozen at tag eval-v1. Never used for tuning. Rule changes create eval-v1.1: `data/eval/v1.1/` is eval-v1 under labeling rules v1.4 (one answer changed).
 
 Each service under `src/` is its own [uv](https://docs.astral.sh/uv/) project with a `pyproject.toml`, `uv.lock`, `Dockerfile`, and `main.py`.
 

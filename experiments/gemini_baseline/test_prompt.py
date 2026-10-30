@@ -61,8 +61,9 @@ def test_heading_must_start_with_the_listed_name():
 
 def test_real_rules_file():
     text, version = load_rules(RULES_PATH)
-    assert version == "1.3"
+    assert version == "1.4"
     assert "E17 (introductions)" in text and "NR9 (directive move)" in text
+    assert "E20 (confirming the user's choice)" in text and "NR10 (introductions" in text
     assert "P6 (we'll be in touch)" not in text and "Open questions for Will" not in text
     assert system_prompt(text).endswith(text)
 
