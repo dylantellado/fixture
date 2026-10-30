@@ -88,35 +88,36 @@ Hard-negative accuracy is reported only if the annotations mark hard negatives
 
 ## Results
 
-Four full runs of the 377 training messages with `gemini-3.8-flash` on `global`,
+Five full runs of the 377 training messages with `gemini-3.8-flash` on `global`,
 temperature 0, concurrency 4, 0 failures each. The first three differ only in the rules
-text sent and the thinking budget. The fourth uses labeling rules v1.4, which changed both
-the rules and 7 training answers, so its column isn't directly comparable with the others.
+text sent and the thinking budget. The last two use labeling rules v1.4 and v1.5, which
+changed both the rules and some training answers (7 in v1.4; v1.5 reverted 3 of them and
+changed 1 more), so their columns aren't directly comparable with the first three.
 
 **The leak:** rules v1.2 had a section 6 listing specific training messages with their
 correct answers (label corrections and kept `needs_response` judgment calls), and the
 first run sent it to Gemini as part of the rules. Rules v1.3 moved it to
 `docs/data/training_conflicts.md`, so the clean runs see only rules in force.
 
-| | Leaked (rules v1.2) | Clean (rules v1.3) | Clean, thinking budget 128 | **Rules v1.4, budget 128 (current defaults)** |
-|---|---|---|---|---|
-| Run | [`20261029-190428Z`](runs/20261029-190428Z/report.md) | [`20261029-192758Z`](runs/20261029-192758Z/report.md) | [`20261029-194238Z`](runs/20261029-194238Z/report.md) | [`20261030-020451Z`](runs/20261030-020451Z/report.md) |
-| Label accuracy | 0.992 (374/377) | 0.984 (371/377) | 0.989 (373/377) | **0.989 (373/377)** |
-| Scheduling recall | 0.996 (1 of 281 as `none`) | 0.993 (2 of 281 as `none`) | 0.996 (1 of 281 as `none`) | **1.000 (0 of 285 as `none`)** |
-| False alarms (`none` → scheduling) | 0 of 96 | 1 of 96 | 1 of 96 | **0 of 92** |
-| needs_response accuracy | 1.000 | 0.997 | 0.992 | **1.000** |
-| needs_response precision | 1.000 | 0.991 | 0.973 | **1.000** |
-| needs_response recall | 1.000 | 1.000 | 1.000 | **1.000** |
-| Thinking tokens (total / median per call) | 124,055 / 189 | 131,129 / 189 | 2,412 / 0 | 3,033 / 0 |
-| Estimated cost | $1.55 | $1.42 | $0.95 | $1.12 |
-| Latency median / p95 | 3.5 s / 18.4 s | 3.8 s / 20.5 s | 2.4 s / 14.0 s | 2.7 s / 42.4 s |
+| | Leaked (rules v1.2) | Clean (rules v1.3) | Clean, thinking budget 128 | Rules v1.4, budget 128 | **Rules v1.5, budget 128 (current)** |
+|---|---|---|---|---|---|
+| Run | [`20261029-190428Z`](runs/20261029-190428Z/report.md) | [`20261029-192758Z`](runs/20261029-192758Z/report.md) | [`20261029-194238Z`](runs/20261029-194238Z/report.md) | [`20261030-020451Z`](runs/20261030-020451Z/report.md) | [`20261030-023237Z`](runs/20261030-023237Z/report.md) |
+| Label accuracy | 0.992 (374/377) | 0.984 (371/377) | 0.989 (373/377) | 0.989 (373/377) | **0.995 (375/377)** |
+| Scheduling recall | 0.996 (1 of 281 as `none`) | 0.993 (2 of 281 as `none`) | 0.996 (1 of 281 as `none`) | 1.000 (0 of 285 as `none`) | **1.000 (0 of 285 as `none`)** |
+| False alarms (`none` → scheduling) | 0 of 96 | 1 of 96 | 1 of 96 | 0 of 92 | **0 of 92** |
+| needs_response accuracy | 1.000 | 0.997 | 0.992 | 1.000 | **0.997** |
+| needs_response precision | 1.000 | 0.991 | 0.973 | 1.000 | **0.991** |
+| needs_response recall | 1.000 | 1.000 | 1.000 | 1.000 | **1.000** |
+| Thinking tokens (total / median per call) | 124,055 / 189 | 131,129 / 189 | 2,412 / 0 | 3,033 / 0 | 1,973 / 0 |
+| Estimated cost | $1.55 | $1.42 | $0.95 | $1.12 | $1.13 |
+| Latency median / p95 | 3.5 s / 18.4 s | 3.8 s / 20.5 s | 2.4 s / 14.0 s | 2.7 s / 42.4 s | 2.1 s / 13.4 s |
 
 Costs use $0.75/1M input and $3.75/1M output and thinking (third-party list prices,
 no caching discount). The leaked run cost more despite less thinking because section 6
-made every prompt longer. The v1.4 run costs more than the third for the same reason: the
-new rules add about 580 input tokens per call (1.36M input tokens vs 1.14M). Its p95
-latency is server-side: the slowest calls took 60 to 108 s with no thinking, and 7 calls
-were retried.
+made every prompt longer. The v1.4 and v1.5 runs cost more than the third for the same
+reason: the new rules add about 580 to 670 input tokens per call (1.36M and 1.39M input
+tokens vs 1.14M). The v1.4 run's p95 latency was server-side: the slowest calls took 60 to
+108 s with no thinking, and 7 calls were retried. The v1.5 run's latency is back to normal.
 
 **How much the leak mattered:** only 4 of 377 answers changed between the leaked and
 clean runs. Two are tied to section 6: `2b1bc892af42b94d` is listed there, and
@@ -153,7 +154,18 @@ right in the v1.4 run.
 3 model errors (all from the new T2 needing mailbox history the prompt doesn't include), 1
 unclear rule, 0 possibly wrong labels. Gemini can't get the three T2 cases right unless the
 prompt says who the user already schedules through, e.g. by listing earlier handoffs in the
-mailbox.
+mailbox. Rules v1.5 fixed this by judging T2 per thread.
+
+### Mistakes in the v1.5 run (current)
+
+| message_id | true | predicted | Gemini's reason | Kind |
+|---|---|---|---|---|
+| `3ba2c3724b1721c5` | new_request | assistant_handoff | "Fiona delegates the scheduling of the meeting to Callum Reid, who will book the user in, making this an assistant handoff under D5 and T2…" | **Unclear rule:** Callum will hold the meeting himself, so E17 makes it `new_request`. But v1.5's T2 ("tells the user scheduling goes through someone else") also matches, and T2 doesn't say it yields to E17. All earlier runs got this right. |
+| `e3f8c97e38dafbee` | proposed_times | reschedule | "The sender cancels the confirmed 10/19 meeting and directively moves the meeting to October 26 at 10:00 (D4, PR1, NR9)." | **Unclear rule:** E18 vs T1, as in the v1.4 run. Marcus made the move; this is a reply inside it. |
+| `2b1bc892af42b94d` | new_request, needs_response false | new_request, needs_response **true** | "…requires a response as neither party was exclusively assigned to reach out (NR10)." | **Unclear rule:** "Grace, Marcus meets by video and Fridays tend to suit him" only implies that Grace should reach out. NR10 covers only the case where the other person is told to. |
+
+0 model errors, 3 unclear rules, 0 possibly wrong labels. All four T2 messages (the three
+reverted ones and `76885a71c68ac079`) are now right, and so is `9d32fed4db2eaa52`.
 
 ### Thinking budget
 
