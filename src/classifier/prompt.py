@@ -6,8 +6,9 @@ imported from experiments/).
 
 The prompt has two parts:
   - system_prompt(): short instructions + docs/data/labeling_rules.md, minus the
-    sections that must not reach the model ("Not adopted", "Training data",
-    "Change log"; see EXCLUDED_SECTIONS).
+    sections that must not reach the model ("Not adopted", "Change log"; see
+    EXCLUDED_SECTIONS). Training answers live in docs/data/training_conflicts.md
+    (since rules v1.3), which is never read here.
   - user_prompt(): the earlier thread messages oldest-first, then the target
     message, each in its own delimited block. Email text is untrusted data.
 """
@@ -29,7 +30,6 @@ LABELS = ["new_request", "proposed_times", "acceptance", "reschedule", "assistan
 # to update this list on purpose instead of training answers leaking silently.
 EXCLUDED_SECTIONS = {
     "not adopted": "proposed rules that are not in force",
-    "training data": "lists training answers by message id",
     "change log": "history, and message ids of changed answers",
 }
 

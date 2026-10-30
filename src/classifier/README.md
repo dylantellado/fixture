@@ -34,14 +34,14 @@ Credentials are Google application-default credentials: run
 ## The prompt
 
 - **System instruction:** short instructions, then the labeling rules file read at startup,
-  without the sections that must never reach the model: "Not adopted" (proposals),
-  "Training data" (training answers by message id) and "Change log" (`EXCLUDED_SECTIONS` in
-  `prompt.py`, matched by heading). The rules version (e.g. `1.2`) is read from the file's
-  `**Version X.Y` line and returned with every label. The service won't start if the file
-  is missing, has no version, or doesn't have exactly one heading for each excluded section:
-  when the rules file is reorganized (rules v1.3 moves "Training data" to
-  `docs/data/training_conflicts.md`), update `EXCLUDED_SECTIONS` on purpose. A test checks
-  that no training message id reaches the prompt.
+  without the sections that must never reach the model: "Not adopted" (proposals) and
+  "Change log" (`EXCLUDED_SECTIONS` in `prompt.py`, matched by heading). Training answers
+  live in `docs/data/training_conflicts.md` (since rules v1.3), which is never read. The
+  rules version (e.g. `1.5`) is read from the file's `**Version X.Y` line and returned with
+  every label. The service won't start if the file is missing, has no version, or doesn't
+  have exactly one heading for each excluded section: when the rules file is reorganized,
+  update `EXCLUDED_SECTIONS` on purpose. A test checks that no training message id (from the
+  training threads, the rules file or `training_conflicts.md`) reaches the prompt.
 - **User message:** the earlier thread messages oldest-first (the 10 most recent before the
   target), then the target email. Each is in its own `<earlier_message>` / `<target_email>`
   block; bodies over 4,000 characters are cut. Messages after the target are never sent.
@@ -61,7 +61,7 @@ Doesn't call Gemini. The web app reads `rules_version` from here to decide which
 labels are out of date.
 
 ```json
-{"status": "ok", "model": "gemini-3.8-flash", "rules_version": "1.2"}
+{"status": "ok", "model": "gemini-3.8-flash", "rules_version": "1.5"}
 ```
 
 ### `POST /classify`
@@ -87,7 +87,7 @@ optional top-level `message_id` is used in logs only.
 ```json
 {"label": "acceptance", "needs_response": true,
  "reason": "D3: confirms a proposed time; NR3: asks Zoom or in person, requiring a response.",
- "model": "gemini-3.8-flash", "rules_version": "1.2", "latency_ms": 4613}
+ "model": "gemini-3.8-flash", "rules_version": "1.5", "latency_ms": 4613}
 ```
 
 Errors never come with a label: `422` for a bad request (empty thread, `target_index`
