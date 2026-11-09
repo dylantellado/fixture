@@ -15,7 +15,7 @@ Where each Milestone 2 requirement lives in this repo:
 | Data and version tracking | Every stage logs the sha256 of what it reads and writes; `preprocess` writes `manifest.json` (counts, hashes, git commit); each ChromaDB collection stores its input hash. See the [evidence README](docs/evidence/README.md#data-version). |
 | Pipeline logs and sample input/output | [`full_pipeline_run.log`](docs/evidence/full_pipeline_run.log), [`preprocess_examples.json`](docs/evidence/preprocess_examples.json) (before/after), [`samples/`](samples/) (small fake inputs). |
 | RAG: collection, chunking, vector database | `ingest` + `preprocess` (collection and cleaning), [`src/rag`](src/rag/README.md) (chunking, embeddings, one ChromaDB collection per user). |
-| One end-to-end retrieval example | [`retrieval_example.md`](docs/evidence/retrieval_example.md) (query → retrieved context) and [`api_search_response.json`](docs/evidence/api_search_response.json) (the same through the API). [`retrieval_check.md`](docs/evidence/retrieval_check.md) checks 15 example queries for quality and per-user isolation. |
+| One end-to-end retrieval example | [`retrieval_example.md`](docs/evidence/retrieval_example.md) (query → retrieved context) and [`api_search_response.json`](docs/evidence/api_search_response.json) (the same through the API). [`retrieval_check.md`](docs/evidence/retrieval_check.md) scores 47 example queries (Will's 15 plus 32 added in Milestone 3) for quality and per-user isolation; [`rag_experiments.md`](docs/evidence/rag_experiments.md) logs every setup we scored. |
 | Mock-up and app skeleton | [`docs/mockup/`](docs/mockup/README.md) (screens, Milestone 1 wireframe, what changed). Working skeleton: [`src/frontend`](src/frontend) (search and "How it works" pages) calling [`src/api`](src/api/README.md) (`GET /users`, `POST /search`). |
 | Tests | `uv run pytest` in each service folder under `src/`. |
 
@@ -31,8 +31,8 @@ secrets/     local credentials (git-ignored)
 src/
   ingest/      validates and deduplicates generated email threads
   preprocess/  cleans threads into one record per message
-  rag/         indexes messages into ChromaDB (one-shot job)
-  api/         HTTP API: health check and search
+  rag/         embeds messages and threads with Vertex AI into ChromaDB (one-shot job)
+  api/         HTTP API: health check and search (one user's messages, with thread context)
   classifier/  labels one email with Gemini (label, needs_response, reason)
   frontend/    web app: Google sign-in, dashboard with live email labels, search page
 ```
@@ -57,9 +57,9 @@ Each service under `src/` is its own [uv](https://docs.astral.sh/uv/) project wi
 
 Startup order: `ingest` → `preprocess` → `rag` run once and exit, each waiting for the previous one to succeed. `rag` also waits for `chromadb` to be healthy. `api` starts after `rag` finishes, and `frontend` starts after `api` is healthy. `classifier` starts on its own; until it's up, the dashboard uses keyword tags.
 
-The `classifier` needs Google application-default credentials for Vertex AI. Run `gcloud auth application-default login` once; Docker mounts `~/.config/gcloud` read-only. Without them the app still runs and the dashboard falls back to keyword tags.
+`rag`, `api` and `classifier` need Google application-default credentials for Vertex AI. Run `gcloud auth application-default login` once; Docker mounts `~/.config/gcloud` read-only into those three services (no API keys, nothing in `.env`). Without credentials `rag` can't embed the messages and exits with an error, so `api` and `frontend` don't start; the classifier alone falls back gracefully (the dashboard uses keyword tags).
 
-**Privacy:** live classification sends the signed-in user's email text (the 20 most recent inbox emails and their threads, quoted replies and signatures removed) to Gemini in our own GCP project (`fixture-ac215-96dhbm`). Email text is never logged or saved; `data/fixture.db` keeps only a hash of the account's email and each message id's label, `needs_response`, reason, model, rules version and time, and signing out deletes that account's rows.
+**Privacy:** indexing and search send email text to Vertex AI in our own GCP project (`rag` embeds every indexed message, today the fictional data-v1 corpus; `api` embeds each search query). Live classification sends the signed-in user's email text (the 20 most recent inbox emails and their threads, quoted replies and signatures removed) to Gemini in our own GCP project (`fixture-ac215-96dhbm`). Email text is never logged or saved; `data/fixture.db` keeps only a hash of the account's email and each message id's label, `needs_response`, reason, model, rules version and time, and signing out deletes that account's rows.
 
 | Service  | Host URL               |
 |----------|------------------------|
@@ -71,8 +71,8 @@ The `classifier` needs Google application-default credentials for Vertex AI. Run
 To work on a single service locally, run it from its folder (e.g. `src/rag`):
 
 ```sh
-uv run main.py                                      # one-shot jobs
-uv run uvicorn main:app --port 8000 --reload        # api
+uv run main.py                                      # one-shot jobs (rag needs gcloud application-default credentials)
+uv run uvicorn main:app --port 8000 --reload        # api (same credentials, for embedding queries)
 GOOGLE_CLOUD_PROJECT=fixture-ac215-96dhbm \
   uv run uvicorn main:app --port 8002 --reload      # classifier (the web app finds it at CLASSIFIER_URL, default http://localhost:8002)
 uv add <package>                                    # add a dependency
@@ -81,6 +81,16 @@ uv add <package>                                    # add a dependency
 ## Data contract
 
 This is the source of truth for how the data side (Will) and the search side (Dylan) fit together. Don't change it without telling the other person, and update this section in the same PR as the change.
+
+### Milestone 3 changes
+
+What changed for the search side in Milestone 3 (Will: nothing changes in your files; the one new dependency on your output is the thread-order rule below):
+
+- **Embeddings:** Vertex AI `gemini-embedding-001` (3,072 dimensions, 2,048-token limit, `RETRIEVAL_DOCUMENT` for stored chunks and `RETRIEVAL_QUERY` for searches) replaces the local all-MiniLM-L6-v2. Chroma's default ONNX embedder and the `model_cache` volume are gone. `rag` and `api` need gcloud application-default credentials.
+- **Chunks:** each message chunk now starts with the thread subject, sender, date and a `Replying to` excerpt of the previous message, and each thread gets its own chunk. Metadata gains `chunk_type`, `token_count`, and for thread chunks `message_ids`.
+- **Search:** still one user's collection only, still returns messages (never threads) in the same request/response shape. `score` now averages the message's and its thread's similarity. A collection built with another embedding model is refused (`503`, rerun rag).
+- **New rule rag depends on:** `messages.jsonl` lists each thread's messages in thread order (it already does).
+- Measurements: [`docs/evidence/retrieval_check.md`](docs/evidence/retrieval_check.md) and [`docs/evidence/rag_experiments.md`](docs/evidence/rag_experiments.md).
 
 ### Pipeline files
 
@@ -132,6 +142,7 @@ Labels:
 - **No nulls:** `message_id`, `user_id`, `thread_id`, `sender`, `timestamp`, `source`, `subject`, and `label` are always strings (`""` if missing). `recipients` is always a list and `body` is always a string.
 - **Anonymization:** email addresses become `EMAIL_###` and phone numbers become `PHONE_###`, using one placeholder map shared across all users, so the same address always gets the same placeholder. Display names stay readable. Placeholders are numbered in sorted order of the addresses and numbers in the whole corpus, so they are stable for a given data version but can renumber when data is added (rag rebuilds each collection from scratch, so that's fine). Treat them as opaque strings: there are three digits today, more past 999. An address with no display name is written `<EMAIL_005>`. Phone numbers are normalized before numbering, so every way of writing a number gets one placeholder.
 - **Sorting by time:** offsets differ between messages, so sort by parsed time, not by the `timestamp` string (rag stores a numeric timestamp for this).
+- **Thread order:** `messages.jsonl` lists each thread's messages together, in thread order (position 0 first), as `preprocess` writes them. rag takes each message's previous message from this order for its reply excerpt.
 - **Safe failure:** `preprocess` exits non-zero on any failure and never leaves half-written files (write to a temporary file, then rename).
 
 ### `manifest.json`
@@ -155,12 +166,16 @@ Labels:
 - A ChromaDB server container (`chromadb` in `docker-compose.yml`, pinned version).
 - One collection per user, named `messages_<user_id>` (e.g. `messages_user_01`), using cosine distance. `rag` rebuilds every collection from scratch on each run and deletes `messages_*` collections for users no longer in `users.json`. Every user in `users.json` gets a collection, even with no messages.
 - Collection metadata: `user_id`, `user_name` (display name from `users.json`), `indexed_at` (UTC ISO time), `input_path` and `input_sha256` (the indexed messages file), `used_sample_data` (bool), `manifest_git_commit` and `manifest_created_at` (from `manifest.json`, `""` if absent), `embedding_model`.
-- One chunk per message; bodies over ~1,000 characters are split into overlapping pieces. Chunk id: `<message_id>-<chunk index>` (index starts at 0). Chunk text: `From: <sender display name>\nSubject: <subject>\nDate: <timestamp>\n\n<body>`, with the header repeated on every piece (`From:` falls back to the raw sender when there is no display name).
-- Chunk metadata (all strings or ints, never null): `message_id`, `user_id`, `thread_id`, `sender`, `sender_name` (`""` if the sender has no display name), `timestamp`, `timestamp_epoch` (int Unix seconds with the UTC offset applied, `0` if `timestamp` is `""`; use it to sort, never the string), `source`, `subject`, `label`, `chunk_index` (int).
-- Embeddings: `all-MiniLM-L6-v2` through Chroma's built-in default embedding function, `chromadb.utils.embedding_functions.DefaultEmbeddingFunction()` from `chromadb==1.5.9` (runs locally with ONNX, no API key). Indexing and search must use this same function. Search score = `1 - cosine distance`.
-- `rag` requires timestamps to be ISO 8601 with a UTC offset (or `""`), every message's `user_id` to be in `users.json`, and `user_id`s not to end with `_` (Chroma collection names must end with a letter or digit). Otherwise it exits non-zero without touching the index.
+- Collection metadata also records how it was embedded: `embedding_model`, `embedding_dimension`, `embedding_task_document` (`RETRIEVAL_DOCUMENT`), `embedding_task_query` (`RETRIEVAL_QUERY`), `embedding_token_limit`, and `chunks_over_token_limit` (always 0). Collections have no Chroma embedding function: `rag` and `api` always pass vectors.
+- Two kinds of chunks, told apart by `chunk_type` in the metadata:
+  - **`message`**: one per message; a body too long for the model is split into overlapping pieces. Chunk id: `<message_id>-<chunk index>` (index starts at 0). Text: `Subject: <subject>\nFrom: <sender display name>\nDate: <timestamp>`, then on every message but a thread's first, `\nReplying to <previous sender's display name>: <first ~200 characters of the previous message>`, then `\n\n<body>`. These first lines repeat on every piece; names fall back to the raw sender when there is no display name.
+  - **`thread`**: one per thread (a thread too long for the model is split into windows of whole messages that overlap by one message). Chunk id: `thread-<thread_id>-<window index>`. Text: `Thread: <subject>\nParticipants: <names>\n\n` then one line per message: `- <sender>, <timestamp>: <first ~300 characters of the body>`.
+- Message chunk metadata (all strings or ints, never null): `chunk_type` (`"message"`), `message_id`, `user_id`, `thread_id`, `sender`, `sender_name` (`""` if the sender has no display name), `timestamp`, `timestamp_epoch` (int Unix seconds with the UTC offset applied, `0` if `timestamp` is `""`; use it to sort, never the string), `source`, `subject`, `label`, `chunk_index` (int), `token_count` (int, counted by Vertex AI).
+- Thread chunk metadata: `chunk_type` (`"thread"`), `user_id`, `thread_id`, `subject`, `source`, `message_ids` (comma-separated, in thread order), `message_count`, `timestamp` and `timestamp_epoch` (of the window's first message), `chunk_index` (window), `token_count`. No `label`.
+- Embeddings: Vertex AI `gemini-embedding-001` in `us-central1` (settings `EMBEDDING_MODEL`, `GOOGLE_CLOUD_PROJECT`, `EMBEDDING_LOCATION`), through google-genai with application-default credentials. Stored chunks use task type `RETRIEVAL_DOCUMENT`, searches `RETRIEVAL_QUERY`. Over-limit text is rejected, never truncated. Indexing and search must use the same model; the api refuses a collection whose `embedding_model` differs.
+- `rag` requires timestamps to be ISO 8601 with a UTC offset (or `""`), every message's `user_id` to be in `users.json`, and `user_id`s not to end with `_` (Chroma collection names must end with a letter or digit). Otherwise it exits non-zero without touching the index. A failed embedding call also stops it before the index is touched.
 - If `data/processed/messages.jsonl` is missing, `rag` indexes `samples/` instead and logs a warning (`used_sample_data` is then `true`).
-- The model is cached in the `model_cache` Docker volume, shared by `rag` and `api`, so it downloads once. Details: `src/rag/README.md`.
+- Details: `src/rag/README.md`.
 
 ### API
 
@@ -181,7 +196,7 @@ Labels:
   }
   ```
 
-  It only searches `messages_<user_id>`, never another user's collection. Results come best first, and `score` is `1 - cosine distance`, rounded to 3 places. `k` is 1–20, `query` can't be blank, and the optional `label` (one of the six labels) limits results to that label. A `user_id` that doesn't match `^[a-z0-9_]+$` or has no collection returns `400` `{"detail": "unknown user"}`. Other invalid input returns `422`. If ChromaDB is unreachable, `/users` and `/search` return `503`.
+  It only searches `messages_<user_id>`, never another user's collection. Each result is one message (its best message chunk's `text` and `metadata`), never a thread chunk, and no message appears twice. Results come best first; `score` is the average of the message's similarity to the query and its thread's (each `1 - cosine distance`), rounded to 3 places. `k` is 1–20, `query` can't be blank, and the optional `label` (one of the six labels) limits results to that label. A `user_id` that doesn't match `^[a-z0-9_]+$` or has no collection returns `400` `{"detail": "unknown user"}`. Other invalid input returns `422`. `/search` returns `503` if ChromaDB is unreachable (also `/users`), if the user's collection was built with a different embedding model (the detail says to rerun rag), or if Vertex AI can't embed the query.
 
   See `src/api/README.md` for examples.
 

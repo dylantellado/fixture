@@ -18,7 +18,7 @@ Fixture is a Harvard AC215 course project by Dylan Tellado and Will Sherwood. It
 - **Prefer simple, easy-to-change solutions** so we can pivot without large rewrites.
 - **Keep this file current:** if a request changes the project's direction, update CLAUDE.md to match.
 
-**What exists so far:** a Google connection proof of concept and the Milestone 2 search pipeline on fake data. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail, plus a "Search past threads" page over the demo mailboxes. The dashboard labels the signed-in user's 20 most recent emails with the `classifier` service (Gemini on Vertex AI, following `docs/data/labeling_rules.md`): a label, a "Needs response" badge and a one-line reason, cached per account and Gmail message id in `data/fixture.db` (deleted on sign-out), with the old keyword match as a fallback when the classifier is down. Everything is read-only; nothing writes to a calendar or sends email yet. `ingest` and `preprocess` are working one-shot jobs over a generated, fictional email corpus of 4 users (see `docs/data/corpus_notes.md`; plan in `docs/data/generation/`); `rag` indexes each user's messages into their own ChromaDB collection; `api` answers `GET /health`, `GET /users`, and `POST /search`, which searches one user's collection only; `classifier` answers `GET /health` and `POST /classify`.
+**What exists so far:** a Google connection proof of concept and the Milestone 2 search pipeline on fake data. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail, plus a "Search past threads" page over the demo mailboxes. The dashboard labels the signed-in user's 20 most recent emails with the `classifier` service (Gemini on Vertex AI, following `docs/data/labeling_rules.md`): a label, a "Needs response" badge and a one-line reason, cached per account and Gmail message id in `data/fixture.db` (deleted on sign-out), with the old keyword match as a fallback when the classifier is down. Everything is read-only; nothing writes to a calendar or sends email yet. `ingest` and `preprocess` are working one-shot jobs over a generated, fictional email corpus of 4 users (see `docs/data/corpus_notes.md`; plan in `docs/data/generation/`); `rag` embeds each user's messages and threads with Vertex AI (`gemini-embedding-001`) into their own ChromaDB collection (each message chunk carries its thread subject and a "Replying to" excerpt; each thread also gets a chunk); `api` answers `GET /health`, `GET /users`, and `POST /search`, which searches one user's collection only and returns messages (never threads), ranked by their own and their thread's similarity; `src/rag/check_retrieval.py` scores 47 queries split into dev and test and logs every setup to `docs/evidence/rag_experiments.md`; `classifier` answers `GET /health` and `POST /classify`.
 
 ## Milestone 2
 
@@ -51,8 +51,12 @@ src/
   ingest/       validates and dedups source threads -> data/raw/threads.jsonl; validate.py checks thread files;
                 also google_auth.py and list_events.py (Calendar check)
   preprocess/   cleans, anonymizes, flattens -> data/processed/messages.jsonl + manifest.json
-  rag/          indexes each user's messages into ChromaDB (messages_<user_id>); query.py searches from the command line
-  api/          FastAPI app (port 8000): GET /health, GET /users, POST /search; ChromaDB access in chroma_store.py
+  rag/          embeds each user's message and thread chunks with Vertex AI into ChromaDB (messages_<user_id>);
+                embeddings.py and message_search.py are copied, identical, into api/ (tests check);
+                query.py searches from the command line; check_retrieval.py scores retrieval_cases.json
+                (dev/test split, never tune on test) and appends to docs/evidence/rag_experiments.md
+  api/          FastAPI app (port 8000): GET /health, GET /users, POST /search; ChromaDB access in chroma_store.py;
+                embeds queries with Vertex AI and refuses a collection built with another embedding model
   (chromadb)    ChromaDB server from a pinned image, no folder (host port 8001)
   classifier/   FastAPI service (port 8002): POST /classify labels one email in its thread with Gemini
                 on Vertex AI (label, needs_response, reason); prompt.py builds the prompt from
@@ -78,7 +82,7 @@ Each service under `src/` is currently self-contained, with its own `Dockerfile`
 
 - Google Cloud project: `fixture-ac215-96dhbm`. Calendar and Gmail APIs are enabled.
 - The OAuth consent screen is in Testing mode, so only listed test users can sign in, and logins expire after about 7 days.
-- Permissions are listed in one `SCOPES` list per service: `src/ingest/google_auth.py` (read-only Calendar) and `src/frontend/main.py` (read-only Calendar and Gmail, plus basic profile). Ask before adding write permissions. The classifier uses no Google user permissions: it gets email text from the web app and calls Vertex AI with gcloud application-default credentials (`aiplatform.googleapis.com` is enabled; Docker mounts `~/.config/gcloud` read-only).
+- Permissions are listed in one `SCOPES` list per service: `src/ingest/google_auth.py` (read-only Calendar) and `src/frontend/main.py` (read-only Calendar and Gmail, plus basic profile). Ask before adding write permissions. The classifier uses no Google user permissions: it gets email text from the web app and calls Vertex AI with gcloud application-default credentials (`aiplatform.googleapis.com` is enabled; Docker mounts `~/.config/gcloud` read-only). `rag` and `api` use the same credentials for Vertex AI embeddings (`EMBEDDING_MODEL`, default `gemini-embedding-001`; `EMBEDDING_LOCATION`, default `us-central1`; on this project `gemini-embedding-2` only works in `global` and ignores task types). Indexing and search send email text to Vertex AI in our own GCP project; never log it.
 - Files in `secrets/` (never commit them; get them from a teammate privately):
   - `credentials.json`: "Fixture Desktop" OAuth client, used by `src/ingest`
   - `web_credentials.json`: "Fixture Web" OAuth client, used by `src/frontend` (redirect URI `http://localhost:8501/auth/callback`)
@@ -116,7 +120,14 @@ Web app (from `src/frontend`; needs `SESSION_SECRET` and `TOKEN_ENCRYPTION_KEY` 
 uv run uvicorn main:app --port 8501 --reload
 ```
 
-API (from `src/api`; then open http://localhost:8000/health):
+rag (from `src/rag`; needs `gcloud auth application-default login` once and ChromaDB on localhost:8001, e.g. `docker compose up -d chromadb`):
+
+```sh
+uv run main.py                                  # index data/processed (or samples/) with Vertex AI
+uv run python check_retrieval.py                # score the dev queries (add --split all --record "name" to log a row)
+```
+
+API (from `src/api`; same credentials; then open http://localhost:8000/health):
 
 ```sh
 uv run uvicorn main:app --port 8000 --reload
