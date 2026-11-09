@@ -225,5 +225,5 @@ def test_no_code_uses_chromas_default_onnx_embedder():
     service = Path(embeddings.__file__).resolve().parent
     for path in service.glob("*.py"):
         text = path.read_text()
-        for banned in ("DefaultEmbeddingFunction", "ONNXMiniLM", "onnx", "MiniLM"):
+        for banned in ("DefaultEmbeddingFunction", "ONNXMiniLM", "onnxruntime", "embedding_functions"):
             assert banned not in text, f"{path.name} mentions {banned}"

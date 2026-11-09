@@ -193,8 +193,18 @@ def append_experiment_rows(rows: list[str], path: Path = EXPERIMENTS_PATH) -> No
 # --- Evidence file ------------------------------------------------------------------
 
 
-def format_markdown(checked: list[dict], summaries: dict[str, dict], k: int, collection_metadata: dict, stats: dict) -> str:
-    """Markdown for an evidence file: data version, per-split summary, one row per query."""
+def experiment_table(path: Path = EXPERIMENTS_PATH) -> list[str]:
+    """The table lines of the experiment log (header and rows), or [] if there is none yet."""
+    if not path.exists():
+        return []
+    return [line for line in path.read_text(encoding="utf-8").splitlines() if line.startswith("|")]
+
+
+def format_markdown(checked: list[dict], summaries: dict[str, dict], k: int, collection_metadata: dict, stats: dict,
+                    experiments: list[str] | None = None) -> str:
+    """Markdown for an evidence file: data version, per-split summary, the 15
+    original queries next to their Milestone 2 result, every query, and the
+    experiment log."""
     lines = [
         "# Retrieval check",
         "",
@@ -229,7 +239,26 @@ def format_markdown(checked: list[dict], summaries: dict[str, dict], k: int, col
         f"`dev` cases were used to build the search; `test` cases were drawn at random before any "
         f"experiment and never tuned on.",
         "",
-        "## Queries",
+    ]
+    originals = [c for c in checked if c.get("ms2_result")]
+    if originals:
+        lines += [
+            "## The 15 original queries: Milestone 2 vs now",
+            "",
+            "Will's example queries from `docs/data/corpus_notes.md`. Milestone 2 used all-MiniLM-L6-v2 with "
+            "one chunk per message; found/expected and ranks in the top 5.",
+            "",
+            f"| # | Split | User | Query | Milestone 2 | Now | Rank(s) now |",
+            "|---|---|---|---|---|---|---|",
+        ]
+        for c in originals:
+            lines.append(
+                f"| {c['name']} | {c['split']} | `{c['user_id']}` | {c['query']} | {c['ms2_result']} | "
+                f"{c['found']}/{len(c['ranks'])} | {format_ranks(c['ranks'])} |"
+            )
+        lines.append("")
+    lines += [
+        "## All queries",
         "",
         f"| # | Split | User | Query | Expected answer | Found | Rank(s) in top {k} | Other users' results |",
         "|---|---|---|---|---|---|---|---|",
@@ -240,6 +269,16 @@ def format_markdown(checked: list[dict], summaries: dict[str, dict], k: int, col
             f"{c['found']}/{len(c['ranks'])} | {format_ranks(c['ranks'])} | {c['other_user_results']} |"
         )
     lines += ["", "Rank `–` means that message wasn't in the top results."]
+    if experiments:
+        lines += [
+            "",
+            "## Experiments",
+            "",
+            "Every scored setup, from `docs/evidence/rag_experiments.md` (rows 1-4 on both splits; "
+            "ablations on dev only).",
+            "",
+            *experiments,
+        ]
     return "\n".join(lines) + "\n"
 
 
@@ -283,7 +322,7 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.markdown:
         any_metadata = next(iter(collections.values())).metadata or {}
-        print(format_markdown(checked, summaries, args.k, any_metadata, stats), end="")
+        print(format_markdown(checked, summaries, args.k, any_metadata, stats, experiment_table()), end="")
     else:
         for c in checked:
             if c["split"] == "dev":  # never show test cases one by one while building

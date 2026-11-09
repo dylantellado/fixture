@@ -159,3 +159,29 @@ def test_markdown_lists_every_query_and_split():
     assert "| 1 | dev | `user_01` | q | a | 2/2 | 1, 2 | 0 |" in markdown
     assert "| 2 | test | `user_01` | q | a | 1/2 | 1, – | 0 |" in markdown
 
+
+
+def test_markdown_compares_original_queries_and_lists_experiments():
+    original = check_case({**CASE, "ms2_result": "0/2 (–, –)"}, [result("aaa"), result("bbb")])
+    added = check_case({**CASE, "name": "n01"}, [])
+    summaries = {"dev": summarize([original, added])}
+    stats = {"chunks": 2, "over_limit": 0, "embedding_model": "m"}
+    experiments = ["| Variant | Split |", "|---|---|", "| 1. Baseline | dev |"]
+    markdown = format_markdown([original, added], summaries, 5, {}, stats, experiments)
+    assert "| 1 | dev | `user_01` | q | 0/2 (–, –) | 2/2 | 1, 2 |" in markdown
+    # Only the original queries go in the comparison table.
+    comparison = markdown.split("## The 15 original queries")[1].split("## All queries")[0]
+    assert "n01" not in comparison
+    assert markdown.rstrip().endswith("| 1. Baseline | dev |")
+
+
+def test_every_original_query_has_its_milestone_2_result():
+    for case in load_cases():
+        assert bool(case.get("ms2_result")) == (case["origin"] == "corpus_notes"), case["name"]
+
+
+def test_experiment_table_reads_only_table_lines(tmp_path):
+    path = tmp_path / "log.md"
+    path.write_text("# Title\n\nSome text.\n\n| a | b |\n|---|---|\n| 1 | 2 |\n")
+    assert check_retrieval.experiment_table(path) == ["| a | b |", "|---|---|", "| 1 | 2 |"]
+    assert check_retrieval.experiment_table(tmp_path / "missing.md") == []
