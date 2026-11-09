@@ -48,6 +48,7 @@ def rebuild_index(
     users: list[dict],
     chunks_by_user: dict[str, list[dict]],
     shared_metadata: dict,
+    user_metadata: dict[str, dict] | None = None,
 ) -> dict[str, int]:
     """Rebuild every user's collection from scratch.
 
@@ -56,7 +57,8 @@ def rebuild_index(
     collection whose user is no longer in users.json. Rebuilding (instead of
     updating in place) means removed or renamed messages never linger.
 
-    shared_metadata is stored on every collection (input file, sha256, ...).
+    shared_metadata is stored on every collection (input file, sha256, ...);
+    user_metadata[user_id] (optional) adds metadata to one user's collection.
     Returns {collection name: number of chunks stored}.
     """
     sizes = {}
@@ -74,7 +76,12 @@ def rebuild_index(
             # A fresh copy each time: Chroma writes the embedding function into
             # the dict it is given, which would leak into the next collection.
             configuration=copy.deepcopy(config.COLLECTION_CONFIGURATION),
-            metadata={**shared_metadata, "user_id": user_id, "user_name": user["name"]},
+            metadata={
+                **shared_metadata,
+                **(user_metadata or {}).get(user_id, {}),
+                "user_id": user_id,
+                "user_name": user["name"],
+            },
             embedding_function=embedding_function,
         )
 

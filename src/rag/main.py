@@ -30,13 +30,17 @@ def build_chunks(messages: list[dict]) -> dict[str, list[dict]]:
     return chunks_by_user
 
 
-def add_token_counts(chunks_by_user: dict[str, list[dict]], count_tokens) -> int:
-    """Store each chunk's token count in its metadata; return how many are over the limit."""
-    over = 0
-    for chunks in chunks_by_user.values():
-        for chunk, tokens in zip(chunks, count_tokens([c["text"] for c in chunks])):
+def add_token_counts(chunks_by_user: dict[str, list[dict]], count_tokens) -> dict[str, int]:
+    """Store each chunk's token count in its metadata.
+
+    Returns {user_id: number of that user's chunks over the token limit}.
+    """
+    over = {}
+    for user_id, chunks in chunks_by_user.items():
+        counts = count_tokens([c["text"] for c in chunks])
+        for chunk, tokens in zip(chunks, counts):
             chunk["metadata"]["token_count"] = tokens
-            over += tokens > config.EMBEDDING_TOKEN_LIMIT
+        over[user_id] = sum(tokens > config.EMBEDDING_TOKEN_LIMIT for tokens in counts)
     return over
 
 
@@ -73,11 +77,18 @@ def run(client_factory, embedding_function, data_dir=config.DATA_DIR, samples_di
             log.warning("User %s has no messages; their collection will be empty", user_id)
         log.info("User %s: %d messages -> %d chunks", user_id, message_count, chunk_count)
 
-    token_metadata = {}
+    # Per-user collection metadata: how many of the user's chunks are too long.
+    user_metadata = {}
     if count_tokens is not None:
         over = add_token_counts(chunks_by_user, count_tokens)
-        log.info("Chunks over the %d-token limit: %d", config.EMBEDDING_TOKEN_LIMIT, over)
-        token_metadata = {"embedding_token_limit": config.EMBEDDING_TOKEN_LIMIT, "chunks_over_token_limit": over}
+        log.info("Chunks over the %d-token limit: %d", config.EMBEDDING_TOKEN_LIMIT, sum(over.values()))
+        user_metadata = {
+            user["user_id"]: {
+                "embedding_token_limit": config.EMBEDDING_TOKEN_LIMIT,
+                "chunks_over_token_limit": over.get(user["user_id"], 0),
+            }
+            for user in users
+        }
 
     # Stored on every collection, so we can tell which data version it came from.
     # Chroma metadata can't hold None, so missing values become "".
@@ -89,12 +100,11 @@ def run(client_factory, embedding_function, data_dir=config.DATA_DIR, samples_di
         "manifest_git_commit": str(manifest.get("git_commit", "")),
         "manifest_created_at": str(manifest.get("created_at", "")),
         "embedding_model": config.EMBEDDING_MODEL,
-        **token_metadata,
     }
 
     # 4. Rebuild the index.
     client = client_factory()
-    sizes = rebuild_index(client, embedding_function, users, chunks_by_user, shared_metadata)
+    sizes = rebuild_index(client, embedding_function, users, chunks_by_user, shared_metadata, user_metadata)
     for name, size in sizes.items():
         log.info("Collection %s: %d chunks", name, size)
     log.info("Indexing finished in %.1f s", time.monotonic() - started)

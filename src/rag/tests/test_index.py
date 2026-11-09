@@ -178,19 +178,30 @@ def test_search_scores_and_label_filter(chroma_client, fake_ef, data_dir):
 
 
 def test_token_counts_are_recorded(chroma_client, fake_ef, data_dir):
-    users = [{"user_id": "user_01", "name": "Priya Shah"}]
-    write_pipeline_data(data_dir, [make_message(body="short"), make_message(message_id="b" * 16, body=long_body(300))], users)
-    # A stand-in tokenizer: one token per word.
+    users = [{"user_id": "user_01", "name": "Priya Shah"}, {"user_id": "user_02", "name": "Marcus Bell"}]
+    messages = [
+        make_message(body="short"),
+        make_message(message_id="b" * 16, body=long_body(300)),
+        make_message(message_id="c" * 16, user_id="user_02", body=long_body(300)),
+    ]
+    write_pipeline_data(data_dir, messages, users)
+    # A stand-in tokenizer: one token per character, so long chunks go over the limit.
     main.run(lambda: chroma_client, fake_ef, data_dir=data_dir, samples_dir=SAMPLES_DIR,
-             count_tokens=lambda texts: [len(t.split()) for t in texts])
+             count_tokens=lambda texts: [len(t) for t in texts])
 
     collection = chroma_client.get_collection("messages_user_01")
     stored = collection.get(include=["metadatas", "documents"])
     for metadata, text in zip(stored["metadatas"], stored["documents"]):
-        assert metadata["token_count"] == len(text.split())
+        assert metadata["token_count"] == len(text)
     over = sum(m["token_count"] > config.EMBEDDING_TOKEN_LIMIT for m in stored["metadatas"])
+    assert over > 0
+    # Each collection counts only its own user's chunks.
     assert collection.metadata["chunks_over_token_limit"] == over
     assert collection.metadata["embedding_token_limit"] == config.EMBEDDING_TOKEN_LIMIT
+    other = chroma_client.get_collection("messages_user_02")
+    assert other.metadata["chunks_over_token_limit"] == sum(
+        m["token_count"] > config.EMBEDDING_TOKEN_LIMIT for m in other.get(include=["metadatas"])["metadatas"]
+    )
 
 
 def test_shared_configuration_is_not_modified(chroma_client, fake_ef, data_dir):
