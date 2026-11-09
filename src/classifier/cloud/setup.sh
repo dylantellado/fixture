@@ -27,11 +27,12 @@ if ! gcloud artifacts repositories describe "$REPOSITORY" --location "$REGION" -
   gcloud artifacts repositories create "$REPOSITORY" --repository-format docker \
     --location "$REGION" --project "$PROJECT_ID" --description "Fixture service images"
 fi
-# Keep the 5 most recent images and delete older ones, so storage stays under the free 0.5 GB.
+# Delete images that are older than 30 days and not among the 5 newest (kept for
+# rollbacks), so storage stays under the free 0.5 GB.
 cat > "${TMPDIR:-/tmp}/fixture-cleanup-policy.json" <<'EOF'
 [
   {"name": "keep-5-newest", "action": {"type": "Keep"}, "mostRecentVersions": {"keepCount": 5}},
-  {"name": "delete-older", "action": {"type": "Delete"}, "condition": {"tagState": "any"}}
+  {"name": "delete-old", "action": {"type": "Delete"}, "condition": {"tagState": "any", "olderThan": "30d"}}
 ]
 EOF
 gcloud artifacts repositories set-cleanup-policies "$REPOSITORY" --location "$REGION" --project "$PROJECT_ID" \
