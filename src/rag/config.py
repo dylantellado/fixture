@@ -58,9 +58,10 @@ THREAD_CONTEXT = os.environ.get("RAG_THREAD_CONTEXT", "1") != "0"
 
 # --- Chunking ---
 # Chunk sizes are in characters but must respect the model's token limit.
-# English averages about 4 characters per token; dates, times and EMAIL_###
-# placeholders use more tokens, so assume 3 to stay safely under the limit.
-CHARS_PER_TOKEN = 3
+# Measured on data-v1 with gemini-embedding-001: chunks average about 3.1
+# characters per token, but dense ones (dates, times, names, EMAIL_###
+# placeholders) go down to 2.1. Assume 2 so no chunk can reach the limit.
+CHARS_PER_TOKEN = 2
 # The longest a chunk (header, reply line and body piece, or a thread window)
 # may be. Longer bodies are split into overlapping pieces; longer threads
 # into overlapping windows.
@@ -74,7 +75,11 @@ CHUNK_OVERLAP = 150
 REPLY_EXCERPT_CHARS = 200
 # How much of each message a thread chunk shows (its first lines).
 THREAD_LINE_CHARS = 300
-# The longest a thread chunk (one window of a thread) may be.
+# The longest a thread chunk (one window of a thread) may be. With the
+# 2,048-token limit every data-v1 thread fits in one window (the longest is
+# about 1,550 characters, 525 tokens); only longer threads are split. Smaller
+# windows (800 characters) scored the same on the dev queries, with more chunks
+# (docs/evidence/rag_experiments.md), so the window is as large as the limit allows.
 THREAD_WINDOW_MAX_CHARS = int(os.environ.get("RAG_THREAD_WINDOW_MAX_CHARS", CHUNK_MAX_CHARS))
 # Messages shared by neighboring windows of a long thread.
 THREAD_WINDOW_OVERLAP = 1
