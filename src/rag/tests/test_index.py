@@ -177,6 +177,22 @@ def test_search_scores_and_label_filter(chroma_client, fake_ef, data_dir):
     assert filtered[0]["metadata"]["label"] == "reschedule"
 
 
+def test_token_counts_are_recorded(chroma_client, fake_ef, data_dir):
+    users = [{"user_id": "user_01", "name": "Priya Shah"}]
+    write_pipeline_data(data_dir, [make_message(body="short"), make_message(message_id="b" * 16, body=long_body(300))], users)
+    # A stand-in tokenizer: one token per word.
+    main.run(lambda: chroma_client, fake_ef, data_dir=data_dir, samples_dir=SAMPLES_DIR,
+             count_tokens=lambda texts: [len(t.split()) for t in texts])
+
+    collection = chroma_client.get_collection("messages_user_01")
+    stored = collection.get(include=["metadatas", "documents"])
+    for metadata, text in zip(stored["metadatas"], stored["documents"]):
+        assert metadata["token_count"] == len(text.split())
+    over = sum(m["token_count"] > config.EMBEDDING_TOKEN_LIMIT for m in stored["metadatas"])
+    assert collection.metadata["chunks_over_token_limit"] == over
+    assert collection.metadata["embedding_token_limit"] == config.EMBEDDING_TOKEN_LIMIT
+
+
 def test_shared_configuration_is_not_modified(chroma_client, fake_ef, data_dir):
     # Regression: Chroma writes the embedding function into the configuration
     # dict it receives. If that were our shared constant, the next run would

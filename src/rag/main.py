@@ -30,11 +30,24 @@ def build_chunks(messages: list[dict]) -> dict[str, list[dict]]:
     return chunks_by_user
 
 
-def run(client_factory, embedding_function, data_dir=config.DATA_DIR, samples_dir=config.SAMPLES_DIR) -> dict[str, int]:
+def add_token_counts(chunks_by_user: dict[str, list[dict]], count_tokens) -> int:
+    """Store each chunk's token count in its metadata; return how many are over the limit."""
+    over = 0
+    for chunks in chunks_by_user.values():
+        for chunk, tokens in zip(chunks, count_tokens([c["text"] for c in chunks])):
+            chunk["metadata"]["token_count"] = tokens
+            over += tokens > config.EMBEDDING_TOKEN_LIMIT
+    return over
+
+
+def run(client_factory, embedding_function, data_dir=config.DATA_DIR, samples_dir=config.SAMPLES_DIR,
+        count_tokens=None) -> dict[str, int]:
     """Do one full indexing run and return {collection name: chunk count}.
 
     client_factory is called only after the input passes validation, so bad
     data never touches ChromaDB. Tests pass an in-memory client here.
+    count_tokens (optional) counts each chunk's tokens, so the run can record
+    how many chunks are longer than the model reads.
     """
     started = time.monotonic()
 
@@ -60,6 +73,12 @@ def run(client_factory, embedding_function, data_dir=config.DATA_DIR, samples_di
             log.warning("User %s has no messages; their collection will be empty", user_id)
         log.info("User %s: %d messages -> %d chunks", user_id, message_count, chunk_count)
 
+    token_metadata = {}
+    if count_tokens is not None:
+        over = add_token_counts(chunks_by_user, count_tokens)
+        log.info("Chunks over the %d-token limit: %d", config.EMBEDDING_TOKEN_LIMIT, over)
+        token_metadata = {"embedding_token_limit": config.EMBEDDING_TOKEN_LIMIT, "chunks_over_token_limit": over}
+
     # Stored on every collection, so we can tell which data version it came from.
     # Chroma metadata can't hold None, so missing values become "".
     shared_metadata = {
@@ -70,6 +89,7 @@ def run(client_factory, embedding_function, data_dir=config.DATA_DIR, samples_di
         "manifest_git_commit": str(manifest.get("git_commit", "")),
         "manifest_created_at": str(manifest.get("created_at", "")),
         "embedding_model": config.EMBEDDING_MODEL,
+        **token_metadata,
     }
 
     # 4. Rebuild the index.
@@ -90,7 +110,7 @@ def main() -> None:
     # The Chroma client logs every HTTP request at INFO; keep only our own lines.
     logging.getLogger("httpx").setLevel(logging.WARNING)
     try:
-        run(connect, config.get_embedding_function())
+        run(connect, config.get_embedding_function(), count_tokens=config.count_tokens)
     except InputError as e:
         log.error("Input is invalid, nothing was indexed.\n%s", e)
         sys.exit(1)

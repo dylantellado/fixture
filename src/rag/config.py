@@ -51,6 +51,28 @@ def get_embedding_function():
     return DefaultEmbeddingFunction()
 
 
+# MiniLM reads at most this many tokens (word pieces, counting the two special
+# tokens it adds) and silently ignores the rest.
+EMBEDDING_TOKEN_LIMIT = 256
+
+
+def count_tokens(texts: list[str]) -> list[int]:
+    """How many MiniLM tokens each text has, without cutting at the limit.
+
+    Used to record how many chunks are longer than EMBEDDING_TOKEN_LIMIT.
+    Loads the tokenizer that ships with the model (downloaded on first use).
+    """
+    from chromadb.utils.embedding_functions.onnx_mini_lm_l6_v2 import ONNXMiniLM_L6_V2
+    from tokenizers import Tokenizer
+
+    model = ONNXMiniLM_L6_V2()
+    model._download_model_if_not_exists()
+    tokenizer = Tokenizer.from_file(str(model.DOWNLOAD_PATH / model.EXTRACTED_FOLDER_NAME / "tokenizer.json"))
+    tokenizer.no_truncation()
+    tokenizer.no_padding()
+    return [len(encoding.ids) for encoding in tokenizer.encode_batch(texts)]
+
+
 # --- Chunking ---
 # Bodies longer than this many characters are split into overlapping pieces.
 # MiniLM reads at most 256 tokens (~1,000 characters of English), and longer
