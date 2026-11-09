@@ -22,3 +22,5 @@ top 5. "Over limit" counts chunks longer than the embedding model's token limit.
 | dev ablation: Vertex + thread context, windows of 800 characters, thread weight 0.5 | gemini-embedding-001 | dev | 32 | 0.883 | 0.688 | 26 | 5 | 1 | 0 | 606 | 0 | `e82c582-dirty` | 2026-11-09 |
 | 4. Vertex + thread context | gemini-embedding-001 | dev | 32 | 0.883 | 0.672 | 25 | 7 | 0 | 0 | 537 | 0 | `d798518` | 2026-11-09 |
 | 4. Vertex + thread context | gemini-embedding-001 | test | 15 | 0.800 | 0.716 | 10 | 4 | 1 | 0 | 537 | 0 | `d798518` | 2026-11-09 |
+| Final check after the full pipeline rerun (same setup as row 4) | gemini-embedding-001 | dev | 32 | 0.883 | 0.672 | 25 | 7 | 0 | 0 | 537 | 0 | `4379eb1` | 2026-11-09 |
+| Final check after the full pipeline rerun (same setup as row 4) | gemini-embedding-001 | test | 15 | 0.800 | 0.716 | 10 | 4 | 1 | 0 | 537 | 0 | `4379eb1` | 2026-11-09 |
