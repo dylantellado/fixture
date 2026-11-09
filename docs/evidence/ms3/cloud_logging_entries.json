@@ -1,0 +1,165 @@
+[
+  {
+    "timestamp": "2026-11-09T20:08:45.020Z",
+    "severity": "INFO",
+    "logName": "projects/fixture-ac215-96dhbm/logs/run.googleapis.com%2Fstdout",
+    "resource": {
+      "labels": {
+        "configuration_name": "fixture-classifier",
+        "location": "us-east1",
+        "project_id": "fixture-ac215-96dhbm",
+        "revision_name": "fixture-classifier-00002-gc7",
+        "service_name": "fixture-classifier"
+      },
+      "type": "cloud_run_revision"
+    },
+    "jsonPayload": {
+      "event": "startup",
+      "location": "global",
+      "logger": "classifier",
+      "message": "classifier starting: model=gemini-3.8-flash rules_version=1.5",
+      "model": "gemini-3.8-flash",
+      "project": "fixture-ac215-96dhbm",
+      "rules_path": "/app/labeling_rules.md",
+      "rules_sha256": "4473a8690a847203f49ca46c9e5087ed3dcf7ac605c13d72631fb086bd124f01",
+      "rules_version": "1.5",
+      "thinking_budget": 128
+    }
+  },
+  {
+    "timestamp": "2026-11-09T20:09:11.504Z",
+    "severity": "INFO",
+    "logName": "projects/fixture-ac215-96dhbm/logs/run.googleapis.com%2Fstdout",
+    "resource": {
+      "labels": {
+        "configuration_name": "fixture-classifier",
+        "location": "us-east1",
+        "project_id": "fixture-ac215-96dhbm",
+        "revision_name": "fixture-classifier-00002-gc7",
+        "service_name": "fixture-classifier"
+      },
+      "type": "cloud_run_revision"
+    },
+    "jsonPayload": {
+      "attempts": 1,
+      "event": "classify",
+      "input_tokens": 3787,
+      "label": "proposed_times",
+      "latency_ms": 3650,
+      "logger": "classifier",
+      "message": "classified: label=proposed_times needs_response=True latency_ms=3650",
+      "message_id": "example-proposed-times",
+      "model": "gemini-3.8-flash",
+      "needs_response": true,
+      "outcome": "ok",
+      "output_tokens": 48,
+      "rules_version": "1.5",
+      "status": 200,
+      "target_index": 2,
+      "thinking_tokens": 0,
+      "thread_length": 3
+    }
+  },
+  {
+    "timestamp": "2026-11-09T20:09:13.201Z",
+    "severity": "INFO",
+    "logName": "projects/fixture-ac215-96dhbm/logs/run.googleapis.com%2Fstdout",
+    "resource": {
+      "labels": {
+        "configuration_name": "fixture-classifier",
+        "location": "us-east1",
+        "project_id": "fixture-ac215-96dhbm",
+        "revision_name": "fixture-classifier-00002-gc7",
+        "service_name": "fixture-classifier"
+      },
+      "type": "cloud_run_revision"
+    },
+    "jsonPayload": {
+      "attempts": 1,
+      "event": "classify",
+      "input_tokens": 3622,
+      "label": "none",
+      "latency_ms": 1573,
+      "logger": "classifier",
+      "message": "classified: label=none needs_response=False latency_ms=1573",
+      "message_id": "example-cold-sales",
+      "model": "gemini-3.8-flash",
+      "needs_response": false,
+      "outcome": "ok",
+      "output_tokens": 39,
+      "rules_version": "1.5",
+      "status": 200,
+      "target_index": 0,
+      "thinking_tokens": 0,
+      "thread_length": 1
+    }
+  },
+  {
+    "timestamp": "2026-11-09T20:09:14.748Z",
+    "severity": "INFO",
+    "logName": "projects/fixture-ac215-96dhbm/logs/run.googleapis.com%2Fstdout",
+    "resource": {
+      "labels": {
+        "configuration_name": "fixture-classifier",
+        "location": "us-east1",
+        "project_id": "fixture-ac215-96dhbm",
+        "revision_name": "fixture-classifier-00002-gc7",
+        "service_name": "fixture-classifier"
+      },
+      "type": "cloud_run_revision"
+    },
+    "jsonPayload": {
+      "attempts": 1,
+      "event": "classify",
+      "input_tokens": 3633,
+      "label": "none",
+      "latency_ms": 1454,
+      "logger": "classifier",
+      "message": "classified: label=none needs_response=False latency_ms=1454",
+      "message_id": "example-injection-newsletter",
+      "model": "gemini-3.8-flash",
+      "needs_response": false,
+      "outcome": "ok",
+      "output_tokens": 49,
+      "rules_version": "1.5",
+      "status": 200,
+      "target_index": 0,
+      "thinking_tokens": 0,
+      "thread_length": 1
+    }
+  },
+  {
+    "timestamp": "2026-11-09T20:09:16.324Z",
+    "severity": "INFO",
+    "logName": "projects/fixture-ac215-96dhbm/logs/run.googleapis.com%2Fstdout",
+    "resource": {
+      "labels": {
+        "configuration_name": "fixture-classifier",
+        "location": "us-east1",
+        "project_id": "fixture-ac215-96dhbm",
+        "revision_name": "fixture-classifier-00002-gc7",
+        "service_name": "fixture-classifier"
+      },
+      "type": "cloud_run_revision"
+    },
+    "jsonPayload": {
+      "attempts": 1,
+      "event": "classify",
+      "input_tokens": 3715,
+      "label": "acceptance",
+      "latency_ms": 1430,
+      "logger": "classifier",
+      "message": "classified: label=acceptance needs_response=True latency_ms=1430",
+      "message_id": "example-acceptance",
+      "model": "gemini-3.8-flash",
+      "needs_response": true,
+      "outcome": "ok",
+      "output_tokens": 36,
+      "rules_version": "1.5",
+      "status": 200,
+      "target_index": 2,
+      "thinking_tokens": 0,
+      "thread_length": 3
+    }
+  }
+]

@@ -20,6 +20,8 @@ Fixture is a Harvard AC215 course project by Dylan Tellado and Will Sherwood. It
 
 **What exists so far:** a Google connection proof of concept and the Milestone 2 search pipeline on fake data. `src/ingest` has a command-line Calendar check, and `src/frontend` has a small web app that reads Calendar and Gmail, plus a "Search past threads" page over the demo mailboxes. The dashboard labels the signed-in user's 20 most recent emails with the `classifier` service (Gemini on Vertex AI, following `docs/data/labeling_rules.md`): a label, a "Needs response" badge and a one-line reason, cached per account and Gmail message id in `data/fixture.db` (deleted on sign-out), with the old keyword match as a fallback when the classifier is down. Everything is read-only; nothing writes to a calendar or sends email yet. `ingest` and `preprocess` are working one-shot jobs over a generated, fictional email corpus of 4 users (see `docs/data/corpus_notes.md`; plan in `docs/data/generation/`); `rag` indexes each user's messages into their own ChromaDB collection; `api` answers `GET /health`, `GET /users`, and `POST /search`, which searches one user's collection only; `classifier` answers `GET /health` and `POST /classify`.
 
+**Milestone 3:** the `classifier` is deployed to Cloud Run (`fixture-classifier`, us-east1, https://fixture-classifier-622192804476.us-east1.run.app), authentication required (callers need `roles/run.invoker`), with structured JSON logs, log-based metrics, a Monitoring dashboard, an uptime check and an error-rate alert. The web app still calls a local classifier (`CLASSIFIER_URL`); calling the deployed one would need an identity token. Evidence: `docs/evidence/ms3/`.
+
 ## Milestone 2
 
 **Scope:** a searchable, per-user email pipeline on fake data. Generated multi-user scheduling emails flow through `ingest` → `preprocess` → `rag`, which indexes each user's messages in ChromaDB. The `api` searches one user's messages at a time, and the frontend gets a search page.
@@ -54,12 +56,15 @@ src/
   rag/          indexes each user's messages into ChromaDB (messages_<user_id>); query.py searches from the command line
   api/          FastAPI app (port 8000): GET /health, GET /users, POST /search; ChromaDB access in chroma_store.py
   (chromadb)    ChromaDB server from a pinned image, no folder (host port 8001)
-  classifier/   FastAPI service (port 8002): POST /classify labels one email in its thread with Gemini
-                on Vertex AI (label, needs_response, reason); prompt.py builds the prompt from
+  classifier/   FastAPI service (port 8002, or $PORT): POST /classify labels one email in its thread with
+                Gemini on Vertex AI (label, needs_response, reason); prompt.py builds the prompt from
                 docs/data/labeling_rules.md minus "Not adopted" and "Change log" (it fails at
                 startup if one of those headings is missing; training_conflicts.md is never read),
-                gemini.py calls the model; uses gcloud application-default credentials, never
-                logs or saves email text
+                gemini.py calls the model, logs.py writes allow-listed JSON log fields only; uses
+                gcloud application-default credentials locally, never logs or saves email text.
+                deploy.sh deploys to Cloud Run; cloud/ has setup.sh, build_context.sh (image =
+                committed code + exact rules file), monitoring.sh and its configs; examples/ has
+                fake requests
   frontend/     FastAPI web app (port 8501): Sign in with Google, then a dashboard of
                 upcoming events (all checked calendars) and recent emails labeled by
                 the classifier (keyword fallback when it's down), with Scheduling and
@@ -78,6 +83,7 @@ Each service under `src/` is currently self-contained, with its own `Dockerfile`
 
 - Google Cloud project: `fixture-ac215-96dhbm`. Calendar and Gmail APIs are enabled.
 - The OAuth consent screen is in Testing mode, so only listed test users can sign in, and logins expire after about 7 days.
+- Cloud Run (classifier): the service runs as `fixture-classifier@` (only `roles/aiplatform.user` and `roles/logging.logWriter`) and Cloud Build as `fixture-builder@`; both are created by `src/classifier/cloud/setup.sh`. Ask before granting anyone `roles/run.invoker` or creating alerts that email anyone other than Dylan.
 - Permissions are listed in one `SCOPES` list per service: `src/ingest/google_auth.py` (read-only Calendar) and `src/frontend/main.py` (read-only Calendar and Gmail, plus basic profile). Ask before adding write permissions. The classifier uses no Google user permissions: it gets email text from the web app and calls Vertex AI with gcloud application-default credentials (`aiplatform.googleapis.com` is enabled; Docker mounts `~/.config/gcloud` read-only).
 - Files in `secrets/` (never commit them; get them from a teammate privately):
   - `credentials.json`: "Fixture Desktop" OAuth client, used by `src/ingest`
@@ -126,6 +132,12 @@ Classifier (from `src/classifier`; needs `gcloud auth application-default login`
 
 ```sh
 GOOGLE_CLOUD_PROJECT=fixture-ac215-96dhbm uv run uvicorn main:app --port 8002 --reload
+```
+
+Deploy the classifier to Cloud Run (commit first; it builds from the last commit with Cloud Build, no local Docker needed):
+
+```sh
+src/classifier/deploy.sh
 ```
 
 Tests (from any service folder: `src/ingest`, `src/preprocess`, `src/rag`, `src/api`, `src/classifier`, or `src/frontend`):
