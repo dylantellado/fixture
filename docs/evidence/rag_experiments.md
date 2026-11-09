@@ -11,3 +11,7 @@ top 5. "Over limit" counts chunks longer than the embedding model's token limit.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1. Baseline: MiniLM, one chunk per message | all-MiniLM-L6-v2 | dev | 32 | 0.650 | 0.465 | 14 | 12 | 6 | 0 | 390 | 13 | `456b89b` | 2026-11-09 |
 | 1. Baseline: MiniLM, one chunk per message | all-MiniLM-L6-v2 | test | 15 | 0.840 | 0.733 | 11 | 4 | 0 | 0 | 390 | 13 | `456b89b` | 2026-11-09 |
+| dev ablation: MiniLM + thread context, thread weight 0 | all-MiniLM-L6-v2 | dev | 32 | 0.667 | 0.590 | 17 | 9 | 6 | 0 | 667 | 1 | `29de105` | 2026-11-09 |
+| dev ablation: MiniLM + thread context, thread weight 0.5 | all-MiniLM-L6-v2 | dev | 32 | 0.667 | 0.598 | 16 | 11 | 5 | 0 | 667 | 1 | `29de105` | 2026-11-09 |
+| 2. MiniLM + thread context | all-MiniLM-L6-v2 | dev | 32 | 0.667 | 0.598 | 16 | 11 | 5 | 0 | 667 | 1 | `29de105` | 2026-11-09 |
+| 2. MiniLM + thread context | all-MiniLM-L6-v2 | test | 15 | 0.800 | 0.528 | 11 | 2 | 2 | 0 | 667 | 1 | `29de105` | 2026-11-09 |
