@@ -1,0 +1,187 @@
+{
+  "displayName": "Fixture classifier",
+  "labels": {"fixture": ""},
+  "mosaicLayout": {
+    "columns": 48,
+    "tiles": [
+      {
+        "xPos": 0, "yPos": 0, "width": 48, "height": 7,
+        "widget": {
+          "title": "About this dashboard",
+          "text": {
+            "format": "MARKDOWN",
+            "content": "Cloud Run service **fixture-classifier** (us-east1): labels one email with Gemini. The classify charts come from log-based metrics on the service's structured `classify` log line (`classifier_requests`, `classifier_errors`, `classifier_latency`); instances and response codes are Cloud Run's own metrics. Latency is the time to get the label from Gemini, including retries. Logs: [Logs Explorer, classify entries](https://console.cloud.google.com/logs/query;query=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22fixture-classifier%22%0AjsonPayload.event%3D%22classify%22?project=fixture-ac215-96dhbm) · [Cloud Run service](https://console.cloud.google.com/run/detail/us-east1/fixture-classifier/metrics?project=fixture-ac215-96dhbm) · Setup: `src/classifier/cloud/monitoring.sh`."
+          }
+        }
+      },
+      {
+        "xPos": 0, "yPos": 7, "width": 24, "height": 16,
+        "widget": {
+          "title": "Classify requests per minute, by outcome",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR",
+              "minAlignmentPeriod": "60s",
+              "legendTemplate": "${metric.labels.outcome}",
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"logging.googleapis.com/user/classifier_requests\" resource.type=\"cloud_run_revision\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_SUM",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": ["metric.label.outcome"]
+                  }
+                }
+              }
+            }],
+            "yAxis": {"label": "requests / min", "scale": "LINEAR"}
+          }
+        }
+      },
+      {
+        "xPos": 24, "yPos": 7, "width": 24, "height": 16,
+        "widget": {
+          "title": "Classify error rate (%, 5-minute windows)",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "LINE",
+              "legendTemplate": "error rate",
+              "timeSeriesQuery": {
+                "prometheusQuery": "100 * (sum(increase(logging_googleapis_com:user_classifier_errors{monitored_resource=\"cloud_run_revision\",service_name=\"fixture-classifier\"}[5m])) or vector(0)) / sum(increase(logging_googleapis_com:user_classifier_requests{monitored_resource=\"cloud_run_revision\",service_name=\"fixture-classifier\"}[5m]))",
+                "unitOverride": "%"
+              }
+            }],
+            "thresholds": [{"value": 20, "label": "alert at 20%"}],
+            "yAxis": {"label": "% failed", "scale": "LINEAR"}
+          }
+        }
+      },
+      {
+        "xPos": 0, "yPos": 23, "width": 24, "height": 16,
+        "widget": {
+          "title": "Classify latency p50 / p95 (ms, Gemini incl. retries)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "p50",
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"logging.googleapis.com/user/classifier_latency\" resource.type=\"cloud_run_revision\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_DELTA",
+                      "crossSeriesReducer": "REDUCE_PERCENTILE_50"
+                    }
+                  }
+                }
+              },
+              {
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "p95",
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"logging.googleapis.com/user/classifier_latency\" resource.type=\"cloud_run_revision\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_DELTA",
+                      "crossSeriesReducer": "REDUCE_PERCENTILE_95"
+                    }
+                  }
+                }
+              }
+            ],
+            "yAxis": {"label": "ms", "scale": "LINEAR"}
+          }
+        }
+      },
+      {
+        "xPos": 24, "yPos": 23, "width": 24, "height": 16,
+        "widget": {
+          "title": "Cloud Run instances (active / idle)",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_AREA",
+              "minAlignmentPeriod": "60s",
+              "legendTemplate": "${metric.labels.state}",
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"run.googleapis.com/container/instance_count\" resource.type=\"cloud_run_revision\" resource.label.\"service_name\"=\"fixture-classifier\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MAX",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": ["metric.label.state"]
+                  }
+                }
+              }
+            }],
+            "yAxis": {"label": "instances (max 2)", "scale": "LINEAR"}
+          }
+        }
+      },
+      {
+        "xPos": 0, "yPos": 39, "width": 24, "height": 16,
+        "widget": {
+          "title": "All HTTP requests per minute, by response code (Cloud Run)",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "STACKED_BAR",
+              "minAlignmentPeriod": "60s",
+              "legendTemplate": "${metric.labels.response_code}",
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"run.googleapis.com/request_count\" resource.type=\"cloud_run_revision\" resource.label.\"service_name\"=\"fixture-classifier\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_SUM",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": ["metric.label.response_code"]
+                  }
+                }
+              }
+            }],
+            "yAxis": {"label": "requests / min (incl. /health, 403, 422)", "scale": "LINEAR"}
+          }
+        }
+      },
+      {
+        "xPos": 24, "yPos": 39, "width": 24, "height": 16,
+        "widget": {
+          "title": "Uptime check: GET /health passing (share of checker regions)",
+          "xyChart": {
+            "dataSets": [{
+              "plotType": "LINE",
+              "minAlignmentPeriod": "300s",
+              "legendTemplate": "passing",
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"monitoring.googleapis.com/uptime_check/check_passed\" metric.label.\"check_id\"=\"__UPTIME_CHECK_ID__\"",
+                  "aggregation": {
+                    "alignmentPeriod": "300s",
+                    "perSeriesAligner": "ALIGN_FRACTION_TRUE",
+                    "crossSeriesReducer": "REDUCE_MEAN"
+                  }
+                }
+              }
+            }],
+            "yAxis": {"label": "1 = all regions pass", "scale": "LINEAR"}
+          }
+        }
+      },
+      {
+        "xPos": 0, "yPos": 55, "width": 48, "height": 20,
+        "widget": {
+          "title": "Recent classify log entries (structured; no email text)",
+          "logsPanel": {
+            "filter": "resource.type=\"cloud_run_revision\"\nresource.labels.service_name=\"fixture-classifier\"\njsonPayload.event=\"classify\"",
+            "resourceNames": ["projects/__PROJECT_ID__"]
+          }
+        }
+      }
+    ]
+  }
+}

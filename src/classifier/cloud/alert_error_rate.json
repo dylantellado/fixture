@@ -1,0 +1,22 @@
+{
+  "displayName": "Fixture classifier: high error rate",
+  "documentation": {
+    "mimeType": "text/markdown",
+    "subject": "Fixture classifier: more than 20% of /classify requests are failing",
+    "content": "More than 20% of `/classify` requests to Cloud Run service `fixture-classifier` failed over the last 10 minutes (at least 3 requests). Failed requests return 502/503/500 and never a label.\n\nSee which errors (`jsonPayload.error_type`: rate_limited, api_error, unreachable, invalid_answer, ...) in Logs Explorer with:\n\n```\nresource.type=\"cloud_run_revision\"\nresource.labels.service_name=\"fixture-classifier\"\njsonPayload.event=\"classify\"\njsonPayload.outcome=\"error\"\n```\n\nDashboard: Monitoring > Dashboards > Fixture classifier. Runbook: src/classifier/README.md, \"Monitoring\"."
+  },
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "More than 20% of classify requests failed (10 min, at least 3 requests)",
+      "conditionPrometheusQueryLanguage": {
+        "query": "(sum(increase(logging_googleapis_com:user_classifier_errors{monitored_resource=\"cloud_run_revision\",service_name=\"fixture-classifier\"}[10m])) / sum(increase(logging_googleapis_com:user_classifier_requests{monitored_resource=\"cloud_run_revision\",service_name=\"fixture-classifier\"}[10m])) > 0.2) and (sum(increase(logging_googleapis_com:user_classifier_requests{monitored_resource=\"cloud_run_revision\",service_name=\"fixture-classifier\"}[10m])) >= 3)",
+        "duration": "0s",
+        "evaluationInterval": "60s"
+      }
+    }
+  ],
+  "alertStrategy": {"autoClose": "1800s"},
+  "notificationChannels": ["__CHANNEL__"],
+  "severity": "ERROR"
+}

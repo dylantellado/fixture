@@ -64,7 +64,9 @@ gcloud run deploy "$SERVICE" \
   --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=$GEMINI_LOCATION,GEMINI_MODEL=$GEMINI_MODEL,GEMINI_THINKING_BUDGET=$GEMINI_THINKING_BUDGET" \
   --labels "app=fixture,component=classifier,git-commit=$COMMIT,rules-sha256=${RULES_SHA256:0:12}"
 
-URL="$(gcloud run services describe "$SERVICE" --project "$PROJECT_ID" --region "$REGION" --format 'value(status.url)')"
+# The stable URL (Cloud Run also serves an older-style *.a.run.app alias).
+PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format 'value(projectNumber)')"
+URL="https://${SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app"
 echo
 echo "Deployed commit $COMMIT (rules sha256 ${RULES_SHA256:0:12}...) to $URL"
 echo "Check it:"

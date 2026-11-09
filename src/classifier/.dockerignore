@@ -9,3 +9,4 @@ deploy.sh
 cloud/
 Dockerfile
 .dockerignore
+examples/
