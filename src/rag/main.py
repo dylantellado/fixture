@@ -20,25 +20,18 @@ import time
 from datetime import datetime, timezone
 
 import config
-from chunking import chunk_message, chunk_thread, group_threads
+from chunking import chunk_thread, group_threads
 from index import connect, rebuild_index
 from inputs import InputError, find_input_files, load_and_validate, sha256_file
 
 log = logging.getLogger("rag")
 
 
-def build_chunks(messages: list[dict], thread_context: bool = True) -> dict[str, list[dict]]:
-    """Chunk every thread (its messages and the thread itself), grouped by user_id.
-
-    thread_context=False (experiments only) makes one plain chunk per message.
-    """
+def build_chunks(messages: list[dict]) -> dict[str, list[dict]]:
+    """Chunk every thread (its messages and the thread itself), grouped by user_id."""
     chunks_by_user: dict[str, list[dict]] = {}
     for (user_id, _thread_id), thread in group_threads(messages).items():
-        if thread_context:
-            chunks = chunk_thread(thread)
-        else:
-            chunks = [chunk for message in thread for chunk in chunk_message(message)]
-        chunks_by_user.setdefault(user_id, []).extend(chunks)
+        chunks_by_user.setdefault(user_id, []).extend(chunk_thread(thread))
     return chunks_by_user
 
 
@@ -66,8 +59,7 @@ def chunks_over_limit(chunks: list[dict], limit: int) -> int:
     return sum(chunk["metadata"]["token_count"] > limit for chunk in chunks)
 
 
-def run(client_factory, embedding_function, data_dir=config.DATA_DIR, samples_dir=config.SAMPLES_DIR,
-        thread_context: bool = config.THREAD_CONTEXT) -> dict[str, int]:
+def run(client_factory, embedding_function, data_dir=config.DATA_DIR, samples_dir=config.SAMPLES_DIR) -> dict[str, int]:
     """Do one full indexing run and return {collection name: chunk count}.
 
     client_factory is called only after the input passes validation and every
@@ -89,7 +81,7 @@ def run(client_factory, embedding_function, data_dir=config.DATA_DIR, samples_di
         log.info("Manifest: git_commit=%s created_at=%s", manifest.get("git_commit", ""), manifest.get("created_at", ""))
 
     # 3. Chunk.
-    chunks_by_user = build_chunks(messages, thread_context)
+    chunks_by_user = build_chunks(messages)
     for user in users:
         user_id = user["user_id"]
         message_count = sum(1 for m in messages if m["user_id"] == user_id)
@@ -114,7 +106,6 @@ def run(client_factory, embedding_function, data_dir=config.DATA_DIR, samples_di
         "used_sample_data": files.used_sample,
         "manifest_git_commit": str(manifest.get("git_commit", "")),
         "manifest_created_at": str(manifest.get("created_at", "")),
-        "chunking": "message+thread" if thread_context else "message",
         # Model, dimension, task types and token limit; the api refuses a collection built with another model.
         **embedding_function.collection_metadata(facts["dimension"]),
     }
@@ -134,7 +125,7 @@ def main() -> None:
         format="%(asctime)s %(levelname)s %(message)s",
         stream=sys.stdout,
     )
-    # The Chroma client logs every HTTP request at INFO; keep only our own lines.
+    # The Chroma and Vertex AI clients log every HTTP request at INFO; keep only our own lines.
     logging.getLogger("httpx").setLevel(logging.WARNING)
     try:
         run(connect, config.get_embedding_function())

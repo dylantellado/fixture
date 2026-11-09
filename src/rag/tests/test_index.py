@@ -70,7 +70,6 @@ def test_collection_metadata_records_the_data_version(chroma_client, fake_ef, da
     assert metadata["embedding_task_document"] == "RETRIEVAL_DOCUMENT"
     assert metadata["embedding_task_query"] == "RETRIEVAL_QUERY"
     assert metadata["embedding_token_limit"] == 2048
-    assert metadata["chunking"] == "message+thread"
     assert metadata["indexed_at"]  # set to the run time
     assert metadata["manifest_git_commit"] == ""  # samples have no manifest
 
@@ -251,14 +250,6 @@ def test_collections_have_no_chroma_embedding_function(chroma_client, fake_ef, d
     """Chroma never embeds by itself (no default ONNX model): rag passes vectors."""
     index(chroma_client, fake_ef, data_dir)
     assert chroma_client.get_collection("messages_user_01").configuration.get("embedding_function") is None
-
-
-def test_plain_chunking_for_experiments(chroma_client, fake_ef, data_dir, sample_messages):
-    sizes = main.run(lambda: chroma_client, fake_ef, data_dir=data_dir, samples_dir=SAMPLES_DIR, thread_context=False)
-    assert sizes["messages_user_01"] == sum(m["user_id"] == "user_01" for m in sample_messages)
-    stored = chroma_client.get_collection("messages_user_01").get(include=["metadatas"])
-    assert {m["chunk_type"] for m in stored["metadatas"]} == {"message"}
-    assert chroma_client.get_collection("messages_user_01").metadata["chunking"] == "message"
 
 
 def test_open_collection_refuses_another_model(chroma_client, fake_ef, data_dir):

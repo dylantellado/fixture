@@ -51,11 +51,6 @@ def get_embedding_function() -> VertexEmbeddingFunction:
     return build_embedding_function(EMBEDDING_SETTINGS)
 
 
-# Experiments only: RAG_THREAD_CONTEXT=0 indexes one plain chunk per message
-# (no reply excerpt, no thread chunks), to measure what thread context adds.
-THREAD_CONTEXT = os.environ.get("RAG_THREAD_CONTEXT", "1") != "0"
-
-
 # --- Chunking ---
 # Chunk sizes are in characters but must respect the model's token limit.
 # Measured on data-v1 with gemini-embedding-001: chunks average about 3.1
@@ -80,7 +75,7 @@ THREAD_LINE_CHARS = 300
 # about 1,550 characters, 525 tokens); only longer threads are split. Smaller
 # windows (800 characters) scored the same on the dev queries, with more chunks
 # (docs/evidence/rag_experiments.md), so the window is as large as the limit allows.
-THREAD_WINDOW_MAX_CHARS = int(os.environ.get("RAG_THREAD_WINDOW_MAX_CHARS", CHUNK_MAX_CHARS))
+THREAD_WINDOW_MAX_CHARS = CHUNK_MAX_CHARS
 # Messages shared by neighboring windows of a long thread.
 THREAD_WINDOW_OVERLAP = 1
 

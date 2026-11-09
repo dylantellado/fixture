@@ -24,11 +24,11 @@
       </li>
       <li>
         <span class="step-num">3</span>
-        <div><strong>Index</strong><p>Turns each message into an embedding (all-MiniLM-L6-v2) and stores it in that person's own ChromaDB collection.</p></div>
+        <div><strong>Index</strong><p>Turns each message (with a line of the email it replies to) and each whole thread into an embedding with Vertex AI (gemini-embedding-001), and stores them in that person's own ChromaDB collection.</p></div>
       </li>
       <li>
         <span class="step-num">4</span>
-        <div><strong>API</strong><p>Searches one person's collection per request and returns the closest messages, best first.</p></div>
+        <div><strong>API</strong><p>Searches one person's collection per request and returns the closest messages, best first. A message in a thread that matches the question moves up.</p></div>
       </li>
       <li>
         <span class="step-num">5</span>

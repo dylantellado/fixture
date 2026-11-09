@@ -207,7 +207,6 @@ def format_markdown(checked: list[dict], summaries: dict[str, dict], k: int, col
         f"({collection_metadata.get('embedding_dimension', '')} dimensions; documents "
         f"{collection_metadata.get('embedding_task_document', '')}, queries "
         f"{collection_metadata.get('embedding_task_query', '')}), cosine distance",
-        f"- **Chunking:** {collection_metadata.get('chunking', '')}",
         f"- **Chunks:** {stats['chunks']} in the searched users' collections, "
         f"{stats['over_limit']} over the model's token limit",
         f"- **Indexed from:** sha256 `{collection_metadata.get('input_sha256', '')}`, "

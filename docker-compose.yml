@@ -67,7 +67,6 @@ services:
     volumes:
       - ./data:/data
       - ./samples:/samples:ro
-      - model_cache:/root/.cache/chroma  # embedding model downloads once, shared with api
 
   api:
     build: ./src/api
@@ -80,9 +79,6 @@ services:
     depends_on:
       rag:
         condition: service_completed_successfully
-    volumes:
-      # No ./secrets mount: the api never talks to Google.
-      - model_cache:/root/.cache/chroma
     healthcheck:
       # python:3.12-slim has no curl, so use Python to call /health.
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
@@ -135,4 +131,3 @@ services:
 
 volumes:
   chroma_data:   # ChromaDB's stored collections
-  model_cache:   # all-MiniLM-L6-v2 ONNX model used by rag and api

@@ -404,3 +404,15 @@ def test_embeddings_matches_the_rag_copy():
     if not rag_copy.exists():
         pytest.skip("src/rag is not next to this service (e.g. inside a container)")
     assert (here / "embeddings.py").read_text() == rag_copy.read_text()
+
+
+def test_no_code_uses_chromas_default_onnx_embedder():
+    """Vertex AI is the only embedder: no api source file may use Chroma's
+    default embedding function (the local all-MiniLM-L6-v2 ONNX model)."""
+    here = Path(__file__).resolve().parent
+    for path in here.glob("*.py"):
+        if path.name.startswith("test_"):
+            continue
+        text = path.read_text()
+        for banned in ("DefaultEmbeddingFunction", "ONNXMiniLM", "onnx", "MiniLM"):
+            assert banned not in text, f"{path.name} mentions {banned}"

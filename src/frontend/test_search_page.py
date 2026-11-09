@@ -309,3 +309,15 @@ def test_format_user():
     user = {"user_id": "user_01", "name": "Priya Shah", "indexed_at": "2026-10-20T02:25:39+00:00"}
     assert api_client.format_user(user)["indexed"] == "Tue, Oct 20, 2026 · 2:25 AM UTC"
     assert api_client.format_user({**user, "indexed_at": ""})["indexed"] == ""
+
+
+def test_reply_context_line_is_not_shown_as_the_message():
+    """rag adds "Replying to ...: <previous email>" for search; the page shows only this email."""
+    text = (
+        "Subject: Larkmoor Capital: Superday invitation\nFrom: Priya Shah\nDate: 2026-10-08T18:30:00-04:00\n"
+        "Replying to Tess Navarro: Hi Priya, Congratulations! Please choose one of…\n\n"
+        "Hi Tess, Thank you. I'd like Friday, October 16 at 9:00 am. Best, Priya"
+    )
+    expected = "Hi Tess, Thank you. I'd like Friday, October 16 at 9:00 am. Best, Priya"
+    assert api_client.message_body(text) == expected
+    assert api_client.snippet(text) == expected
