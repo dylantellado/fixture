@@ -206,7 +206,7 @@ def chunk_thread_overview(messages: list[dict]) -> list[dict]:
     """
     first = messages[0]
     header = f"Thread: {first['subject']}\nParticipants: {', '.join(participants(messages))}"
-    budget = max(config.CHUNK_MAX_CHARS - len(header) - 2, config.MIN_BODY_CHARS)
+    budget = max(config.THREAD_WINDOW_MAX_CHARS - len(header) - 2, config.MIN_BODY_CHARS)
     line_chars = min(config.THREAD_LINE_CHARS, budget)
     lines = [
         f"- {display_name(m['sender'])}, {m['timestamp']}: {excerpt(m['body'], line_chars)}"

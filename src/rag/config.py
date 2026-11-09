@@ -8,7 +8,7 @@ DATA_DIR=/data, SAMPLES_DIR=/samples, CHROMA_HOST=chromadb, CHROMA_PORT=8000).
 import os
 from pathlib import Path
 
-from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
+from embeddings import EmbeddingSettings, VertexEmbeddingFunction, build_embedding_function
 
 # Repo root, found from this file's location (src/rag/config.py -> repo root).
 # In Docker this resolves to "/", which is fine because env vars override it.
@@ -31,46 +31,29 @@ CONNECT_DELAY_SECONDS = 2.0
 # Each user gets their own collection named messages_<user_id>.
 COLLECTION_PREFIX = "messages_"
 # Cosine distance: compares the direction of two embeddings, not their length,
-# which is the usual choice for sentence embeddings like MiniLM.
+# which is the usual choice for text embeddings.
 # Chroma's default is l2, so this must be set explicitly when creating a collection.
 COLLECTION_CONFIGURATION = {"hnsw": {"space": "cosine"}}
 
 # --- Embeddings ---
-# The model behind Chroma's built-in default embedding function. It runs
-# locally with ONNX (no API key) and downloads once to ~/.cache/chroma.
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+# Vertex AI text embeddings (embeddings.py, identical in the api). The model,
+# project and region come from EMBEDDING_MODEL, GOOGLE_CLOUD_PROJECT and
+# EMBEDDING_LOCATION; the api must use the same model (it checks).
+EMBEDDING_SETTINGS = EmbeddingSettings.from_env()
+EMBEDDING_MODEL = EMBEDDING_SETTINGS.model
+# The longest text the model accepts, in tokens. Longer texts are rejected
+# (never silently cut), so chunks are sized to stay under it.
+EMBEDDING_TOKEN_LIMIT = EMBEDDING_SETTINGS.token_limit
 
 
-def get_embedding_function():
-    """Return the embedding function used for both indexing and search.
-
-    The api must use exactly this, chromadb's DefaultEmbeddingFunction
-    (all-MiniLM-L6-v2), or its query vectors won't match the stored ones.
-    Changing the model means changing it here and in the api together.
-    """
-    return DefaultEmbeddingFunction()
+def get_embedding_function() -> VertexEmbeddingFunction:
+    """The embedding function used for indexing (and by query.py / check_retrieval.py)."""
+    return build_embedding_function(EMBEDDING_SETTINGS)
 
 
-# MiniLM reads at most this many tokens (word pieces, counting the two special
-# tokens it adds) and silently ignores the rest.
-EMBEDDING_TOKEN_LIMIT = 256
-
-
-def count_tokens(texts: list[str]) -> list[int]:
-    """How many MiniLM tokens each text has, without cutting at the limit.
-
-    Used to record how many chunks are longer than EMBEDDING_TOKEN_LIMIT.
-    Loads the tokenizer that ships with the model (downloaded on first use).
-    """
-    from chromadb.utils.embedding_functions.onnx_mini_lm_l6_v2 import ONNXMiniLM_L6_V2
-    from tokenizers import Tokenizer
-
-    model = ONNXMiniLM_L6_V2()
-    model._download_model_if_not_exists()
-    tokenizer = Tokenizer.from_file(str(model.DOWNLOAD_PATH / model.EXTRACTED_FOLDER_NAME / "tokenizer.json"))
-    tokenizer.no_truncation()
-    tokenizer.no_padding()
-    return [len(encoding.ids) for encoding in tokenizer.encode_batch(texts)]
+# Experiments only: RAG_THREAD_CONTEXT=0 indexes one plain chunk per message
+# (no reply excerpt, no thread chunks), to measure what thread context adds.
+THREAD_CONTEXT = os.environ.get("RAG_THREAD_CONTEXT", "1") != "0"
 
 
 # --- Chunking ---
@@ -91,9 +74,12 @@ CHUNK_OVERLAP = 150
 REPLY_EXCERPT_CHARS = 200
 # How much of each message a thread chunk shows (its first lines).
 THREAD_LINE_CHARS = 300
+# The longest a thread chunk (one window of a thread) may be.
+THREAD_WINDOW_MAX_CHARS = int(os.environ.get("RAG_THREAD_WINDOW_MAX_CHARS", CHUNK_MAX_CHARS))
 # Messages shared by neighboring windows of a long thread.
 THREAD_WINDOW_OVERLAP = 1
 
 # --- Indexing ---
-# Number of chunks sent to ChromaDB per upsert call.
+# Number of chunks sent to ChromaDB per upsert call (embedding requests are
+# batched separately, in embeddings.py).
 BATCH_SIZE = 100

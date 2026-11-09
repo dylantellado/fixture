@@ -38,7 +38,8 @@ from pathlib import Path
 from chromadb.errors import NotFoundError
 
 import config
-from index import collection_name, connect, search
+from embeddings import EmbeddingModelMismatch
+from index import connect, open_collection, search
 
 CASES_PATH = Path(__file__).resolve().parent / "retrieval_cases.json"
 EXPERIMENTS_PATH = config.REPO_ROOT / "docs" / "evidence" / "rag_experiments.md"
@@ -202,7 +203,11 @@ def format_markdown(checked: list[dict], summaries: dict[str, dict], k: int, col
         "Milestone 3 (`src/rag/retrieval_cases.json`). Each lists the messages that answer it.",
         "",
         f"- **Command:** `uv run python check_retrieval.py --split all --k {k} --markdown` (from `src/rag`)",
-        f"- **Embedding model:** {collection_metadata.get('embedding_model', '')}, cosine distance",
+        f"- **Embedding model:** {collection_metadata.get('embedding_model', '')} "
+        f"({collection_metadata.get('embedding_dimension', '')} dimensions; documents "
+        f"{collection_metadata.get('embedding_task_document', '')}, queries "
+        f"{collection_metadata.get('embedding_task_query', '')}), cosine distance",
+        f"- **Chunking:** {collection_metadata.get('chunking', '')}",
         f"- **Chunks:** {stats['chunks']} in the searched users' collections, "
         f"{stats['over_limit']} over the model's token limit",
         f"- **Indexed from:** sha256 `{collection_metadata.get('input_sha256', '')}`, "
@@ -262,13 +267,17 @@ def main(argv: list[str] | None = None) -> None:
     for user_id in sorted({c["user_id"] for c in cases}):
         try:
             # One collection per user: a query only ever searches its own user's collection.
-            collections[user_id] = client.get_collection(
-                collection_name(user_id), embedding_function=config.get_embedding_function()
-            )
+            collections[user_id] = open_collection(client, user_id)
+        except EmbeddingModelMismatch as e:
+            sys.exit(str(e))
         except NotFoundError:
             sys.exit(f"No collection for {user_id}. Run the rag job on data-v1 first (uv run main.py).")
 
-    checked = [check_case(c, search(collections[c["user_id"]], c["query"], k=args.k)) for c in cases]
+    embedding_function = config.get_embedding_function()
+    checked = [
+        check_case(c, search(collections[c["user_id"]], c["query"], k=args.k, embedding_function=embedding_function))
+        for c in cases
+    ]
     splits = [s for s in SPLITS if any(c["split"] == s for c in checked)]
     summaries = {s: summarize([c for c in checked if c["split"] == s]) for s in splits}
     stats = index_stats(list(collections.values()))

@@ -18,6 +18,13 @@ from chunking import (
 from helpers import long_body, make_message
 
 
+@pytest.fixture(autouse=True)
+def small_limits(monkeypatch):
+    """Small chunk limits, so splitting is tested the same way whatever the model's limit is."""
+    monkeypatch.setattr(config, "CHUNK_MAX_CHARS", 800)
+    monkeypatch.setattr(config, "THREAD_WINDOW_MAX_CHARS", 800)
+
+
 def reply(body="Tuesday works for me.", **overrides):
     """A reply in the same thread as make_message()."""
     defaults = {
@@ -207,7 +214,7 @@ def test_long_thread_is_split_into_windows_within_the_limit():
     assert [c["id"] for c in chunks] == [f"thread-t001-{i}" for i in range(len(chunks))]
     covered = []
     for chunk in chunks:
-        assert len(chunk["text"]) <= config.CHUNK_MAX_CHARS
+        assert len(chunk["text"]) <= config.THREAD_WINDOW_MAX_CHARS
         assert chunk["text"].startswith("Thread: Interview\nParticipants: ")  # header on every window
         covered += chunk["metadata"]["message_ids"].split(",")
     # Every message is in some window; neighbors share one message.
@@ -247,3 +254,15 @@ def test_every_chunk_fits_the_limit(body_words):
     thread = [make_message(body=long_body(body_words)), reply(body=long_body(body_words))]
     for chunk in chunk_thread(thread):
         assert len(chunk["text"]) <= config.CHUNK_MAX_CHARS
+
+
+def test_default_limits_follow_the_models_token_limit():
+    """Chunks are sized in characters at 3 per token, so they stay under the model's limit."""
+    import importlib
+
+    fresh = importlib.reload(config)
+    try:
+        assert fresh.CHUNK_MAX_CHARS == fresh.EMBEDDING_TOKEN_LIMIT * fresh.CHARS_PER_TOKEN
+        assert fresh.THREAD_WINDOW_MAX_CHARS <= fresh.CHUNK_MAX_CHARS
+    finally:
+        importlib.reload(config)

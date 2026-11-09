@@ -12,7 +12,8 @@ import sys
 from chromadb.errors import NotFoundError
 
 import config
-from index import collection_name, connect, search
+from embeddings import EmbeddingError, EmbeddingModelMismatch
+from index import collection_name, connect, open_collection, search
 from inputs import ALLOWED_LABELS, check_user_id
 
 
@@ -46,13 +47,16 @@ def format_markdown(query: str, user_id: str, collection_metadata: dict, results
         f"- **User:** `{user_id}` ({collection_metadata.get('user_name', '')})",
         f"- **Collection:** `{collection_name(user_id)}`",
         f"- **Label filter:** {f'`{label}`' if label else 'none'}",
-        f"- **Embedding model:** {collection_metadata.get('embedding_model', '')}, cosine distance",
+        f"- **Embedding model:** {collection_metadata.get('embedding_model', '')} "
+        f"(documents {collection_metadata.get('embedding_task_document', '')}, "
+        f"query {collection_metadata.get('embedding_task_query', '')}), cosine distance",
         f"- **Indexed from:** `{collection_metadata.get('input_path', '')}` "
         f"(sha256 `{collection_metadata.get('input_sha256', '')}`)",
         f"- **Indexed at:** {collection_metadata.get('indexed_at', '')}",
         f"- **Command:** `{command}` (from `src/rag`)",
         "",
-        "Score = 1 - cosine distance (higher is closer).",
+        "Each result is one message. Score = the message's similarity to the query "
+        "(1 - cosine distance) averaged with its thread's; higher is closer.",
         "",
     ]
     if collection_metadata.get("used_sample_data"):
@@ -102,8 +106,10 @@ def main(argv: list[str] | None = None) -> None:
         sys.exit(f"{e}\nIs ChromaDB running? From the repo root: docker compose up -d chromadb")
     name = collection_name(args.user)
     try:
-        # Must be the same embedding function the rag job indexed with.
-        collection = client.get_collection(name, embedding_function=config.get_embedding_function())
+        # Refused if it was built with a different embedding model.
+        collection = open_collection(client, args.user)
+    except EmbeddingModelMismatch as e:
+        sys.exit(str(e))
     except NotFoundError:
         known = sorted(
             c.name.removeprefix(config.COLLECTION_PREFIX)
@@ -115,7 +121,10 @@ def main(argv: list[str] | None = None) -> None:
             f"(uv run main.py). Users with collections: {', '.join(known) or 'none'}"
         )
 
-    results = search(collection, args.query, k=args.k, label=args.label)
+    try:
+        results = search(collection, args.query, k=args.k, label=args.label)
+    except EmbeddingError as e:
+        sys.exit(f"Couldn't embed the query: {e}")
     if args.markdown:
         print(format_markdown(args.query, args.user, collection.metadata or {}, results, args.k, args.label))
     else:

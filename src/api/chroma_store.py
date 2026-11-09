@@ -17,8 +17,8 @@ import time
 import chromadb
 import httpx
 from chromadb.errors import NotFoundError
-from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 
+from embeddings import EmbeddingError, EmbeddingModelMismatch, build_embedding_function, check_collection_model
 from message_search import search_messages
 
 # Where ChromaDB runs. The defaults fit a laptop (the chromadb container's
@@ -48,6 +48,11 @@ class UnknownUser(Exception):
     """The user_id is malformed or has no collection. main.py turns this into a 400."""
 
 
+class SearchUnavailable(Exception):
+    """The search can't run right now: the index was built with another embedding
+    model (rerun rag), or Vertex AI couldn't embed the query. main.py turns this into a 503."""
+
+
 def collection_name(user_id: str) -> str:
     """The one collection that holds this user's messages, e.g. messages_user_01."""
     return f"{COLLECTION_PREFIX}{user_id}"
@@ -65,15 +70,19 @@ class MessageStore:
 
     client_factory: makes a ChromaDB client (the real server by default;
         tests pass an in-memory client or a fake).
-    embedding_function: turns the query into a vector. It must be the same
-        one the rag service indexed with, chromadb's DefaultEmbeddingFunction
-        (all-MiniLM-L6-v2), or query vectors won't match the stored ones.
+    embedding_function: turns the query into a vector with Vertex AI
+        (embeddings.py, identical in rag). Its model must be the one the rag
+        service indexed with; search() checks each collection's metadata and
+        refuses a mismatch, because vectors from different models can't be
+        compared.
     """
 
     def __init__(self, client_factory=connect_to_server, embedding_function=None,
                  attempts=CONNECT_ATTEMPTS, delay_seconds=CONNECT_DELAY_SECONDS):
         self.client_factory = client_factory
-        self.embedding_function = embedding_function or DefaultEmbeddingFunction()
+        # Built from EMBEDDING_MODEL, GOOGLE_CLOUD_PROJECT and EMBEDDING_LOCATION.
+        # It connects to Vertex AI on first use, so the API starts without credentials.
+        self.embedding_function = embedding_function or build_embedding_function()
         self.attempts = attempts
         self.delay_seconds = delay_seconds
         self._client = None  # created on first use, not at startup
@@ -147,13 +156,17 @@ class MessageStore:
         try:
             # PRIVACY: the only collection this request ever opens is the one
             # named from the requested user_id. Never loop over collections here.
-            collection = client.get_collection(
-                collection_name(user_id), embedding_function=self.embedding_function
-            )
+            # No Chroma embedding function: we always pass the query's vector.
+            name = collection_name(user_id)
+            collection = client.get_collection(name, embedding_function=None)
+            check_collection_model(name, collection.metadata, self.embedding_function.model)
+            # The query (not the user's email) is sent to Vertex AI here.
             query_embedding = [float(x) for x in self.embedding_function.embed_query([query])[0]]
             found = search_messages(collection, query_embedding, k, label)
         except NotFoundError:
             raise UnknownUser(user_id)
+        except (EmbeddingModelMismatch, EmbeddingError) as e:
+            raise SearchUnavailable(str(e))
         except httpx.TransportError:
             raise self._lost_connection()
 

@@ -3,7 +3,7 @@
 Endpoints (see "Data contract" in the README and src/api/README.md):
     GET  /health   is the API up?
     GET  /users    users that have an indexed message collection
-    POST /search   semantic search over ONE user's messages
+    POST /search   semantic search over ONE user's messages (query embedded with Vertex AI)
 
 Run from src/api with:
     uv run uvicorn main:app --port 8000 --reload
@@ -14,7 +14,7 @@ from typing import Literal
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
-from chroma_store import ChromaUnavailable, MessageStore, UnknownUser
+from chroma_store import ChromaUnavailable, MessageStore, SearchUnavailable, UnknownUser
 
 # The six labels from the Data contract.
 Label = Literal["new_request", "proposed_times", "acceptance", "reschedule", "assistant_handoff", "none"]
@@ -93,6 +93,6 @@ def search(request: SearchRequest, store: MessageStore = Depends(get_store)) -> 
         results = store.search(request.user_id, request.query, request.k, request.label)
     except UnknownUser:
         raise HTTPException(status_code=400, detail="unknown user")
-    except ChromaUnavailable as e:
+    except (ChromaUnavailable, SearchUnavailable) as e:
         raise HTTPException(status_code=503, detail=str(e))
     return SearchResponse(user_id=request.user_id, query=request.query, results=results)

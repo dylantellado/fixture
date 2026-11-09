@@ -8,7 +8,8 @@ import pytest
 import config
 import main
 from helpers import SAMPLES_DIR, long_body, make_message, write_pipeline_data
-from index import collection_name, search
+from embeddings import EmbeddingError, EmbeddingModelMismatch
+from index import collection_name, open_collection, search
 from inputs import InputError, sha256_file
 
 
@@ -64,7 +65,12 @@ def test_collection_metadata_records_the_data_version(chroma_client, fake_ef, da
     assert metadata["input_path"] == str(SAMPLES_DIR / "messages_sample.jsonl")
     assert metadata["input_sha256"] == sha256_file(SAMPLES_DIR / "messages_sample.jsonl")
     assert metadata["used_sample_data"] is True
-    assert metadata["embedding_model"] == "all-MiniLM-L6-v2"
+    assert metadata["embedding_model"] == "fake-bag-of-words"
+    assert metadata["embedding_dimension"] == 64
+    assert metadata["embedding_task_document"] == "RETRIEVAL_DOCUMENT"
+    assert metadata["embedding_task_query"] == "RETRIEVAL_QUERY"
+    assert metadata["embedding_token_limit"] == 2048
+    assert metadata["chunking"] == "message+thread"
     assert metadata["indexed_at"]  # set to the run time
     assert metadata["manifest_git_commit"] == ""  # samples have no manifest
 
@@ -131,7 +137,7 @@ def test_user_without_messages_gets_an_empty_collection(chroma_client, fake_ef, 
 
 def test_long_message_is_stored_as_several_chunks(chroma_client, fake_ef, data_dir):
     users = [{"user_id": "user_01", "name": "Priya Shah"}]
-    write_pipeline_data(data_dir, [make_message(body=long_body())], users)
+    write_pipeline_data(data_dir, [make_message(body=long_body(2000))], users)  # well over CHUNK_MAX_CHARS
     sizes = index(chroma_client, fake_ef, data_dir)
 
     stored = chroma_client.get_collection("messages_user_01").get(where={"chunk_type": "message"}, include=["metadatas"])
@@ -157,7 +163,7 @@ def test_main_exits_nonzero_on_invalid_input(monkeypatch):
         raise InputError("bad data")
 
     monkeypatch.setattr(main, "run", fail)
-    monkeypatch.setattr(main.config, "get_embedding_function", lambda: None)
+    monkeypatch.setattr(main.config, "get_embedding_function", lambda: None)  # never call Vertex AI
     with pytest.raises(SystemExit) as excinfo:
         main.main()
     assert excinfo.value.code == 1
@@ -204,23 +210,62 @@ def test_token_counts_are_recorded(chroma_client, fake_ef, data_dir):
         make_message(message_id="c" * 16, user_id="user_02", body=long_body(300)),
     ]
     write_pipeline_data(data_dir, messages, users)
-    # A stand-in tokenizer: one token per character, so long chunks go over the limit.
-    main.run(lambda: chroma_client, fake_ef, data_dir=data_dir, samples_dir=SAMPLES_DIR,
-             count_tokens=lambda texts: [len(t) for t in texts])
+    main.run(lambda: chroma_client, fake_ef, data_dir=data_dir, samples_dir=SAMPLES_DIR)
 
-    collection = chroma_client.get_collection("messages_user_01")
-    stored = collection.get(include=["metadatas", "documents"])
-    for metadata, text in zip(stored["metadatas"], stored["documents"]):
-        assert metadata["token_count"] == len(text)
-    over = sum(m["token_count"] > config.EMBEDDING_TOKEN_LIMIT for m in stored["metadatas"])
-    assert over > 0
-    # Each collection counts only its own user's chunks.
-    assert collection.metadata["chunks_over_token_limit"] == over
-    assert collection.metadata["embedding_token_limit"] == config.EMBEDDING_TOKEN_LIMIT
-    other = chroma_client.get_collection("messages_user_02")
-    assert other.metadata["chunks_over_token_limit"] == sum(
-        m["token_count"] > config.EMBEDDING_TOKEN_LIMIT for m in other.get(include=["metadatas"])["metadatas"]
-    )
+    for user_id in ("user_01", "user_02"):
+        collection = chroma_client.get_collection(collection_name(user_id))
+        stored = collection.get(include=["metadatas", "documents"])
+        for metadata, text in zip(stored["metadatas"], stored["documents"]):
+            assert metadata["token_count"] == len(text.split())  # what the embedding call reported
+        assert collection.metadata["chunks_over_token_limit"] == 0
+
+
+def test_chunks_over_the_limit_are_counted_per_user():
+    chunks = [{"metadata": {"token_count": n}} for n in (10, 2048, 2049, 5000)]
+    assert main.chunks_over_limit(chunks, 2048) == 2
+
+
+def test_stored_vectors_are_the_embedding_functions(chroma_client, fake_ef, data_dir):
+    index(chroma_client, fake_ef, data_dir)
+    stored = chroma_client.get_collection("messages_user_01").get(include=["documents", "embeddings"])
+    for text, vector in zip(stored["documents"], stored["embeddings"]):
+        assert list(vector) == pytest.approx(fake_ef([text])[0], abs=1e-6)
+
+
+def test_failed_embedding_leaves_existing_index_alone(chroma_client, fake_ef, data_dir):
+    index(chroma_client, fake_ef, data_dir)  # a good index from the samples
+    before = chroma_client.get_collection("messages_user_01").count()
+
+    class FailingEmbedding(type(fake_ef)):
+        def embed_documents(self, texts):
+            raise EmbeddingError("Vertex AI returned 429 (rate limited)")
+
+    connected = []
+    with pytest.raises(EmbeddingError):
+        main.run(lambda: connected.append(True) or chroma_client, FailingEmbedding(), data_dir=data_dir, samples_dir=SAMPLES_DIR)
+    assert connected == []  # never touched ChromaDB
+    assert chroma_client.get_collection("messages_user_01").count() == before
+
+
+def test_collections_have_no_chroma_embedding_function(chroma_client, fake_ef, data_dir):
+    """Chroma never embeds by itself (no default ONNX model): rag passes vectors."""
+    index(chroma_client, fake_ef, data_dir)
+    assert chroma_client.get_collection("messages_user_01").configuration.get("embedding_function") is None
+
+
+def test_plain_chunking_for_experiments(chroma_client, fake_ef, data_dir, sample_messages):
+    sizes = main.run(lambda: chroma_client, fake_ef, data_dir=data_dir, samples_dir=SAMPLES_DIR, thread_context=False)
+    assert sizes["messages_user_01"] == sum(m["user_id"] == "user_01" for m in sample_messages)
+    stored = chroma_client.get_collection("messages_user_01").get(include=["metadatas"])
+    assert {m["chunk_type"] for m in stored["metadatas"]} == {"message"}
+    assert chroma_client.get_collection("messages_user_01").metadata["chunking"] == "message"
+
+
+def test_open_collection_refuses_another_model(chroma_client, fake_ef, data_dir):
+    index(chroma_client, fake_ef, data_dir)
+    assert open_collection(chroma_client, "user_01", model="fake-bag-of-words").name == "messages_user_01"
+    with pytest.raises(EmbeddingModelMismatch, match="Rerun rag"):
+        open_collection(chroma_client, "user_01", model="gemini-embedding-001")
 
 
 def test_shared_configuration_is_not_modified(chroma_client, fake_ef, data_dir):

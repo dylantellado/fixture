@@ -9,6 +9,7 @@ from chromadb.config import Settings
 from chromadb.errors import NotFoundError
 
 import config
+from embeddings import check_collection_model
 from message_search import search_messages
 
 log = logging.getLogger(__name__)
@@ -45,7 +46,6 @@ def connect(
 
 def rebuild_index(
     client,
-    embedding_function,
     users: list[dict],
     chunks_by_user: dict[str, list[dict]],
     shared_metadata: dict,
@@ -54,7 +54,9 @@ def rebuild_index(
     """Rebuild every user's collection from scratch.
 
     For each user in users.json: delete their collection if it exists, create
-    it again, and upsert their chunks in batches. Then delete any messages_*
+    it again, and upsert their chunks (already embedded: each has "embedding")
+    in batches. Collections get no Chroma embedding function, so Chroma never
+    embeds anything itself; rag and the api always pass vectors. Then delete any messages_*
     collection whose user is no longer in users.json. Rebuilding (instead of
     updating in place) means removed or renamed messages never linger.
 
@@ -83,7 +85,7 @@ def rebuild_index(
                 "user_id": user_id,
                 "user_name": user["name"],
             },
-            embedding_function=embedding_function,
+            embedding_function=None,
         )
 
         chunks = chunks_by_user.get(user_id, [])
@@ -91,6 +93,7 @@ def rebuild_index(
             batch = chunks[start : start + config.BATCH_SIZE]
             collection.upsert(
                 ids=[c["id"] for c in batch],
+                embeddings=[c["embedding"] for c in batch],
                 documents=[c["text"] for c in batch],
                 metadatas=[c["metadata"] for c in batch],
             )
@@ -106,12 +109,24 @@ def rebuild_index(
     return sizes
 
 
+def open_collection(client, user_id: str, model: str = config.EMBEDDING_MODEL):
+    """Open one user's collection, refusing it if it was built with another embedding model.
+
+    Raises chromadb.errors.NotFoundError (no collection) or
+    embeddings.EmbeddingModelMismatch (rerun rag).
+    """
+    name = collection_name(user_id)
+    collection = client.get_collection(name, embedding_function=None)
+    check_collection_model(name, collection.metadata, model)
+    return collection
+
+
 def search(collection, query: str, k: int = 5, label: str | None = None, embedding_function=None) -> list[dict]:
     """Return the k messages that best answer the query, best first.
 
-    Embeds the query with the same embedding function used for indexing, then
-    runs the shared message search (message_search.py, identical in the api).
-    Each result is {"id", "text", "score", "metadata"} for one message.
+    Embeds the query (RETRIEVAL_QUERY) with the same model used for indexing,
+    then runs the shared message search (message_search.py, identical in the
+    api). Each result is {"id", "text", "score", "metadata"} for one message.
     If label is given, only messages with that label are returned.
     """
     embedding_function = embedding_function or config.get_embedding_function()

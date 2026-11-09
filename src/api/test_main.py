@@ -15,6 +15,7 @@ from fastapi.testclient import TestClient
 
 import chroma_store
 from chroma_store import MessageStore
+from embeddings import EmbeddingError, VertexEmbeddingFunction
 from main import app, get_store
 
 client = TestClient(app)
@@ -62,14 +63,19 @@ class FakeClient:
 class KeywordEmbedding(EmbeddingFunction):
     """A tiny, deterministic embedding for tests: one dimension per keyword.
 
-    Avoids downloading the real model; it only needs to make related texts
-    land close together.
+    Stands in for Vertex AI (no network in tests); it only needs to make
+    related texts land close together. `queries` records every query embedded.
     """
 
     KEYWORDS = ["interview", "coffee", "reschedule", "dentist"]
+    model = "keyword-test"
 
     def __init__(self):
-        pass
+        self.queries = []
+
+    def embed_query(self, input):
+        self.queries.extend(input)
+        return self(input)
 
     def __call__(self, input: Documents) -> Embeddings:
         # The trailing 1.0 keeps every vector non-zero (cosine needs a length).
@@ -136,37 +142,36 @@ def test_unknown_or_malformed_user_returns_400(user_id):
 # --- Search results ----------------------------------------------------------------
 
 
-def add_mailbox(chroma, user_id, messages):
+def add_mailbox(chroma, user_id, messages, model="keyword-test"):
     """Index a tiny mailbox the way rag does: one chunk per message
-    (chunk_type "message") and one chunk per thread (chunk_type "thread").
+    (chunk_type "message") and one chunk per thread (chunk_type "thread"),
+    with vectors computed up front and the model recorded in the metadata.
 
     messages: (message_id, thread_id, label, text) tuples.
     """
+    embed = KeywordEmbedding()
     collection = chroma.create_collection(
         f"messages_{user_id}",
-        embedding_function=KeywordEmbedding(),
+        embedding_function=None,  # like rag: Chroma never embeds by itself
         configuration={"hnsw": {"space": "cosine"}},  # same distance as rag
-        metadata={"user_name": user_id, "indexed_at": "2026-10-20T00:00:00+00:00"},
-    )
-    collection.add(
-        ids=[f"{mid}-0" for mid, _, _, _ in messages],
-        documents=[text for _, _, _, text in messages],
-        metadatas=[
-            {"chunk_type": "message", "message_id": mid, "thread_id": tid, "user_id": user_id, "label": label}
-            for mid, tid, label, _ in messages
-        ],
+        metadata={"user_name": user_id, "indexed_at": "2026-10-20T00:00:00+00:00", "embedding_model": model},
     )
     threads = {}
     for mid, tid, _, text in messages:
         threads.setdefault(tid, []).append((mid, text))
+    chunks = [
+        (f"{mid}-0", text, {"chunk_type": "message", "message_id": mid, "thread_id": tid, "user_id": user_id, "label": label})
+        for mid, tid, label, text in messages
+    ] + [
+        (f"thread-{tid}-0", " ".join(text for _, text in items),
+         {"chunk_type": "thread", "thread_id": tid, "user_id": user_id, "message_ids": ",".join(mid for mid, _ in items)})
+        for tid, items in threads.items()
+    ]
     collection.add(
-        ids=[f"thread-{tid}-0" for tid in threads],
-        documents=[" ".join(text for _, text in items) for items in threads.values()],
-        metadatas=[
-            {"chunk_type": "thread", "thread_id": tid, "user_id": user_id,
-             "message_ids": ",".join(mid for mid, _ in items)}
-            for tid, items in threads.items()
-        ],
+        ids=[c[0] for c in chunks],
+        documents=[c[1] for c in chunks],
+        embeddings=embed([c[1] for c in chunks]),
+        metadatas=[c[2] for c in chunks],
     )
     return collection
 
@@ -240,6 +245,56 @@ def test_default_k_is_5(chroma):
     response = client.post("/search", json={"user_id": "user_01", "query": "interview"})
 
     assert len(response.json()["results"]) == 5
+
+
+def test_index_built_with_another_model_is_refused(chroma):
+    add_mailbox(chroma, "user_01", [("m1", "t1", "none", "interview")], model="all-MiniLM-L6-v2")
+    embedding = KeywordEmbedding()
+    use_store(MessageStore(client_factory=lambda: chroma, embedding_function=embedding))
+
+    response = client.post("/search", json={"user_id": "user_01", "query": "interview"})
+
+    assert response.status_code == 503
+    assert "all-MiniLM-L6-v2" in response.json()["detail"]
+    assert "Rerun rag" in response.json()["detail"]
+    assert embedding.queries == []  # refused before the query was sent anywhere
+
+
+def test_vertex_failure_returns_503(chroma):
+    add_mailbox(chroma, "user_01", [("m1", "t1", "none", "interview")])
+
+    class Unavailable(KeywordEmbedding):
+        def embed_query(self, input):
+            raise EmbeddingError("Couldn't embed 1 text(s) with keyword-test: Vertex AI returned 429")
+
+    use_store(MessageStore(client_factory=lambda: chroma, embedding_function=Unavailable()))
+
+    response = client.post("/search", json={"user_id": "user_01", "query": "interview"})
+
+    assert response.status_code == 503
+    assert "429" in response.json()["detail"]
+    assert client.get("/health").status_code == 200  # the API itself stays up
+
+
+def test_unknown_user_never_reaches_vertex(chroma):
+    embedding = KeywordEmbedding()
+    use_store(MessageStore(client_factory=lambda: chroma, embedding_function=embedding))
+    assert client.post("/search", json={"user_id": "user_42", "query": "interview"}).status_code == 400
+    assert embedding.queries == []
+
+
+def test_query_is_embedded_once_as_a_query(chroma):
+    add_mailbox(chroma, "user_01", [("m1", "t1", "none", "interview")])
+    embedding = KeywordEmbedding()
+    use_store(MessageStore(client_factory=lambda: chroma, embedding_function=embedding))
+    client.post("/search", json={"user_id": "user_01", "query": "interview tips"})
+    assert embedding.queries == ["interview tips"]
+
+
+def test_default_store_uses_vertex_without_connecting_at_startup():
+    store = MessageStore()
+    assert isinstance(store.embedding_function, VertexEmbeddingFunction)
+    assert store.embedding_function._client is None  # created on first search, not at startup
 
 
 def test_search_opens_only_the_requested_collection():
@@ -340,3 +395,12 @@ def test_message_search_matches_the_rag_copy():
     if not rag_copy.exists():
         pytest.skip("src/rag is not next to this service (e.g. inside a container)")
     assert (here / "message_search.py").read_text() == rag_copy.read_text()
+
+
+def test_embeddings_matches_the_rag_copy():
+    """embeddings.py is copied from src/rag; the two must never drift."""
+    here = Path(__file__).resolve().parent
+    rag_copy = here.parent / "rag" / "embeddings.py"
+    if not rag_copy.exists():
+        pytest.skip("src/rag is not next to this service (e.g. inside a container)")
+    assert (here / "embeddings.py").read_text() == rag_copy.read_text()
