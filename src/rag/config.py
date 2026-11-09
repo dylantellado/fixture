@@ -74,13 +74,25 @@ def count_tokens(texts: list[str]) -> list[int]:
 
 
 # --- Chunking ---
-# Bodies longer than this many characters are split into overlapping pieces.
-# MiniLM reads at most 256 tokens (~1,000 characters of English), and longer
-# text is cut off, so pieces stay near that size.
-CHUNK_SIZE = 1000
-# Characters repeated between neighboring pieces, so a sentence that falls on
-# a boundary still appears whole in at least one piece.
+# Chunk sizes are in characters but must respect the model's token limit.
+# English averages about 4 characters per token; dates, times and EMAIL_###
+# placeholders use more tokens, so assume 3 to stay safely under the limit.
+CHARS_PER_TOKEN = 3
+# The longest a chunk (header, reply line and body piece, or a thread window)
+# may be. Longer bodies are split into overlapping pieces; longer threads
+# into overlapping windows.
+CHUNK_MAX_CHARS = EMBEDDING_TOKEN_LIMIT * CHARS_PER_TOKEN
+# Never cut a body into pieces smaller than this, even under a long header.
+MIN_BODY_CHARS = 200
+# Characters repeated between neighboring body pieces, so a sentence that falls
+# on a boundary still appears whole in at least one piece.
 CHUNK_OVERLAP = 150
+# How much of the previous message a message chunk quotes ("Replying to ...").
+REPLY_EXCERPT_CHARS = 200
+# How much of each message a thread chunk shows (its first lines).
+THREAD_LINE_CHARS = 300
+# Messages shared by neighboring windows of a long thread.
+THREAD_WINDOW_OVERLAP = 1
 
 # --- Indexing ---
 # Number of chunks sent to ChromaDB per upsert call.

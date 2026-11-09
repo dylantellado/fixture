@@ -3,7 +3,8 @@
 Steps (see README.md in this folder):
   1. Find the input: data/processed/messages.jsonl, or the samples if missing.
   2. Load and validate it against the data contract. Stop on any problem.
-  3. Chunk every message (one chunk per message, long bodies split).
+  3. Chunk: one chunk per message (with thread context, long bodies split)
+     and one per thread (long threads split into windows).
   4. Connect to ChromaDB and rebuild every user's collection from scratch.
 
 Exits 0 on success and 1 on failure, so docker compose stops the pipeline.
@@ -15,7 +16,7 @@ import time
 from datetime import datetime, timezone
 
 import config
-from chunking import chunk_message
+from chunking import chunk_thread, group_threads
 from index import connect, rebuild_index
 from inputs import InputError, find_input_files, load_and_validate, sha256_file
 
@@ -23,10 +24,10 @@ log = logging.getLogger("rag")
 
 
 def build_chunks(messages: list[dict]) -> dict[str, list[dict]]:
-    """Chunk every message, grouped by user_id."""
+    """Chunk every thread (its messages and the thread itself), grouped by user_id."""
     chunks_by_user: dict[str, list[dict]] = {}
-    for message in messages:
-        chunks_by_user.setdefault(message["user_id"], []).extend(chunk_message(message))
+    for (user_id, _thread_id), thread in group_threads(messages).items():
+        chunks_by_user.setdefault(user_id, []).extend(chunk_thread(thread))
     return chunks_by_user
 
 

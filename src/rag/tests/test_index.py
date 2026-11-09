@@ -1,6 +1,7 @@
 """Indexing into an in-memory Chroma with a fake embedding function (fast, offline)."""
 
 import copy
+import json
 
 import pytest
 
@@ -9,6 +10,17 @@ import main
 from helpers import SAMPLES_DIR, long_body, make_message, write_pipeline_data
 from index import collection_name, search
 from inputs import InputError, sha256_file
+
+
+def json_lines(path):
+    with open(path, encoding="utf-8") as f:
+        return [json.loads(line) for line in f if line.strip()]
+
+
+def index_size(messages, user_id):
+    """Chunks expected for a user whose messages are all short: one per message, one per thread."""
+    own = [m for m in messages if m["user_id"] == user_id]
+    return len(own) + len({m["thread_id"] for m in own})
 
 
 def index(client, ef, data_dir):
@@ -22,16 +34,22 @@ def test_sample_gives_one_collection_per_user(chroma_client, fake_ef, data_dir, 
     # Every user in users.json gets a collection, even one with no sample
     # messages yet (its collection is empty). Expectations come from the
     # sample files, so this stays right if samples gain users or messages.
-    # All sample bodies are short, so each message is exactly one chunk.
+    # All sample bodies are short, so each message is exactly one chunk, and
+    # each thread adds one thread chunk.
     user_ids = [u["user_id"] for u in sample_users]
-    expected = {collection_name(u): sum(m["user_id"] == u for m in sample_messages) for u in user_ids}
+
+    def own(user_id):
+        return [m for m in sample_messages if m["user_id"] == user_id]
+
+    expected = {collection_name(u): len(own(u)) + len({m["thread_id"] for m in own(u)}) for u in user_ids}
     assert sizes == expected
     assert sorted(c.name for c in chroma_client.list_collections()) == sorted(expected)
 
-    # Each collection holds exactly that user's messages.
+    # Each collection holds exactly that user's messages and threads.
     for user_id in user_ids:
         stored = chroma_client.get_collection(collection_name(user_id)).get(include=["metadatas"])
-        expected_ids = {f"{m['message_id']}-0" for m in sample_messages if m["user_id"] == user_id}
+        expected_ids = {f"{m['message_id']}-0" for m in own(user_id)}
+        expected_ids |= {f"thread-{m['thread_id']}-0" for m in own(user_id)}
         assert set(stored["ids"]) == expected_ids
         assert all(meta["user_id"] == user_id for meta in stored["metadatas"])
 
@@ -87,7 +105,7 @@ def test_removed_message_disappears_after_rebuild(chroma_client, fake_ef, data_d
     write_pipeline_data(data_dir, sample_messages[1:], sample_users)
     sizes = index(chroma_client, fake_ef, data_dir)
 
-    assert sizes["messages_user_01"] == 9
+    assert sizes["messages_user_01"] == index_size(sample_messages[1:], "user_01")
     assert chroma_client.get_collection("messages_user_01").get(ids=[f"{removed['message_id']}-0"])["ids"] == []
 
 
@@ -108,7 +126,7 @@ def test_user_without_messages_gets_an_empty_collection(chroma_client, fake_ef, 
     users = [{"user_id": "user_01", "name": "Priya Shah"}, {"user_id": "user_03", "name": "Ana Ruiz"}]
     write_pipeline_data(data_dir, [make_message()], users)
     sizes = index(chroma_client, fake_ef, data_dir)
-    assert sizes == {"messages_user_01": 1, "messages_user_03": 0}
+    assert sizes == {"messages_user_01": 2, "messages_user_03": 0}  # one message chunk, one thread chunk
 
 
 def test_long_message_is_stored_as_several_chunks(chroma_client, fake_ef, data_dir):
@@ -116,8 +134,8 @@ def test_long_message_is_stored_as_several_chunks(chroma_client, fake_ef, data_d
     write_pipeline_data(data_dir, [make_message(body=long_body())], users)
     sizes = index(chroma_client, fake_ef, data_dir)
 
-    stored = chroma_client.get_collection("messages_user_01").get(include=["metadatas"])
-    assert sizes["messages_user_01"] == len(stored["ids"]) > 1
+    stored = chroma_client.get_collection("messages_user_01").get(where={"chunk_type": "message"}, include=["metadatas"])
+    assert len(stored["ids"]) > 1
     assert {meta["message_id"] for meta in stored["metadatas"]} == {"abc123def4567890"}
 
 
@@ -130,7 +148,8 @@ def test_invalid_input_leaves_existing_index_alone(chroma_client, fake_ef, data_
         main.run(lambda: connected.append(True) or chroma_client, fake_ef, data_dir=data_dir, samples_dir=SAMPLES_DIR)
 
     assert connected == []  # never connected to Chroma
-    assert chroma_client.get_collection("messages_user_01").count() == 10
+    assert chroma_client.get_collection("messages_user_01").count() == index_size(
+        [m for m in json_lines(SAMPLES_DIR / "messages_sample.jsonl")], "user_01")
 
 
 def test_main_exits_nonzero_on_invalid_input(monkeypatch):
@@ -152,7 +171,7 @@ def test_search_only_returns_the_users_own_messages(chroma_client, fake_ef, data
     user_02_ids = {m["message_id"] for m in sample_messages if m["user_id"] == "user_02"}
 
     collection = chroma_client.get_collection("messages_user_01", embedding_function=fake_ef)
-    results = search(collection, "Jordan Lee Northbridge Capital interview", k=10)
+    results = search(collection, "Jordan Lee Northbridge Capital interview", k=10, embedding_function=fake_ef)
 
     assert len(results) == 10  # every user_01 message, and nothing else
     returned_ids = {r["metadata"]["message_id"] for r in results}
@@ -167,12 +186,12 @@ def test_search_scores_and_label_filter(chroma_client, fake_ef, data_dir):
     index(chroma_client, fake_ef, data_dir)
     collection = chroma_client.get_collection("messages_user_02", embedding_function=fake_ef)
 
-    results = search(collection, "move the interview", k=5)
+    results = search(collection, "move the interview", k=5, embedding_function=fake_ef)
     scores = [r["score"] for r in results]
     assert scores == sorted(scores, reverse=True)  # best first
     assert all(-1.0 <= s <= 1.0 for s in scores)
 
-    filtered = search(collection, "move the interview", k=5, label="reschedule")
+    filtered = search(collection, "move the interview", k=5, label="reschedule", embedding_function=fake_ef)
     assert len(filtered) == 1
     assert filtered[0]["metadata"]["label"] == "reschedule"
 

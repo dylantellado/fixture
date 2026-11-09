@@ -8,6 +8,7 @@ from chunking import chunk_message, sender_display_name, timestamp_to_epoch
 from helpers import long_body, make_message
 
 EXPECTED_KEYS = {
+    "chunk_type",
     "message_id",
     "user_id",
     "thread_id",

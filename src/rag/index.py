@@ -9,6 +9,7 @@ from chromadb.config import Settings
 from chromadb.errors import NotFoundError
 
 import config
+from message_search import search_messages
 
 log = logging.getLogger(__name__)
 
@@ -105,26 +106,14 @@ def rebuild_index(
     return sizes
 
 
-def search(collection, query: str, k: int = 5, label: str | None = None) -> list[dict]:
-    """Return the k chunks closest to the query, best first.
+def search(collection, query: str, k: int = 5, label: str | None = None, embedding_function=None) -> list[dict]:
+    """Return the k messages that best answer the query, best first.
 
-    Each result is {"id", "text", "score", "metadata"}, where
-    score = 1 - cosine distance (1.0 means same direction, higher is closer).
-    If label is given, only chunks with that label are searched.
+    Embeds the query with the same embedding function used for indexing, then
+    runs the shared message search (message_search.py, identical in the api).
+    Each result is {"id", "text", "score", "metadata"} for one message.
+    If label is given, only messages with that label are returned.
     """
-    response = collection.query(
-        query_texts=[query],
-        n_results=k,
-        where={"label": label} if label else None,
-        include=["documents", "metadatas", "distances"],
-    )
-    # Chroma returns one list per query text; we sent one query, so take [0].
-    return [
-        {"id": chunk_id, "text": text, "score": 1 - distance, "metadata": metadata}
-        for chunk_id, text, metadata, distance in zip(
-            response["ids"][0],
-            response["documents"][0],
-            response["metadatas"][0],
-            response["distances"][0],
-        )
-    ]
+    embedding_function = embedding_function or config.get_embedding_function()
+    query_embedding = [float(x) for x in embedding_function.embed_query([query])[0]]
+    return search_messages(collection, query_embedding, k, label)
