@@ -51,6 +51,11 @@ services:
       timeout: 3s
       retries: 20
 
+  # rag and api embed text with Vertex AI (src/rag/embeddings.py), like the classifier:
+  # your gcloud application-default credentials (gcloud auth application-default login),
+  # mounted read-only. No .env values or secrets/ folder for this. Indexing sends the
+  # fake corpus's email text, and search sends the query, to Vertex AI in our own GCP
+  # project; neither is logged. Both must use the same EMBEDDING_MODEL (the api checks).
   rag:
     build: ./src/rag
     env_file: .env
@@ -59,6 +64,9 @@ services:
       - SAMPLES_DIR=/samples  # used only when data/processed/messages.jsonl is missing
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-fixture-ac215-96dhbm}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-gemini-embedding-001}
+      - EMBEDDING_LOCATION=${EMBEDDING_LOCATION:-us-central1}
     depends_on:
       preprocess:
         condition: service_completed_successfully
@@ -67,6 +75,7 @@ services:
     volumes:
       - ./data:/data
       - ./samples:/samples:ro
+      - ~/.config/gcloud:/root/.config/gcloud:ro
 
   api:
     build: ./src/api
@@ -74,11 +83,17 @@ services:
     environment:
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-fixture-ac215-96dhbm}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-gemini-embedding-001}
+      - EMBEDDING_LOCATION=${EMBEDDING_LOCATION:-us-central1}
     ports:
       - "8000:8000"
     depends_on:
       rag:
         condition: service_completed_successfully
+    volumes:
+      # Credentials for embedding search queries with Vertex AI (no secrets/ folder).
+      - ~/.config/gcloud:/root/.config/gcloud:ro
     healthcheck:
       # python:3.12-slim has no curl, so use Python to call /health.
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
