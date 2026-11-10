@@ -134,7 +134,8 @@ services:
       - SECRETS_DIR=/run/secrets
       - DATA_DIR=/data
       - API_URL=http://api:8000
-      - CLASSIFIER_URL=http://classifier:8002
+      # The classifier service above, unless .env sets CLASSIFIER_URL (e.g. to Cloud Run).
+      - CLASSIFIER_URL=${CLASSIFIER_URL:-http://classifier:8002}
     ports:
       - "8501:8501"
     depends_on:
@@ -143,6 +144,8 @@ services:
     volumes:
       - ./secrets:/run/secrets:ro
       - ./data:/data
+      # gcloud credentials for the ID token the Cloud Run classifier requires (unused for the local one).
+      - ~/.config/gcloud:/root/.config/gcloud:ro
 
 volumes:
   chroma_data:   # ChromaDB's stored collections

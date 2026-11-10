@@ -12,6 +12,7 @@ from base64 import b64encode
 
 import pytest
 from fastapi.testclient import TestClient
+from google.auth.exceptions import RefreshError
 from google.oauth2.credentials import Credentials
 from itsdangerous import TimestampSigner
 
@@ -333,8 +334,20 @@ def test_dashboard_falls_back_when_classifier_is_down(dashboard, monkeypatch):
     assert 'data-filter="needs-response"' not in page  # no Gemini, no needs-response filter
 
 
+def test_dashboard_falls_back_when_the_cloud_run_token_fails(dashboard, monkeypatch):
+    """The real client, pointed at Cloud Run, with no usable gcloud login: same notice, no request sent."""
+    browser, _, _ = dashboard
+    monkeypatch.setenv("CLASSIFIER_URL", "https://fixture-classifier-test.us-east1.run.app")
+    monkeypatch.setattr(classifier_client, "_token", {"audience": None, "value": None, "expires_at": 0.0})
+    monkeypatch.setattr(classifier_client, "_fetch_id_token", raise_(RefreshError("expired")))
+    monkeypatch.setattr(classifier_client.httpx, "get", raise_(AssertionError("must not be called without a token")))
+    page = browser.get("/").text
+    assert "The Gemini classifier isn't reachable" in page
+    assert ">Scheduling</span>" in page  # the keyword tag
+
+
 def test_unreachable_classifier_raises_classifier_unavailable(monkeypatch):
-    monkeypatch.setattr(classifier_client, "CLASSIFIER_URL", "http://127.0.0.1:9")  # nothing listens here
+    monkeypatch.setenv("CLASSIFIER_URL", "http://127.0.0.1:9")  # nothing listens here
     with pytest.raises(classifier_client.ClassifierUnavailable):
         classifier_client.health()
     with pytest.raises(classifier_client.ClassifierUnavailable):
