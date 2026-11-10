@@ -2,6 +2,8 @@
 
 Proof that the Milestone 2 pipeline runs end to end, with real inputs and outputs.
 
+Milestone 3 (the classifier on Cloud Run, with monitoring) is in [`ms3/`](ms3/README.md).
+
 ## Full pipeline run (one command)
 
 From a clean state (`docker compose down -v`), at commit `0c1bbe3`, with data-v1 in `data/source/`:

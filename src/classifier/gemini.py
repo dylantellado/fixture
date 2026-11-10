@@ -27,11 +27,19 @@ CALL_TIMEOUT_MS = 30_000  # per Gemini call
 
 
 class GeminiError(Exception):
-    """Gemini couldn't give a valid answer. `status` is the HTTP code main.py returns."""
+    """Gemini couldn't give a valid answer.
 
-    def __init__(self, message: str, status: int = 503):
+    status: the HTTP code main.py returns.
+    kind:   a short name for logs and the error metric (no_project, client_error,
+            rate_limited, api_error, unreachable, invalid_answer).
+    code:   the HTTP code Vertex AI returned, if it returned one.
+    """
+
+    def __init__(self, message: str, status: int = 503, kind: str = "error", code: int | None = None):
         super().__init__(message)
         self.status = status
+        self.kind = kind
+        self.code = code
 
 
 def is_transient(error: Exception) -> bool:
@@ -52,8 +60,13 @@ def with_retries(call, max_attempts: int = MAX_ATTEMPTS, sleep=time.sleep):
         except Exception as error:
             if attempt == max_attempts or not is_transient(error):
                 raise
-            # Log the code only: API error messages are safe, but keep logs minimal.
-            log.warning("gemini attempt %d failed (%s), retrying", attempt, getattr(error, "code", type(error).__name__))
+            # Log the code or error type only: API error messages are safe, but keep logs minimal.
+            code = getattr(error, "code", None)
+            log.warning(
+                "gemini attempt %d failed (%s), retrying", attempt, code or type(error).__name__,
+                extra={"fields": {"event": "gemini_retry", "attempts": attempt, "gemini_code": code,
+                                  "error_type": type(error).__name__}},
+            )
             sleep(2 ** (attempt - 1) + random.uniform(0, 0.5))
 
 
@@ -81,7 +94,7 @@ class GeminiLabeler:
     def client(self) -> genai.Client:
         if self._client is None:
             if not self.project:
-                raise GeminiError("GOOGLE_CLOUD_PROJECT is not set")
+                raise GeminiError("GOOGLE_CLOUD_PROJECT is not set", kind="no_project")
             try:
                 self._client = genai.Client(
                     vertexai=True,
@@ -90,7 +103,8 @@ class GeminiLabeler:
                     http_options=types.HttpOptions(timeout=CALL_TIMEOUT_MS),
                 )
             except Exception as error:  # e.g. no application-default credentials
-                raise GeminiError(f"can't create the Vertex AI client: {type(error).__name__}") from error
+                raise GeminiError(f"can't create the Vertex AI client: {type(error).__name__}",
+                                  kind="client_error") from error
         return self._client
 
     def label(self, system: str, user: str) -> dict:
@@ -111,15 +125,16 @@ class GeminiLabeler:
             )
         except errors.APIError as error:
             if error.code == 429:
-                raise GeminiError("Gemini is rate limited; try again shortly") from error
-            raise GeminiError(f"Gemini returned an error ({error.code})", 502 if error.code < 500 else 503) from error
+                raise GeminiError("Gemini is rate limited; try again shortly", kind="rate_limited", code=429) from error
+            raise GeminiError(f"Gemini returned an error ({error.code})", 502 if error.code < 500 else 503,
+                              kind="api_error", code=error.code) from error
         except Exception as error:
-            raise GeminiError(f"couldn't reach Gemini ({type(error).__name__})") from error
+            raise GeminiError(f"couldn't reach Gemini ({type(error).__name__})", kind="unreachable") from error
 
         try:
             answer = parse_answer(response.text or "")
         except (ValueError, TypeError) as error:  # json.JSONDecodeError is a ValueError
-            raise GeminiError(f"Gemini's answer was not valid: {error}", 502) from error
+            raise GeminiError(f"Gemini's answer was not valid: {error}", 502, kind="invalid_answer") from error
 
         usage = response.usage_metadata
         answer["usage"] = {

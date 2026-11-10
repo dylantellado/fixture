@@ -1,0 +1,58 @@
+$ gcloud run services describe fixture-classifier --region us-east1 --format yaml(...)
+metadata:
+  annotations:
+    run.googleapis.com/ingress: all
+    run.googleapis.com/urls: '["https://fixture-classifier-622192804476.us-east1.run.app","https://fixture-classifier-jwoeyemg7q-ue.a.run.app"]'
+  labels:
+    app: fixture
+    cloud.googleapis.com/location: us-east1
+    component: classifier
+    git-commit: 5950325fb512
+    rules-sha256: 4473a8690a84
+  name: fixture-classifier
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: '2'
+        run.googleapis.com/client-name: gcloud
+        run.googleapis.com/client-version: 583.0.0
+        run.googleapis.com/cpu-throttling: 'true'
+        run.googleapis.com/startup-cpu-boost: 'true'
+    spec:
+      containerConcurrency: 20
+      containers:
+      - env:
+        - name: GOOGLE_CLOUD_PROJECT
+          value: fixture-ac215-96dhbm
+        - name: GOOGLE_CLOUD_LOCATION
+          value: global
+        - name: GEMINI_MODEL
+          value: gemini-3.8-flash
+        - name: GEMINI_THINKING_BUDGET
+          value: '128'
+        image: us-east1-docker.pkg.dev/fixture-ac215-96dhbm/fixture/classifier:5950325fb512
+        resources:
+          limits:
+            cpu: '1'
+            memory: 512Mi
+      serviceAccountName: fixture-classifier@fixture-ac215-96dhbm.iam.gserviceaccount.com
+      timeoutSeconds: 150
+status:
+  conditions:
+  - lastTransitionTime: '2026-11-09T20:08:46.854302Z'
+    status: 'True'
+    type: Ready
+  latestReadyRevisionName: fixture-classifier-00002-gc7
+
+$ gcloud run services get-iam-policy fixture-classifier --region us-east1
+bindings:
+- members:
+  - serviceAccount:service-622192804476@gcp-sa-monitoring-notification.iam.gserviceaccount.com
+  role: roles/run.invoker
+etag: BwZf3Ybo5gY=
+version: 1
+
+$ gcloud projects get-iam-policy fixture-ac215-96dhbm --flatten=bindings[].members --filter=bindings.members:fixture-classifier@ --format="value(bindings.role)"
+roles/aiplatform.user
+roles/logging.logWriter

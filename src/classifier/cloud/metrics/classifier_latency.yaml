@@ -1,0 +1,26 @@
+# Log-based distribution: latency_ms from each classify log line, i.e. the time to
+# get the label from Gemini, including retries (the same value /classify returns).
+# The dashboard shows its p50 and p95. Buckets grow by 40% from 100 ms (100, 140,
+# 196, ... ms), which is fine-grained in the 1-15 s range where most calls land.
+# Metric type: logging.googleapis.com/user/classifier_latency
+description: Fixture classifier time to label one email (Gemini call incl. retries), ms
+filter: |-
+  resource.type="cloud_run_revision"
+  resource.labels.service_name="fixture-classifier"
+  jsonPayload.event="classify"
+metricDescriptor:
+  metricKind: DELTA
+  valueType: DISTRIBUTION
+  unit: ms
+  labels:
+    - key: outcome
+      valueType: STRING
+      description: ok or error
+labelExtractors:
+  outcome: EXTRACT(jsonPayload.outcome)
+valueExtractor: EXTRACT(jsonPayload.latency_ms)
+bucketOptions:
+  exponentialBuckets:
+    numFiniteBuckets: 24
+    growthFactor: 1.4
+    scale: 100

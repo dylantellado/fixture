@@ -1,0 +1,9 @@
+{
+  "message_id": "example-cold-sales",
+  "thread": [
+    {"from": "Brooke Hale <brooke@acme-analytics.example>", "to": "Sam Student <sam@example.edu>",
+     "date": "Wed, 14 Oct 2026 08:45:00 -0400", "subject": "Quick question about your club's sponsors",
+     "body": "Hi Sam,\n\nI'm Brooke from Acme Analytics. We help student organizations track their sponsorship pipeline in one place.\n\nDo you have 15 minutes Thursday at 3 pm to see how Acme can help your club? You can also grab any slot here: https://acme-analytics.example/book\n\nBest,\nBrooke"}
+  ],
+  "target_index": 0
+}

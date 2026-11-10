@@ -1,0 +1,23 @@
+# Log-based counter: one per POST /classify that reached the handler (valid request),
+# from the structured "classify" log line. Bad requests (422) and requests Cloud Run
+# rejected (403) never reach it; see the Cloud Run request count for those.
+# Metric type: logging.googleapis.com/user/classifier_requests
+description: Fixture classifier /classify requests, by outcome (ok or error) and label
+filter: |-
+  resource.type="cloud_run_revision"
+  resource.labels.service_name="fixture-classifier"
+  jsonPayload.event="classify"
+metricDescriptor:
+  metricKind: DELTA
+  valueType: INT64
+  unit: "1"
+  labels:
+    - key: outcome
+      valueType: STRING
+      description: ok or error
+    - key: label
+      valueType: STRING
+      description: the label given (empty on errors)
+labelExtractors:
+  outcome: EXTRACT(jsonPayload.outcome)
+  label: EXTRACT(jsonPayload.label)
