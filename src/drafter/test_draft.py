@@ -36,7 +36,8 @@ def test_label_tasks_say_what_to_do():
     assert "different days" in draft.TASKS["reschedule"]
     assert "FREE WINDOW" in draft.TASKS["proposed_times"] and "accept_time" in draft.TASKS["proposed_times"]
     assert "offer 2 or 3" in draft.TASKS["proposed_times"]  # the counter-offer
-    assert "Reply to that person" in draft.TASKS["assistant_handoff"]
+    assert "Write to that person" in draft.TASKS["assistant_handoff"]
+    assert "never as a second greeting" in draft.TASKS["assistant_handoff"]
     assert "answer_question" in draft.TASKS["acceptance"]
     assert "BUSY block" in draft.TASKS["none"] and "ask_question" in draft.TASKS["none"]
 

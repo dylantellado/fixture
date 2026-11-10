@@ -130,8 +130,9 @@ TASKS = {
         "work, without repeating them, and offer 2 or 3 times from ALLOWED SLOTS on different days "
         "(action offer_times)."),
     "assistant_handoff": (
-        "Scheduling has been handed to someone else (an assistant or coordinator). Reply to that person, "
-        "greeting them by first name, thank the original sender briefly if natural, and offer 2 or 3 "
+        "Scheduling has been handed to someone else (an assistant or coordinator). Write to that person: "
+        "greet them by first name, and if you thank the original sender, do it in one full sentence "
+        "(e.g. \"Thank you, Professor Lee, for connecting us.\"), never as a second greeting. Offer 2 or 3 "
         "times from ALLOWED SLOTS on different days (action offer_times)."),
     "acceptance": (
         "A time is already agreed, and they asked something the user must answer (e.g. Zoom or in "
