@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "notes": [
+    "Default scheduling rules for every user. rules.py loads this file, then applies per-user overrides (a settings page will store them) and any overrides sent with the request.",
+    "Busy calendar events are never offered or accepted. That rule is in code (slots.py) and can't be turned off here.",
+    "Change a default: edit this file, bump version, and note it in src/drafter/README.md."
+  ],
+  "working_hours": {"start": "08:00", "end": "20:00"},
+  "working_days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+  "min_notice_hours": 24,
+  "buffer_minutes": 15,
+  "default_meeting_minutes": 30,
+  "horizon_days": 14,
+  "slot_step_minutes": 30
+}

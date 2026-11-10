@@ -1,5 +1,11 @@
 """Calls to the Fixture classifier (src/classifier), which labels emails with Gemini.
 
+KEEP IN SYNC: src/frontend/classifier_client.py and src/drafter/classifier_client.py
+are identical copies, because services don't import from each other. The web app
+uses it to label the dashboard's emails; the drafter uses it when a draft request
+comes without a label. Change both together; a test in each service fails if
+they differ.
+
 All HTTP calls to the classifier live here, so tests can replace these
 functions with fakes. Email text goes out in the request body only; it is
 never logged here.
@@ -11,9 +17,9 @@ Where the classifier runs is CLASSIFIER_URL:
                                     requires a Google ID token on every request
 
 For an https URL we get the ID token from the Google credentials of whoever
-runs the web app (application-default credentials: your gcloud login locally,
-the mounted ~/.config/gcloud in Docker). That account needs roles/run.invoker
-on the service (project owners have it).
+runs the service (application-default credentials: your gcloud login locally,
+the mounted ~/.config/gcloud in Docker, its service account on Cloud Run). That
+account needs roles/run.invoker on the classifier (project owners have it).
 """
 
 import logging

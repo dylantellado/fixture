@@ -85,7 +85,7 @@
       {% if labels.mode == "fallback" %}
       <p class="label-notice notice-warn">The Gemini classifier isn't reachable, so the Scheduling tags below come from simple keyword rules.</p>
       {% else %}
-      <p class="label-notice">Labeled by Gemini ({{ labels.model }}) using labeling rules v{{ labels.rules_version }}. Hover or open an email to see why.
+      <p class="label-notice">Labeled by Gemini ({{ labels.model }}) using labeling rules v{{ labels.rules_version }}. Hover or open an email to see why{% if needs_response_count %}; open one marked Needs response to draft a reply{% endif %}.
         {%- if labels.pending %} {{ labels.pending }} still classifying; <a href="/">reload</a> in a moment.{% endif %}
         {%- if labels.errors %} <span class="warn">{{ labels.errors }} couldn't be classified and show keyword tags instead.</span>{% endif %}
       </p>
@@ -132,6 +132,13 @@
               <p class="why">Tagged as scheduling by keyword rules because it mentions <strong>“{{ m.scheduling_match }}”</strong>.</p>
               {% endif %}
               {% endif %}
+              {% if ai.state == "done" and ai.needs_response %}
+              {# static/draft.js fills the panel. Nothing is sent or saved. #}
+              <div class="draft" data-message-id="{{ m.id }}" data-thread-id="{{ m.thread_id }}">
+                <button type="button" class="btn-draft">Draft reply</button>
+                <div class="draft-panel" hidden></div>
+              </div>
+              {% endif %}
             </div>
           </details>
         </li>
@@ -142,9 +149,10 @@
     </section>
   </div>
 
-  <p class="footnote">Read-only demo. Showing your next 10 events across your checked calendars and 20 most recent inbox emails (headers and Gmail's short preview on screen). To label them, each email's thread is sent to Gemini in Fixture's own Google Cloud project; labels are cached per account by message id (never the email text) and deleted when you sign out. If the classifier is down, tags come from simple keyword rules.</p>
+  <p class="footnote">Read-only demo. Showing your next 10 events across your checked calendars and 20 most recent inbox emails (headers and Gmail's short preview on screen). To label them, each email's thread is sent to Gemini in Fixture's own Google Cloud project; labels are cached per account by message id (never the email text) and deleted when you sign out. If the classifier is down, tags come from simple keyword rules. "Draft reply" sends that thread, your free/busy times for the next 14 days (no event details) and recent emails with the sender to Gemini in the same project; the draft is shown here only, never sent, saved or added to Gmail.</p>
 </main>
 
+<script src="{{ url_for('static', path='draft.js') }}" defer></script>
 <script>
   // Email filter: set data-filter on the list; CSS hides non-matching rows.
   const list = document.getElementById("email-list");

@@ -20,6 +20,7 @@ Cloud Logging and Cloud Monitoring. How to call, redeploy and monitor it:
 | [`cloud_run_curl.md`](cloud_run_curl.md) | The exact curl commands and responses: 403 without a token, `/health`, `/classify` on a proposed-times email, a cold sales pitch, a prompt-injection newsletter and an acceptance, and a 422 for an invalid request. |
 | [`cloud_logging_entries.json`](cloud_logging_entries.json) | The structured Cloud Logging entries for those requests and the instance's startup line (rules version 1.5, rules sha256 `4473a869…`, which matches `shasum -a 256 docs/data/labeling_rules.md` at that commit). No email text, subject, address or reason. |
 | [`cloud_run_service.txt`](cloud_run_service.txt) | The deployed configuration (`gcloud run services describe`), who can invoke it (only the uptime check's Monitoring service agent so far) and the runtime service account's roles. |
+| [`draft_scenarios.md`](draft_scenarios.md) | The drafter (Draft reply, not deployed) on 16 fake scenarios against the real Gemini: every label, a fully booked calendar, a sender proposing only busy times, a prompt-injection email, casual vs formal senders, time zones and a DST change. Status, offered times, checks, cost and the full draft for each; every returned time re-checked independently. Made by `src/drafter/run_scenarios.py`. |
 | `*.png` | Screenshots, see the checklist below. |
 
 ## Monitoring

@@ -7,7 +7,8 @@ functions with no network calls, so they are easy to test.
 import base64
 import html
 import re
-from datetime import date, datetime, timezone
+from concurrent.futures import ThreadPoolExecutor
+from datetime import date, datetime, timedelta, timezone
 from email.utils import getaddresses, parseaddr
 from html.parser import HTMLParser
 
@@ -135,6 +136,76 @@ def fetch_thread(creds: Credentials, thread_id: str) -> list[dict]:
     service = build("gmail", "v1", credentials=creds)
     thread = service.users().threads().get(userId="me", id=thread_id, format="full").execute()
     return [format_thread_message(m) for m in thread.get("messages", []) if "DRAFT" not in m.get("labelIds", [])]
+
+
+def fetch_calendar_context(creds: Credentials, days: int = 14) -> dict:
+    """Busy times for the next `days` days and the user's time zone, for drafting a reply.
+
+    Uses Calendar's free/busy query (read-only), across every calendar the user
+    has checked (the same ones the dashboard shows, plus free/busy-only ones).
+    Free/busy gives start and end times only: no titles, attendees or places.
+
+    Returns {"busy": [{"start", "end"}], "busy_from", "busy_until", "timezone",
+    "calendars": number read, "unreadable": [names]}. Busy times are UTC ISO strings.
+    """
+    service = build("calendar", "v3", credentials=creds)
+    calendars = [c for c in service.calendarList().list().execute().get("items", []) if c.get("selected")]
+    timezone_name = service.calendars().get(calendarId="primary").execute().get("timeZone") or "UTC"
+
+    start = datetime.now(timezone.utc).replace(microsecond=0)
+    end = start + timedelta(days=days)
+    busy, unreadable = [], []
+    # One query covers at most 50 calendars.
+    for first in range(0, len(calendars), 50):
+        group = calendars[first:first + 50]
+        result = service.freebusy().query(body={
+            "timeMin": start.isoformat(), "timeMax": end.isoformat(),
+            "items": [{"id": c["id"]} for c in group],
+        }).execute()
+        for cal in group:
+            info = result.get("calendars", {}).get(cal["id"], {})
+            if info.get("errors"):
+                unreadable.append("Primary" if cal.get("primary") else cal.get("summaryOverride") or cal.get("summary", ""))
+                continue
+            busy += [{"start": b["start"], "end": b["end"]} for b in info.get("busy", [])]
+    return {"busy": busy, "busy_from": start.isoformat(), "busy_until": end.isoformat(), "timezone": timezone_name,
+            "calendars": len(calendars) - len(unreadable), "unreadable": unreadable}
+
+
+# A plain email address, safe to put inside a Gmail search query.
+SEARCHABLE_ADDRESS = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+
+
+def fetch_past_messages(creds: Credentials, address: str, exclude_thread_id: str, max_threads: int = 10,
+                        per_thread: int = 5) -> list[dict]:
+    """Recent messages exchanged with `address` in the user's other threads (read-only).
+
+    Searches Gmail for the latest `max_threads` threads from or to that address,
+    skips the current thread, and keeps the last `per_thread` messages of each
+    that the address sent or received. Each message is a format_thread_message()
+    dict plus "thread_id", newest thread first. Threads that can't be read are skipped.
+    """
+    if not SEARCHABLE_ADDRESS.fullmatch(address or ""):
+        return []
+    service = build("gmail", "v1", credentials=creds)
+    listing = service.users().threads().list(
+        userId="me", q=f'from:"{address}" OR to:"{address}"', maxResults=max_threads + 1).execute()
+    thread_ids = [t["id"] for t in listing.get("threads", []) if t["id"] != exclude_thread_id][:max_threads]
+
+    def read(thread_id: str) -> list[dict]:
+        try:
+            return fetch_thread(creds, thread_id)  # builds its own client: safe in parallel
+        except HttpError:
+            return []
+
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        threads = list(pool.map(read, thread_ids))
+    wanted = address.lower()
+    messages = []
+    for thread_id, thread in zip(thread_ids, threads):
+        exchanged = [m for m in thread if m["address"] == wanted or wanted in m["to"].lower()]
+        messages += [{**m, "thread_id": thread_id} for m in exchanged[-per_thread:]]
+    return messages
 
 
 def event_start(event: dict) -> datetime:

@@ -37,6 +37,10 @@ Details: [`src/classifier/README.md`](src/classifier/README.md#deployed-service-
 Cost: about $0.003 per classified email (Gemini is ~98% of it; $0.006 from 2027), about $3 a
 month at low usage, $0 when idle.
 
+New in MS3 as well: the [`drafter`](src/drafter/README.md) service and the dashboard's **Draft
+reply** button ([below](#draft-reply)). The drafter's image is Cloud Run-ready but not deployed;
+it runs locally and in Docker Compose.
+
 ### Use the deployed classifier
 
 The dashboard uses the local classifier by default. To label emails with the one on Cloud Run:
@@ -61,6 +65,10 @@ With no token (never signed in, expired login, offline) or a `403` from Cloud Ru
 `roles/run.invoker`), the dashboard shows keyword tags and its "isn't reachable" notice, and the
 web app logs the error type only. Remove the line to go back to the local classifier.
 
+The [drafter](src/drafter/README.md) reads the same `CLASSIFIER_URL` (from your shell when run
+with `uv run`, from `.env` in Docker Compose) for the emails it has to classify itself, through
+an identical copy of `classifier_client.py` (a test in each service checks they stay the same).
+
 ## Layout
 
 ```
@@ -76,7 +84,8 @@ src/
   rag/         embeds messages and threads with Vertex AI into ChromaDB (one-shot job)
   api/         HTTP API: health check and search (one user's messages, with thread context)
   classifier/  labels one email with Gemini (label, needs_response, reason)
-  frontend/    web app: Google sign-in, dashboard with live email labels, search page
+  drafter/     drafts a calendar-aware reply to one email; every time in it is checked in code
+  frontend/    web app: Google sign-in, dashboard with live email labels and Draft reply, search page
 ```
 
 eval-v1 is frozen at tag eval-v1. Never used for tuning. Rule changes create eval-v1.1: `data/eval/v1.1/` is eval-v1 under labeling rules v1.5 (one answer changed).
@@ -97,11 +106,11 @@ Each service under `src/` is its own [uv](https://docs.astral.sh/uv/) project wi
    GIT_COMMIT=$(git rev-parse HEAD) docker compose up --build
    ```
 
-Startup order: `ingest` → `preprocess` → `rag` run once and exit, each waiting for the previous one to succeed. `rag` also waits for `chromadb` to be healthy. `api` starts after `rag` finishes, and `frontend` starts after `api` is healthy. `classifier` starts on its own; until it's up, the dashboard uses keyword tags.
+Startup order: `ingest` → `preprocess` → `rag` run once and exit, each waiting for the previous one to succeed. `rag` also waits for `chromadb` to be healthy. `api` starts after `rag` finishes, and `frontend` starts after `api` is healthy. `classifier` and `drafter` start on their own; until the classifier is up, the dashboard uses keyword tags, and until the drafter is up, Draft reply shows an error.
 
-`rag`, `api` and `classifier` need Google application-default credentials for Vertex AI. Run `gcloud auth application-default login` once; Docker mounts `~/.config/gcloud` read-only into those three services (no API keys, nothing in `.env`). Without credentials `rag` can't embed the messages and exits with an error, so `api` and `frontend` don't start; the classifier alone falls back gracefully (the dashboard uses keyword tags).
+`rag`, `api`, `classifier` and `drafter` need Google application-default credentials for Vertex AI. Run `gcloud auth application-default login` once; Docker mounts `~/.config/gcloud` read-only into those four services (no API keys, nothing in `.env`). Without credentials `rag` can't embed the messages and exits with an error, so `api` and `frontend` don't start; the classifier alone falls back gracefully (the dashboard uses keyword tags).
 
-**Privacy:** indexing and search send email text to Vertex AI in our own GCP project (`rag` embeds every indexed message, today the fictional data-v1 corpus; `api` embeds each search query). Live classification sends the signed-in user's email text (the 20 most recent inbox emails and their threads, quoted replies and signatures removed) to Gemini in our own GCP project (`fixture-ac215-96dhbm`). Email text is never logged or saved; `data/fixture.db` keeps only a hash of the account's email and each message id's label, `needs_response`, reason, model, rules version and time, and signing out deletes that account's rows.
+**Privacy:** indexing and search send email text to Vertex AI in our own GCP project (`rag` embeds every indexed message, today the fictional data-v1 corpus; `api` embeds each search query). Live classification sends the signed-in user's email text (the 20 most recent inbox emails and their threads, quoted replies and signatures removed) to Gemini in our own GCP project (`fixture-ac215-96dhbm`). **Draft reply** (only when clicked) sends that email's thread, the user's free/busy times for the next 14 days (start and end only, no event details) and recent emails with the sender to Gemini and Vertex AI embeddings in the same project; the draft is shown in the browser only, never sent, saved, or added to Gmail. Email text is never logged or saved; `data/fixture.db` keeps only a hash of the account's email and each message id's label, `needs_response`, reason, model, rules version and time, and signing out deletes that account's rows.
 
 | Service  | Host URL               |
 |----------|------------------------|
@@ -109,6 +118,7 @@ Startup order: `ingest` → `preprocess` → `rag` run once and exit, each waiti
 | api      | http://localhost:8000  |
 | chromadb | http://localhost:8001  |
 | classifier | http://localhost:8002 |
+| drafter  | http://localhost:8003  |
 
 To work on a single service locally, run it from its folder (e.g. `src/rag`):
 
@@ -117,7 +127,42 @@ uv run main.py                                      # one-shot jobs (rag needs g
 uv run uvicorn main:app --port 8000 --reload        # api (same credentials, for embedding queries)
 GOOGLE_CLOUD_PROJECT=fixture-ac215-96dhbm \
   uv run uvicorn main:app --port 8002 --reload      # classifier (the web app finds it at CLASSIFIER_URL, default http://localhost:8002)
+GOOGLE_CLOUD_PROJECT=fixture-ac215-96dhbm \
+  uv run uvicorn main:app --port 8003 --reload      # drafter (the web app finds it at DRAFTER_URL, default http://localhost:8003)
 uv add <package>                                    # add a dependency
+```
+
+## Draft reply
+
+On the dashboard, open an email marked **Needs response** and click **Draft reply**. Fixture
+reads the thread, your Calendar free/busy for the next 14 days across your checked calendars
+and your calendar's time zone, and your recent emails with the sender (the last ~10 other
+threads), all with the existing read-only permissions. It sends them, with the email's cached
+label, to the [drafter](src/drafter/README.md), which:
+
+- computes the times you can offer **in code** from your busy times and rules (8 AM-8 PM every
+  day, 24 hours' notice, 15 minutes around busy events, 30-minute meetings unless the email says
+  otherwise, 14 days ahead; busy events are never offered),
+- picks the 5 most relevant past emails with `gemini-embedding-001`,
+- asks Gemini for one reply in JSON: offer 2-3 times on different days, accept one of the
+  sender's times only if it's free and allowed, reply to an assistant, answer a question, or
+  confirm a meeting only if your calendar shows it,
+- **checks every draft in code** (every time is free and follows your rules, the text names no
+  other date or time, no contact details from other emails). A failing draft is rewritten once,
+  then refused: an unchecked draft is never shown.
+
+The panel shows the draft (editable, with Copy and Regenerate), the times it offers or accepts,
+each check, and the past emails it used (subject and date). Nothing is sent, saved, or added to
+Gmail drafts, and the calendar is never changed. Results on 16 fake scenarios, including a
+prompt-injection email and a fully booked week: [`docs/evidence/ms3/draft_scenarios.md`](docs/evidence/ms3/draft_scenarios.md).
+
+To run it locally without Docker, start the classifier, the drafter and the web app, each from
+its folder (see [Getting started](#getting-started)):
+
+```sh
+cd src/classifier && GOOGLE_CLOUD_PROJECT=fixture-ac215-96dhbm uv run uvicorn main:app --port 8002
+cd src/drafter    && GOOGLE_CLOUD_PROJECT=fixture-ac215-96dhbm uv run uvicorn main:app --port 8003
+cd src/frontend   && uv run uvicorn main:app --port 8501
 ```
 
 ## Data contract
@@ -133,6 +178,7 @@ What changed for the search side in Milestone 3 (Will: nothing changes in your f
 - **Search:** still one user's collection only, still returns messages (never threads) in the same request/response shape. **`score` means something new:** `0.5 × the message's own similarity + 0.5 × its thread's` (definition under API below), no longer one chunk's cosine similarity. A collection built with another embedding model is refused (`503`, rerun rag).
 - **New rule rag depends on:** `messages.jsonl` lists each thread's messages in thread order (it already does).
 - Measurements: [`docs/evidence/retrieval_check.md`](docs/evidence/retrieval_check.md) and [`docs/evidence/rag_experiments.md`](docs/evidence/rag_experiments.md).
+- **New service, `drafter` (Dylan):** `POST /draft` drafts a calendar-aware reply to one live Gmail email for the dashboard's Draft reply button (contract under [Drafter](#drafter) below). It doesn't read or change any pipeline file, and nothing in `data/` changes. It uses the same labels as `messages.jsonl` and the classifier, and the same embedding model and task types as rag and the api, so a per-user inbox index built by rag could later replace its live sender search.
 
 ### Pipeline files
 
@@ -251,4 +297,13 @@ Labels live Gmail emails for the web app; it doesn't read the pipeline's files. 
 - The web app caches answers in `data/fixture.db` (table `classifications`), keyed by account (sha256 of the signed-in email) and Gmail message id, classifies again when `rules_version` changes, and deletes the account's rows on sign-out.
 - The prompt includes `docs/data/labeling_rules.md` except its "Not adopted" and "Change log" sections (`docs/data/training_conflicts.md` is never sent); the classifier won't start if one of those headings is missing, so moving a section means updating `EXCLUDED_SECTIONS` in `src/classifier/prompt.py`.
 
-Inside Docker, `rag` and `api` reach ChromaDB at `CHROMA_HOST=chromadb`, `CHROMA_PORT=8000`, the frontend reaches the API at `API_URL=http://api:8000`, and the classifier at `CLASSIFIER_URL=http://classifier:8002`.
+### Drafter
+
+Drafts a reply to one email for the web app; it doesn't read the pipeline's files, Gmail or Calendar (the web app sends everything). Details, full examples and the checks: `src/drafter/README.md`.
+
+- `GET /health` → `{"status": "ok", "model": "gemini-3.8-flash", "embedding_model": "gemini-embedding-001", "rules_version": "1.0"}`. `rules_version` is the version of `src/drafter/rules/default_rules.json`.
+- `POST /draft` with `{"thread": [{"from", "to", "date", "subject", "body", "id"?, "from_user"?}], "target_index": int, "user": {"name", "email", "timezone"}, "classification"?: {"label", "needs_response", "reason"}, "busy": [{"start", "end"}], "busy_until"?: str, "past_messages"?: [{"id", "from", "to", "date", "subject", "body", "thread_id"?, "from_user"?}], "now"?: str, "rules"?: {...}, "regenerate"?: bool, "message_id"?: str}`. Times are ISO 8601 with a UTC offset; `timezone` is an IANA name. Without `classification`, the drafter calls the classifier (`CLASSIFIER_URL`, with a Google ID token when it's an `https://` Cloud Run URL).
+- Returns `{"status", "draft_text", "action", "offered_times", "accepted_time", "confirmed_time", "checks", "context_used", "warnings", "error", "error_type", "label", "needs_response", "meeting_minutes", "model", "rules_version", "attempts", "latency_ms", "usage"}`. `status` is `drafted`, `no_reply_needed`, `no_free_time` or `error`; `draft_text` is `""` unless `drafted`. Each time is `{"start", "end", "label"}` in the user's time zone. `checks` lists seven checks (`name`, `passed`, `detail`); a draft is returned only if all pass. `context_used` lists the past emails given to the model (`id`, `score`, `cited`, `why`). Valid requests always get `200`; invalid input gets `422`.
+- The web app never stores drafts. Logs on both sides hold message ids, statuses, counts, check names, tokens and timing, never email text or the draft.
+
+Inside Docker, `rag` and `api` reach ChromaDB at `CHROMA_HOST=chromadb`, `CHROMA_PORT=8000`, the frontend reaches the API at `API_URL=http://api:8000`, the classifier at `CLASSIFIER_URL=http://classifier:8002` and the drafter at `DRAFTER_URL=http://drafter:8003`, and the drafter reaches the classifier at `CLASSIFIER_URL=http://classifier:8002`.

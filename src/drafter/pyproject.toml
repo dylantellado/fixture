@@ -1,0 +1,19 @@
+[project]
+name = "drafter"
+version = "0.1.0"
+description = "drafter service: drafts a calendar-aware reply to one scheduling email, checked by deterministic rules"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.162.0",
+    "google-auth>=2.62.0",
+    "google-genai>=2.34.0,<3",  # same major version as the classifier, rag and api
+    "httpx>=0.28.1",
+    "requests>=2.32.0",  # used by google-auth to fetch ID tokens for the classifier
+    "tzdata>=2025.2",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]

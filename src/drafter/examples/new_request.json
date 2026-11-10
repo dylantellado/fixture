@@ -1,0 +1,27 @@
+{
+  "message_id": "example-new-request",
+  "now": "2026-11-09T10:00:00-05:00",
+  "user": {"name": "Sam Rivera", "email": "sam.rivera@example.edu", "timezone": "America/New_York"},
+  "thread": [
+    {"from": "Jordan Lee <jordan.lee@northbridge.example.com>", "to": "sam.rivera@example.edu",
+     "date": "Mon, 09 Nov 2026 08:41:00 -0500", "subject": "Quick call about the analyst role?",
+     "body": "Hi Sam,\n\nThanks for applying to the summer analyst program. I'd love to set up a 30-minute call to tell you more about the team and answer your questions. What does your availability look like over the next week or so?\n\nBest,\nJordan"}
+  ],
+  "target_index": 0,
+  "classification": {"label": "new_request", "needs_response": true, "reason": "D1: asks to meet without specific times; NR1."},
+  "busy": [
+    {"start": "2026-11-10T09:00:00-05:00", "end": "2026-11-10T17:00:00-05:00"},
+    {"start": "2026-11-11T10:00:00-05:00", "end": "2026-11-11T11:15:00-05:00"},
+    {"start": "2026-11-11T13:30:00-05:00", "end": "2026-11-11T15:00:00-05:00"},
+    {"start": "2026-11-12T14:00:00-05:00", "end": "2026-11-12T15:00:00-05:00"}
+  ],
+  "busy_until": "2026-11-23T10:00:00-05:00",
+  "past_messages": [
+    {"id": "past-1", "from": "Jordan Lee <jordan.lee@northbridge.example.com>", "to": "sam.rivera@example.edu",
+     "date": "Tue, 20 Oct 2026 16:05:00 -0400", "subject": "Northbridge info session follow-up",
+     "body": "Great meeting you at the info session! I usually do calls in the mornings before the market gets busy, so keep that in mind if we ever set something up."},
+    {"id": "past-2", "from": "Sam Rivera <sam.rivera@example.edu>", "to": "jordan.lee@northbridge.example.com",
+     "date": "Wed, 21 Oct 2026 09:12:00 -0400", "subject": "Re: Northbridge info session follow-up",
+     "body": "Thanks Jordan, it was great to meet you too. I just submitted my application.", "from_user": true}
+  ]
+}

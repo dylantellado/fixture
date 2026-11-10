@@ -246,3 +246,13 @@ def test_auth_failure_during_classify_raises_unavailable(monkeypatch, server):
     with pytest.raises(classifier_client.ClassifierUnavailable, match="RefreshError"):
         classifier_client.classify(THREAD, 0)
     assert server.requests == []
+
+
+def test_same_file_as_the_drafters_copy():
+    """src/drafter/classifier_client.py is an identical copy (services don't import from each other)."""
+    from pathlib import Path
+
+    here = Path(__file__).resolve().parent
+    drafter = here.parent / "drafter" / "classifier_client.py"
+    assert (here / "classifier_client.py").read_text() == drafter.read_text(), \
+        "change src/frontend/classifier_client.py and src/drafter/classifier_client.py together"
