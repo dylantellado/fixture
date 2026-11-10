@@ -42,7 +42,8 @@ This is the starting layout, not a final architecture. Folders and services may 
 ```
 docker-compose.yml   runs all services together, in pipeline order (see README)
 .env.example         template for .env (copy it, never commit .env)
-data/                data/source/ holds the data-v1 inputs (committed until DVC is set up); data/eval/v1/
+dvc.yaml, dvc.lock   DVC data pipeline (ingest -> preprocess) and its pinned hashes; rules in docs/data/versions.md
+data/                data/source/ holds the data-v1 inputs (in DVC, bucket gs://fixture-ac215-96dhbm-dvc: `dvc pull`); data/eval/v1/
                      is the held-out classifier test set (committed; never tune or train on it, see its
                      README), frozen at tag eval-v1; data/eval/v1.1/ is the same set under labeling rules v1.5; everything else is local and git-ignored, e.g. fixture.db (the web app's
                      encrypted logins)
@@ -149,6 +150,14 @@ Deploy the classifier to Cloud Run (commit first; it builds from the last commit
 
 ```sh
 src/classifier/deploy.sh
+```
+
+Data (from the repo root; needs `uv tool install "dvc[gs]==3.67.1"` and gcloud application-default credentials; rules in `docs/data/versions.md`):
+
+```sh
+dvc pull     # fetch the data for this commit
+dvc repro    # rerun ingest -> preprocess if inputs or code changed; commit dvc.lock with the code
+dvc push     # upload new data before pushing the commit
 ```
 
 Tests (from any service folder: `src/ingest`, `src/preprocess`, `src/rag`, `src/api`, `src/classifier`, or `src/frontend`):

@@ -1,0 +1,78 @@
+schema: '2.0'
+stages:
+  ingest:
+    cmd: uv run --directory src/ingest python main.py
+    deps:
+    - path: data/source/generated_threads.jsonl
+      hash: md5
+      md5: 816fa0bcac66bf15cdb1a5148d376f65
+      size: 307308
+    - path: data/source/users.json
+      hash: md5
+      md5: c6715cac8519dc012e8b6aaae1523067
+      size: 345
+    - path: src/ingest/collectors.py
+      hash: md5
+      md5: 96586997ed0966b8390c32c0e25120d3
+      size: 3045
+    - path: src/ingest/main.py
+      hash: md5
+      md5: f788c8861c6839e6cd90ba7f49d3106d
+      size: 7144
+    - path: src/ingest/pyproject.toml
+      hash: md5
+      md5: 0ebf53e51a39b712e82e28e80bf4130a
+      size: 249
+    - path: src/ingest/uv.lock
+      hash: md5
+      md5: 2769edbe1ad8f362ef02633014ceea39
+      size: 106803
+    - path: src/ingest/validation.py
+      hash: md5
+      md5: a5c88889cc9a09652a55151a7d4935b4
+      size: 5726
+    outs:
+    - path: data/raw/threads.jsonl
+      hash: md5
+      md5: 79d82d1e28fedefbe060365c8d98f749
+      size: 334720
+  preprocess:
+    cmd: uv run --directory src/preprocess python main.py
+    deps:
+    - path: data/raw/threads.jsonl
+      hash: md5
+      md5: 79d82d1e28fedefbe060365c8d98f749
+      size: 334720
+    - path: data/source/users.json
+      hash: md5
+      md5: c6715cac8519dc012e8b6aaae1523067
+      size: 345
+    - path: src/preprocess/anonymize.py
+      hash: md5
+      md5: 6e9dd7a1ebbb40d9a8f3b75545924934
+      size: 3400
+    - path: src/preprocess/cleaning.py
+      hash: md5
+      md5: 925cb50902c18e00c83aa72fbf0976b6
+      size: 5883
+    - path: src/preprocess/main.py
+      hash: md5
+      md5: 08b829e0c931c430442ee3e4c246672a
+      size: 9507
+    - path: src/preprocess/pyproject.toml
+      hash: md5
+      md5: b77ce4fa4bf056ad496304f296796a02
+      size: 180
+    - path: src/preprocess/uv.lock
+      hash: md5
+      md5: a9fffcd64bf2ecd299f09ce6a76e2999
+      size: 4652
+    outs:
+    - path: data/processed/manifest.json
+      hash: md5
+      md5: 8c8bcd2d886720a8773c2eb5fe674296
+      size: 763
+    - path: data/processed/messages.jsonl
+      hash: md5
+      md5: 483ed6d7c925267804deccb63bf44662
+      size: 236204

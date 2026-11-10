@@ -1,0 +1,37 @@
+# Data pipeline, run with `dvc repro` from the repo root (see docs/data/versions.md).
+#
+# DVC reruns a stage only when one of its deps changed, and records the hash of
+# every dep and out in dvc.lock. Committing dvc.lock together with the code is
+# what ties each data version to the exact code and inputs that made it.
+#
+# deps list the code that shapes the output (not tests or READMEs) plus each
+# service's pyproject.toml and uv.lock, so a library upgrade also reruns it.
+# The rag job writes to ChromaDB, not to files, so it isn't a stage here.
+
+stages:
+  ingest:
+    cmd: uv run --directory src/ingest python main.py
+    deps:
+      - data/source/generated_threads.jsonl
+      - data/source/users.json
+      - src/ingest/main.py
+      - src/ingest/collectors.py
+      - src/ingest/validation.py
+      - src/ingest/pyproject.toml
+      - src/ingest/uv.lock
+    outs:
+      - data/raw/threads.jsonl
+
+  preprocess:
+    cmd: uv run --directory src/preprocess python main.py
+    deps:
+      - data/raw/threads.jsonl
+      - data/source/users.json
+      - src/preprocess/main.py
+      - src/preprocess/cleaning.py
+      - src/preprocess/anonymize.py
+      - src/preprocess/pyproject.toml
+      - src/preprocess/uv.lock
+    outs:
+      - data/processed/messages.jsonl
+      - data/processed/manifest.json

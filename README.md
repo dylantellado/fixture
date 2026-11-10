@@ -64,8 +64,10 @@ web app logs the error type only. Remove the line to go back to the local classi
 ## Layout
 
 ```
-data/        data/source/ holds the data-v1 inputs (in git); data/eval/v1/ is the held-out classifier
-             test set (in git, never tune on it); everything else in data/ is local and git-ignored
+data/        data/source/ holds the data-v1 inputs (in DVC: `dvc pull`, see docs/data/versions.md);
+             data/eval/v1/ is the held-out classifier test set (in git, never tune on it);
+             everything else in data/ is local and git-ignored
+dvc.yaml     the data pipeline (ingest -> preprocess) for `dvc repro`; dvc.lock pins every hash
 docs/        data notes, evidence of pipeline runs, and the app mock-up
 experiments/ one-off experiments, e.g. gemini_baseline/ (Gemini labeling the training data)
 samples/     fake sample data checked into the repo
@@ -91,7 +93,15 @@ Each service under `src/` is its own [uv](https://docs.astral.sh/uv/) project wi
    cp .env.example .env
    ```
 
-2. Run the whole pipeline and app with one command. `GIT_COMMIT` is recorded in `data/processed/manifest.json`, so you can see which code produced the data. The input data (data-v1, see `docs/data/corpus_notes.md`) is already in `data/source/`:
+2. Get the data. It's versioned with DVC in our private bucket (setup and rules: [`docs/data/versions.md`](docs/data/versions.md)):
+
+   ```sh
+   uv tool install "dvc[gs]==3.67.1"
+   gcloud auth application-default login
+   dvc pull
+   ```
+
+3. Run the whole pipeline and app with one command. `GIT_COMMIT` is recorded in `data/processed/manifest.json`, so you can see which code produced the data. The input data (data-v1, see `docs/data/corpus_notes.md`) is now in `data/source/`:
 
    ```sh
    GIT_COMMIT=$(git rev-parse HEAD) docker compose up --build
@@ -132,6 +142,7 @@ What changed for the search side in Milestone 3 (Will: nothing changes in your f
 - **Chunks:** each message chunk now starts with the thread subject, sender, date and a `Replying to` excerpt of the previous message, and each thread gets its own chunk. Metadata gains `chunk_type`, `token_count`, and for thread chunks `message_ids`.
 - **Search:** still one user's collection only, still returns messages (never threads) in the same request/response shape. **`score` means something new:** `0.5 × the message's own similarity + 0.5 × its thread's` (definition under API below), no longer one chunk's cosine similarity. A collection built with another embedding model is refused (`503`, rerun rag).
 - **New rule rag depends on:** `messages.jsonl` lists each thread's messages in thread order (it already does).
+- **Data is in DVC (Will):** `data/source/` is no longer in git. Run `dvc pull` after cloning or checking out (needs gcloud application-default credentials). Paths, file shapes and ids don't change. `dvc repro` reruns `ingest` → `preprocess` and records every hash in `dvc.lock`; releases are git tags `data-vN` listed in [`docs/data/versions.md`](docs/data/versions.md).
 - Measurements: [`docs/evidence/retrieval_check.md`](docs/evidence/retrieval_check.md) and [`docs/evidence/rag_experiments.md`](docs/evidence/rag_experiments.md).
 
 ### Pipeline files
@@ -139,7 +150,7 @@ What changed for the search side in Milestone 3 (Will: nothing changes in your f
 | File | Written by | Contents |
 |------|------------|----------|
 | `data/source/users.json` | data generation | The fake users: a JSON list of `{"user_id", "name", "email"}`. |
-| `data/source/generated_threads.jsonl` | data generation | One JSON object per thread: `user_id`, `thread_id`, `subject`, `participants`, `messages` (each: `sender`, `recipients`, `timestamp`, `body`, `label`). `timestamp` is the email "Date" header format, e.g. `Tue, 13 Oct 2026 09:12:00 -0400`. Committed to git for now (data-v1, fictional, ~300 KB) so a fresh clone runs end to end; DVC will take over once its storage bucket exists. |
+| `data/source/generated_threads.jsonl` | data generation | One JSON object per thread: `user_id`, `thread_id`, `subject`, `participants`, `messages` (each: `sender`, `recipients`, `timestamp`, `body`, `label`). `timestamp` is the email "Date" header format, e.g. `Tue, 13 Oct 2026 09:12:00 -0400`. Versioned with DVC (data-v1, fictional, ~300 KB): `dvc pull` fetches it; releases are listed in [`docs/data/versions.md`](docs/data/versions.md). |
 | `data/source/annotations.jsonl` | labeling | One line per source message, keyed by `user_id`, `thread_id` and `position` (0-based index in the thread): `needs_response` (bool), the `rule` that set it, `rationale` and `rules_version`, following `docs/data/labeling_rules.md`. Not read by the pipeline; it is the ground truth for scoring `needs_response`. |
 | `data/raw/threads.jsonl` | `ingest` | Same shape as the source threads, validated and deduplicated, sorted by `(user_id, thread_id)`, with `user_id` kept. Adds `source` (`"generated"`) and `provenance` (`file`, `line`, `sha256` of the thread). |
 | `data/processed/messages.jsonl` | `preprocess` | One JSON object per message (schema below). This is what `rag` indexes. |
