@@ -90,7 +90,7 @@ curl -X POST http://localhost:8000/search \
 
 (`text` is shortened here; the full response is in `docs/evidence/api_search_response.json`.)
 
-`score` is the average of the message's similarity to the query and its thread's (each `1 - cosine distance`), rounded to 3 places. Higher means closer, and results come best first. `text` and `metadata` are exactly what `rag` stored for the message's best chunk: the first lines are the thread subject, sender and date, and on a reply, `Replying to <sender>:` with the start of the previous email (context for search; the web app hides it).
+`score` is `0.5 × own + 0.5 × thread`, rounded to 3 places: `own` is the query's similarity (`1 - cosine distance`) to the message's best message chunk, `thread` its similarity to the best thread chunk containing the message (`own` if there is none); the weight is `THREAD_WEIGHT` in `message_search.py`. Higher means closer, and results come best first. It ranks one search's results; it isn't a raw cosine similarity or a calibrated threshold (the Data contract in the root README has the full definition). `text` and `metadata` are exactly what `rag` stored for the message's best chunk: the first lines are the thread subject, sender and date, and on a reply, `Replying to <sender>:` with the start of the previous email (context for search; the web app hides it).
 
 With a label filter:
 
