@@ -79,10 +79,13 @@ def test_real_rules_file_loads():
     assert "## Change log" not in text and "Not adopted" not in text and "Training data" not in text
 
 
+SOURCE_THREADS = prompt.REPO_ROOT / "data" / "source" / "generated_threads.jsonl"
+
+
 def training_message_ids() -> set[str]:
-    """Every training message_id (Data contract rule), from the committed data-v1 source threads."""
+    """Every training message_id (Data contract rule), from the data-v1 source threads (in DVC)."""
     ids = set()
-    with open(prompt.REPO_ROOT / "data" / "source" / "generated_threads.jsonl", encoding="utf-8") as f:
+    with open(SOURCE_THREADS, encoding="utf-8") as f:
         for line in f:
             thread = json.loads(line)
             for position in range(len(thread["messages"])):
@@ -91,22 +94,30 @@ def training_message_ids() -> set[str]:
     return ids
 
 
-def test_no_training_message_id_reaches_the_prompt():
-    # The rules file plus the training notes moved out of it in rules v1.3.
+def built_prompt() -> str:
+    rules_text, _ = prompt.load_rules()
+    return prompt.system_prompt(rules_text) + prompt.user_prompt([{"from": "a@example.com", "body": "hi"}], 0)
+
+
+def test_no_id_like_text_reaches_the_prompt():
+    # Needs no data, so it always runs. The rules file plus the training notes moved
+    # out of it in rules v1.3: every id-like string in them (e.g. training corrections)
+    # stays out, and so does anything that looks like a message id or an eval reference.
     full_rules = prompt.RULES_PATH.read_text(encoding="utf-8")
     full_rules += (prompt.RULES_PATH.parent / "training_conflicts.md").read_text(encoding="utf-8")
-    rules_text, _ = prompt.load_rules()
-    built = prompt.system_prompt(rules_text) + prompt.user_prompt([{"from": "a@example.com", "body": "hi"}], 0)
-
-    training_ids = training_message_ids()
-    assert len(training_ids) > 300  # the check really ran over the training set
-    assert not {i for i in training_ids if i in built}
-    # Every id-like string in those files (e.g. training corrections) stays out,
-    # and so does anything that looks like a message id or an eval message reference.
+    built = built_prompt()
     mentioned = set(re.findall(r"\b[0-9a-f]{16}\b", full_rules))
     assert mentioned and not {i for i in mentioned if i in built}
     assert not re.search(r"\b[0-9a-f]{16}\b", built)
     assert not re.search(r"eval_\d+/t\d+", built)
+
+
+@pytest.mark.skipif(not SOURCE_THREADS.exists(), reason="data/source not pulled: run dvc pull")
+def test_no_training_message_id_reaches_the_prompt():
+    # The real training set, so it needs the data (a fake set would check nothing).
+    training_ids = training_message_ids()
+    assert len(training_ids) > 300  # the check really ran over the training set
+    assert not {i for i in training_ids if i in built_prompt()}
 
 
 def test_system_prompt_has_instructions_then_rules():

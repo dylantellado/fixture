@@ -4,9 +4,9 @@
 # Git keeps only the small .dvc pointer files; `dvc pull` fetches the data.
 # See docs/data/versions.md.
 # `?*` rather than `*`: DVC's own ignore check reads `/data/*` as covering the
-# data/ folder itself, then never finds data/source.dvc. Same meaning for git.
+# data/ folder itself, then never finds the data/*.dvc pointers. Same meaning for git.
 /data/?*
-!/data/source.dvc
+!/data/*.dvc
 # The held-out classifier test set is committed too, except the writers'
 # drafts and the pipeline output made when checking it.
 !/data/eval/

@@ -4,34 +4,31 @@
 # every dep and out in dvc.lock. Committing dvc.lock together with the code is
 # what ties each data version to the exact code and inputs that made it.
 #
-# deps list the code that shapes the output (not tests or READMEs) plus each
-# service's pyproject.toml and uv.lock, so a library upgrade also reruns it.
+# Each stage depends on its whole service folder, so a new module, a
+# pyproject.toml / uv.lock / .python-version change, or any code edit reruns it.
+# .dvcignore leaves out what doesn't shape the data (tests, READMEs, .venv,
+# caches). A false rerun is harmless; a missed one would release old data with
+# new code. `uv run --locked` fails instead of rewriting uv.lock mid-run.
 # The rag job writes to ChromaDB, not to files, so it isn't a stage here.
 
 stages:
   ingest:
-    cmd: uv run --directory src/ingest python main.py
+    cmd: uv run --locked --directory src/ingest python main.py
     deps:
       - data/source/generated_threads.jsonl
       - data/source/users.json
-      - src/ingest/main.py
-      - src/ingest/collectors.py
-      - src/ingest/validation.py
-      - src/ingest/pyproject.toml
-      - src/ingest/uv.lock
+      - src/ingest
     outs:
       - data/raw/threads.jsonl
 
   preprocess:
-    cmd: uv run --directory src/preprocess python main.py
+    cmd: uv run --locked --directory src/preprocess python main.py
     deps:
       - data/raw/threads.jsonl
       - data/source/users.json
-      - src/preprocess/main.py
-      - src/preprocess/cleaning.py
-      - src/preprocess/anonymize.py
-      - src/preprocess/pyproject.toml
-      - src/preprocess/uv.lock
+      - src/preprocess
     outs:
+      # manifest.json holds only counts and hashes, so it is identical for identical
+      # inputs. run.json (time, commit) is written next to it but not tracked.
       - data/processed/messages.jsonl
       - data/processed/manifest.json

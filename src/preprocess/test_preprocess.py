@@ -112,7 +112,22 @@ def test_manifest_counts_add_up_and_hash_every_file(tmp_path):
     assert sum(counts["per_user"].values()) == counts["total"] == 4
     assert sum(counts["per_label"].values()) == counts["total"]
     assert set(manifest["sha256"]) == {"data/raw/threads.jsonl", "data/source/users.json", "data/processed/messages.jsonl"}
-    assert manifest["created_at"].endswith("Z") and manifest["git_commit"]
+    # Time and commit live in the untracked run.json, never in the DVC-tracked manifest.
+    assert "created_at" not in manifest and "git_commit" not in manifest
+    run_info = json.loads((tmp_path / "processed" / "run.json").read_text())
+    assert run_info["created_at"].endswith("Z") and run_info["run_from_commit"]
+    assert isinstance(run_info["dirty"], bool)
+
+
+def test_two_runs_write_a_byte_identical_manifest(tmp_path, monkeypatch):
+    setup_data(tmp_path)
+    monkeypatch.setenv("GIT_COMMIT", "aaaa")
+    run(tmp_path)
+    first = (tmp_path / "processed" / "manifest.json").read_bytes()
+    monkeypatch.setenv("GIT_COMMIT", "bbbb")  # a different commit and time must not change it
+    run(tmp_path)
+    assert (tmp_path / "processed" / "manifest.json").read_bytes() == first
+    assert json.loads((tmp_path / "processed" / "run.json").read_text())["run_from_commit"] == "bbbb"
 
 
 def test_missing_input_fails(tmp_path):
@@ -133,7 +148,7 @@ def test_bad_input_fails_and_keeps_previous_output(tmp_path):
 # --- Checks on the real corpus (skipped if it hasn't been generated / pulled) ---
 
 REAL = Path(__file__).resolve().parents[2] / "data" / "processed" / "messages.jsonl"
-needs_corpus = pytest.mark.skipif(not REAL.exists(), reason="run ingest and preprocess first (or dvc pull)")
+needs_corpus = pytest.mark.skipif(not REAL.exists(), reason="data/processed not pulled: run dvc pull")
 
 
 @needs_corpus

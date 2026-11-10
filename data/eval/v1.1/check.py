@@ -72,6 +72,14 @@ def read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
 
+
+def training_threads():
+    """The data-v1 training threads, which live in DVC: stop with a clear message if not pulled."""
+    path = REPO / "data" / "source" / "generated_threads.jsonl"
+    if not path.exists():
+        sys.exit("data/source/generated_threads.jsonl is missing: run dvc pull from the repo root")
+    return read_jsonl(path)
+
 # --- Names already used in the training corpus ---
 
 
@@ -106,7 +114,7 @@ def training_names() -> tuple[set[str], set[str]]:
     names are usually in the dictionary, so they aren't flagged on their own.
     """
     full_names, texts = set(), []
-    for thread in read_jsonl(REPO / "data" / "source" / "generated_threads.jsonl"):
+    for thread in training_threads():
         for person in thread["participants"]:
             name = person.split("<")[0].strip().strip('"')
             if name:
@@ -257,7 +265,7 @@ def closest_training_bodies(eval_bodies: list[tuple[str, str]], top: int = 5) ->
     quickly; difflib's ratio then measures that pair (0 = nothing shared, 1 = identical).
     """
     training = []
-    for thread in read_jsonl(REPO / "data" / "source" / "generated_threads.jsonl"):
+    for thread in training_threads():
         for position, message in enumerate(thread["messages"]):
             text = normalize(message["body"])
             training.append((f"{thread['user_id']}/{thread['thread_id']} msg {position}", text, shingles(text)))
