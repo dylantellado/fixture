@@ -1,89 +1,100 @@
-"""Calling the classifier locally (no auth) and on Cloud Run (ID token). No network."""
+"""The classifier client the drafter uses when a request has no label.
+
+classifier_client.py is an identical copy of src/frontend/classifier_client.py
+(the web app's, with the Cloud Run ID-token helper); its own tests live there.
+These check the copy is identical and that the drafter uses it as expected.
+No network: httpx and the token source are faked.
+"""
 
 import base64
 import json
 import time
+from pathlib import Path
 
 import httpx
 import pytest
+from fastapi.testclient import TestClient
+from google.auth.exceptions import RefreshError
 
 import classifier_client
-from classifier_client import ClassifierClient, ClassifierError, IdTokenSource
+import main
+import pipeline
+from conftest import FakeEmbedder, FakeGemini, base_request, offer_answer
 
-ANSWER = {"label": "proposed_times", "needs_response": True, "reason": "D2.", "model": "m", "rules_version": "1.5",
-          "latency_ms": 5}
-
-
-class FakePost:
-    def __init__(self, status=200, body=None, error=None):
-        self.status, self.body, self.error = status, body or ANSWER, error
-        self.calls = []
-
-    def __call__(self, url, json=None, headers=None, timeout=None):
-        self.calls.append({"url": url, "json": json, "headers": headers})
-        if self.error:
-            raise self.error
-        return httpx.Response(self.status, json=self.body)
+HERE = Path(__file__).resolve().parent
+CLOUD_RUN = "https://fixture-classifier-test.us-east1.run.app"
+LABEL = {"label": "new_request", "needs_response": True, "reason": "D1.", "model": "m", "rules_version": "1.5",
+         "latency_ms": 5}
 
 
-def jwt(exp: float) -> str:
-    payload = base64.urlsafe_b64encode(json.dumps({"exp": exp}).encode()).decode().rstrip("=")
-    return f"header.{payload}.signature"
+def test_same_file_as_the_web_apps_copy():
+    frontend = HERE.parent / "frontend" / "classifier_client.py"
+    assert (HERE / "classifier_client.py").read_text() == frontend.read_text(), \
+        "src/drafter/classifier_client.py must stay identical to src/frontend/classifier_client.py"
 
 
-def test_local_classifier_gets_no_token():
-    post = FakePost()
-    client = ClassifierClient("http://localhost:8002", post=post)
-    assert client.classify([{"from": "a", "body": "b"}], 0, "m1") == ANSWER
-    assert post.calls[0]["url"] == "http://localhost:8002/classify"
-    assert post.calls[0]["headers"] == {}
-    assert post.calls[0]["json"] == {"thread": [{"from": "a", "body": "b"}], "target_index": 0, "message_id": "m1"}
+def fake_jwt(expires_at: float) -> str:
+    def part(data: dict) -> str:
+        return base64.urlsafe_b64encode(json.dumps(data).encode()).decode().rstrip("=")
+    return f"{part({'alg': 'RS256'})}.{part({'exp': int(expires_at)})}.c2ln"
 
 
-def test_cloud_run_classifier_gets_an_id_token(monkeypatch):
-    fetches = []
-    token = jwt(time.time() + 3600)
-    monkeypatch.setattr(IdTokenSource, "_fetch", lambda self: fetches.append(self.audience) or token)
-    post = FakePost()
-    client = ClassifierClient("https://fixture-classifier-123.us-east1.run.app/", post=post)
-    client.classify([{}], 0)
-    client.classify([{}], 0)
-    assert post.calls[0]["headers"] == {"Authorization": f"Bearer {token}"}
-    assert fetches == ["https://fixture-classifier-123.us-east1.run.app"]  # fetched once, then reused
+@pytest.fixture
+def server(monkeypatch):
+    """Fake classifier: records each request's URL and headers."""
+    requests = []
+
+    def post(url, json=None, headers=None, timeout=None):
+        requests.append({"url": url, "headers": dict(headers or {}), "json": json})
+        return httpx.Response(200, json=LABEL, request=httpx.Request("POST", url))
+
+    monkeypatch.setattr(classifier_client.httpx, "post", post)
+    monkeypatch.setattr(classifier_client, "_token", {"audience": None, "value": None, "expires_at": 0.0})
+    return requests
 
 
-def test_expiring_token_is_refreshed(monkeypatch):
-    tokens = iter([jwt(time.time() + 60), jwt(time.time() + 3600)])
-    monkeypatch.setattr(IdTokenSource, "_fetch", lambda self: next(tokens))
-    source = IdTokenSource("https://x.run.app")
-    first = source.token()
-    assert source.token() != first  # under 5 minutes left: fetched again
+def draft_without_label(monkeypatch, url):
+    """POST /draft with no classification, using the real classifier_client module."""
+    monkeypatch.setenv("CLASSIFIER_URL", url)
+    deps = pipeline.Deps(gemini=FakeGemini(offer_answer("S2", "S4", labels=[
+        "Wed, Nov 11, 10:00–10:30 AM EST", "Thu, Nov 12, 10:00–10:30 AM EST"])), embedder=FakeEmbedder(),
+        classifier=classifier_client, model="gemini-test", embedding_model="embedding-test")
+    main.app.dependency_overrides[main.get_deps] = lambda: deps
+    request = base_request()
+    del request["classification"]
+    try:
+        return TestClient(main.app).post("/draft", json=request).json()
+    finally:
+        main.app.dependency_overrides.clear()
 
 
-def test_auth_can_be_forced_or_turned_off():
-    assert ClassifierClient("http://classifier:8002", auth="id_token").tokens is not None
-    assert ClassifierClient("https://x.run.app", auth="none").tokens is None
+def test_local_classifier_is_called_without_a_token(server, monkeypatch):
+    body = draft_without_label(monkeypatch, "http://localhost:8002")
+    assert body["status"] == "drafted" and body["usage"]["classifier_called"] is True
+    assert server[0]["url"] == "http://localhost:8002/classify" and "Authorization" not in server[0]["headers"]
+    assert server[0]["json"]["target_index"] == 0 and server[0]["json"]["message_id"] == "test-message"
 
 
-@pytest.mark.parametrize("post, message", [
-    (FakePost(error=httpx.ConnectError("refused")), "unreachable"),
-    (FakePost(status=503), "returned 503"),
-    (FakePost(body={"detail": "x"}), "missing its label"),
-])
-def test_failures_raise_classifier_error(post, message):
-    with pytest.raises(ClassifierError, match=message):
-        ClassifierClient("http://localhost:8002", post=post).classify([{}], 0)
+def test_cloud_run_classifier_gets_an_id_token(server, monkeypatch):
+    token = fake_jwt(time.time() + 3600)
+    monkeypatch.setattr(classifier_client, "_fetch_id_token", lambda audience: token)
+    body = draft_without_label(monkeypatch, CLOUD_RUN)
+    assert body["status"] == "drafted"
+    assert server[0]["url"] == f"{CLOUD_RUN}/classify"
+    assert server[0]["headers"]["Authorization"] == f"Bearer {token}"
 
 
-def test_token_failure_is_a_classifier_error(monkeypatch):
-    def broken(self):
-        raise RuntimeError("no credentials")
-    monkeypatch.setattr(IdTokenSource, "_fetch", broken)
-    with pytest.raises(ClassifierError, match="identity token"):
-        ClassifierClient("https://x.run.app", post=FakePost()).classify([{}], 0)
+def test_no_token_means_classifier_unavailable_and_no_request(server, monkeypatch):
+    def expired(audience):
+        raise RefreshError("expired login")
+    monkeypatch.setattr(classifier_client, "_fetch_id_token", expired)
+    body = draft_without_label(monkeypatch, CLOUD_RUN)
+    assert body["status"] == "error" and body["error_type"] == "classifier_unavailable"
+    assert server == []  # nothing sent without a token
 
 
-def test_from_env(monkeypatch):
-    monkeypatch.setenv("CLASSIFIER_URL", "https://y.run.app")
-    monkeypatch.setenv("CLASSIFIER_AUTH", "auto")
-    assert classifier_client.from_env().tokens is not None
+def test_a_partial_answer_is_not_used(monkeypatch):
+    monkeypatch.setattr(classifier_client.httpx, "post", lambda url, **kwargs: httpx.Response(
+        200, json={"detail": "odd"}, request=httpx.Request("POST", url)))
+    body = draft_without_label(monkeypatch, "http://localhost:8002")
+    assert body["status"] == "error" and body["error_type"] == "classifier_unavailable"

@@ -16,8 +16,8 @@ Settings (environment variables):
     GEMINI_THINKING_BUDGET    max thinking tokens per draft, default 512
     EMBEDDING_MODEL           default "gemini-embedding-001"
     EMBEDDING_LOCATION        default "us-central1"
-    CLASSIFIER_URL            default http://localhost:8002 (https = Cloud Run, sent with an ID token)
-    CLASSIFIER_AUTH           auto (default), id_token or none
+    CLASSIFIER_URL            default http://localhost:8002; an https URL (Cloud Run) is called with
+                              a Google ID token (classifier_client.py, shared with the web app)
     PORT                      only read by the Docker image's start command (Cloud Run sets 8080)
 
 Privacy: email text goes to Vertex AI in our own GCP project and is never
@@ -51,11 +51,10 @@ THINKING_BUDGET = int(os.environ.get("GEMINI_THINKING_BUDGET", "512"))
 EMBEDDING_MODEL = os.environ.get("EMBEDDING_MODEL", "gemini-embedding-001")
 EMBEDDING_LOCATION = os.environ.get("EMBEDDING_LOCATION", "us-central1")
 
-classifier = classifier_client.from_env()
 deps = pipeline.Deps(
     gemini=GeminiClient(MODEL, PROJECT, LOCATION, THINKING_BUDGET),
     embedder=VertexEmbedder(EMBEDDING_MODEL, PROJECT, EMBEDDING_LOCATION),
-    classifier=classifier,
+    classifier=classifier_client,  # the module: classify() reads CLASSIFIER_URL on every call
     model=MODEL,
     embedding_model=EMBEDDING_MODEL,
     rules_store=NoStoredRules(),  # SWAP LATER: per-user settings (see rules.py)
@@ -65,7 +64,8 @@ log.info("drafter starting: model=%s rules_version=%s", MODEL, DEFAULTS["version
          extra={"fields": {"event": "startup", "model": MODEL, "project": PROJECT, "location": LOCATION,
                            "thinking_budget": THINKING_BUDGET, "embedding_model": EMBEDDING_MODEL,
                            "rules_version": DEFAULTS["version"],
-                           "classifier_url_kind": "cloud_run" if classifier.tokens else "plain_http"}})
+                           "classifier_url_kind": "https_id_token" if classifier_client.classifier_url()
+                           .startswith("https://") else "plain_http"}})
 
 app = FastAPI(title="Fixture drafter")
 

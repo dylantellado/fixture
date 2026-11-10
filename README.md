@@ -41,6 +41,34 @@ New in MS3 as well: the [`drafter`](src/drafter/README.md) service and the dashb
 reply** button ([below](#draft-reply)). The drafter's image is Cloud Run-ready but not deployed;
 it runs locally and in Docker Compose.
 
+### Use the deployed classifier
+
+The dashboard uses the local classifier by default. To label emails with the one on Cloud Run:
+
+1. Sign in once with a Google account that has `roles/run.invoker` on the service (project owners have it):
+   ```sh
+   gcloud auth application-default login
+   ```
+2. Add this line to `.env` at the repo root (see `.env.example`):
+   ```sh
+   CLASSIFIER_URL=https://fixture-classifier-622192804476.us-east1.run.app
+   ```
+3. Start the web app as usual: `uv run uvicorn main:app --port 8501 --reload` in `src/frontend`, or
+   `docker compose up --build` (which mounts `~/.config/gcloud` read-only into the frontend).
+
+For an `https` URL, `src/frontend/classifier_client.py` sends a Google ID token with every request.
+It comes from your application-default credentials: refreshing your gcloud login returns one
+(its audience is gcloud's client id, which Cloud Run accepts, as with `gcloud auth print-identity-token`);
+a service account would instead get one for the service URL. The token is cached until 5 minutes
+before it expires (they last an hour), then fetched again. `http` URLs (local, Docker's `classifier`) get none.
+With no token (never signed in, expired login, offline) or a `403` from Cloud Run (no
+`roles/run.invoker`), the dashboard shows keyword tags and its "isn't reachable" notice, and the
+web app logs the error type only. Remove the line to go back to the local classifier.
+
+The [drafter](src/drafter/README.md) reads the same `CLASSIFIER_URL` (from your shell when run
+with `uv run`, from `.env` in Docker Compose) for the emails it has to classify itself, through
+an identical copy of `classifier_client.py` (a test in each service checks they stay the same).
+
 ## Layout
 
 ```

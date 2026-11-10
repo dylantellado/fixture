@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 import logs
 import main
 import pipeline
-from classifier_client import ClassifierError
+from classifier_client import ClassifierUnavailable
 from conftest import FakeClassifier, FakeEmbedder, FakeGemini, base_request, offer_answer
 from gemini import GeminiError
 
@@ -100,7 +100,7 @@ def test_upstream_failures_log_no_secrets(caplog, kwargs):
 def test_classifier_failure_logs_no_secrets(caplog):
     request = secret_request()
     del request["classification"]
-    _, lines, raw = capture(caplog, request, classifier=FakeClassifier(error=ClassifierError("returned 503")))
+    _, lines, raw = capture(caplog, request, classifier=FakeClassifier(error=ClassifierUnavailable("returned 503")))
     assert_no_secrets(raw)
     assert draft_line(lines)["error_type"] == "classifier_unavailable"
 

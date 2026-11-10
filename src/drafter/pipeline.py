@@ -28,7 +28,7 @@ import checker
 import context as context_module
 import draft
 import slots
-from classifier_client import ClassifierError
+from classifier_client import ClassifierUnavailable
 from gemini import GeminiError
 from rules import NoStoredRules, RulesStore, describe, rules_for
 from schemas import DraftRequest
@@ -47,7 +47,7 @@ class Deps:
 
     gemini: object  # .generate_json(system, user, schema, temperature) -> (dict, usage)
     embedder: object  # .embed(texts, task_type) -> (vectors, tokens)
-    classifier: object | None  # .classify(thread, target_index, message_id) -> dict
+    classifier: object | None  # .classify(thread, target_index, message_id) -> dict (classifier_client)
     model: str
     embedding_model: str
     rules_store: RulesStore = NoStoredRules()
@@ -119,8 +119,12 @@ def run(request: DraftRequest, deps: Deps) -> dict:
         call_started = time.perf_counter()
         try:
             classification = deps.classifier.classify(thread, target_index, request.message_id)
-        except ClassifierError as error:
-            return finish("error", "classifier_unavailable", f"Couldn't classify the email: {error}.")
+            # classifier_client returns the classifier's JSON as is; never act on a partial answer.
+            if classification.get("label") not in draft.LABELS or not isinstance(
+                    classification.get("needs_response"), bool):
+                raise ClassifierUnavailable("classifier answer is missing its label")
+        except ClassifierUnavailable as error:
+            return finish("error", "classifier_unavailable", f"Couldn't classify the email ({error}).")
         finally:
             fields["classify_ms"] = round((time.perf_counter() - call_started) * 1000)
         response["usage"]["classifier_called"] = True

@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 import main
 import pipeline
-from classifier_client import ClassifierError
+from classifier_client import ClassifierUnavailable
 from conftest import FakeClassifier, FakeEmbedder, FakeGemini, base_request, offer_answer
 from gemini import GeminiError
 
@@ -118,7 +118,7 @@ def test_missing_classification_asks_the_classifier():
 def test_classifier_failure_is_an_error():
     request = base_request()
     del request["classification"]
-    body = post(request, classifier=FakeClassifier(error=ClassifierError("classifier returned 503"))).json()
+    body = post(request, classifier=FakeClassifier(error=ClassifierUnavailable("classifier returned 503"))).json()
     assert body["status"] == "error" and body["error_type"] == "classifier_unavailable"
 
 

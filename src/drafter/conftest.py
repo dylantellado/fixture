@@ -69,6 +69,8 @@ class FakeEmbedder:
 
 
 class FakeClassifier:
+    """Stands in for the classifier_client module (its classify function)."""
+
     def __init__(self, answer=None, error=None):
         self.answer = answer or {"label": "new_request", "needs_response": True, "reason": "D1."}
         self.error = error

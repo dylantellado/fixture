@@ -142,7 +142,9 @@ services:
       - GEMINI_THINKING_BUDGET=${DRAFTER_THINKING_BUDGET:-512}
       - EMBEDDING_MODEL=${EMBEDDING_MODEL:-gemini-embedding-001}
       - EMBEDDING_LOCATION=${EMBEDDING_LOCATION:-us-central1}
-      - CLASSIFIER_URL=http://classifier:8002
+      # Like the frontend: the classifier service above, unless .env sets CLASSIFIER_URL (e.g. to
+      # Cloud Run; the request then carries an ID token from the mounted gcloud credentials).
+      - CLASSIFIER_URL=${CLASSIFIER_URL:-http://classifier:8002}
     ports:
       - "8003:8003"
     volumes:
@@ -162,7 +164,8 @@ services:
       - SECRETS_DIR=/run/secrets
       - DATA_DIR=/data
       - API_URL=http://api:8000
-      - CLASSIFIER_URL=http://classifier:8002
+      # The classifier service above, unless .env sets CLASSIFIER_URL (e.g. to Cloud Run).
+      - CLASSIFIER_URL=${CLASSIFIER_URL:-http://classifier:8002}
       - DRAFTER_URL=http://drafter:8003
     ports:
       - "8501:8501"
@@ -172,6 +175,8 @@ services:
     volumes:
       - ./secrets:/run/secrets:ro
       - ./data:/data
+      # gcloud credentials for the ID token the Cloud Run classifier requires (unused for the local one).
+      - ~/.config/gcloud:/root/.config/gcloud:ro
 
 volumes:
   chroma_data:   # ChromaDB's stored collections

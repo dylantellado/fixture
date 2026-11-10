@@ -221,7 +221,7 @@ overrides when any apply (`1.0+3f9a1c2e`). To change a default, edit the JSON an
 | `context.py`, `embeddings.py` | Ranking past emails with Vertex AI embeddings. |
 | `draft.py`, `gemini.py` | The prompt, the Gemini call (retries on rate limits), parsing the answer. |
 | `checker.py`, `mentions.py` | The checks, and the date/time scanner they use. |
-| `classifier_client.py` | Calls the classifier: plain HTTP locally, with a Google ID token on Cloud Run. |
+| `classifier_client.py` | Calls the classifier: plain HTTP locally, with a Google ID token on Cloud Run. An identical copy of the web app's `src/frontend/classifier_client.py` (a test in each service checks); change both together. |
 | `logs.py` | Structured JSON logs with an allow-list of fields (same format as the classifier). |
 | `scenarios/scenarios.json`, `run_scenarios.py` | 16 fake scenarios run against the real models; writes [`docs/evidence/ms3/draft_scenarios.md`](../../docs/evidence/ms3/draft_scenarios.md). |
 | `examples/new_request.json` | The fake request above. |
@@ -236,17 +236,21 @@ overrides when any apply (`1.0+3f9a1c2e`). To change a default, edit the JSON an
 | `GEMINI_MODEL` | `gemini-3.8-flash` | Same as the classifier. |
 | `GEMINI_THINKING_BUDGET` | `512` | Max thinking tokens per call (in Docker Compose: `DRAFTER_THINKING_BUDGET`). The scenarios used 0. |
 | `EMBEDDING_MODEL`, `EMBEDDING_LOCATION` | `gemini-embedding-001`, `us-central1` | Same as rag and the api. |
-| `CLASSIFIER_URL` | `http://localhost:8002` | Docker: `http://classifier:8002`. An `https://` URL (Cloud Run) is called with a Google ID token. |
-| `CLASSIFIER_AUTH` | `auto` | `auto` (ID token for https), `id_token` or `none`. |
+| `CLASSIFIER_URL` | `http://localhost:8002` | Docker: `http://classifier:8002`, or the `.env` value (the same setting as the web app's). An `https://` URL (Cloud Run) is called with a Google ID token. |
 | `PORT` | `8003` | Only read by the Docker image's start command (Cloud Run sets 8080). |
 
 Credentials are Google application-default credentials (`gcloud auth application-default login`).
 
 **Calling the classifier on Cloud Run.** With `CLASSIFIER_URL=https://fixture-classifier-622192804476.us-east1.run.app`,
-each call carries an ID token. On Cloud Run it comes from the metadata server for the
-classifier's URL; locally, from your gcloud user credentials (the same kind of token `gcloud
-auth print-identity-token` prints). Either way the identity needs `roles/run.invoker` on the
-classifier (a project owner already has it).
+each call carries a Google ID token, from the same helper the web app uses
+([`classifier_client.py`](classifier_client.py), copied from `src/frontend`; see the root
+README's "Use the deployed classifier"). Locally it comes from your gcloud login (the kind of
+token `gcloud auth print-identity-token` prints); a service account (e.g. the drafter on Cloud
+Run) gets one for the classifier's URL. Tokens are cached until 5 minutes before they expire.
+The identity needs `roles/run.invoker` on the classifier (project owners have it). With no
+token, or a `403`, the draft comes back as `status: "error"`, `error_type:
+"classifier_unavailable"`; the web app avoids this case for emails it has already labeled by
+sending the cached label.
 
 ## Run it
 
@@ -257,7 +261,7 @@ GOOGLE_CLOUD_PROJECT=fixture-ac215-96dhbm uv run uvicorn main:app --port 8003 --
 curl http://localhost:8003/health
 curl -s -X POST http://localhost:8003/draft -H "Content-Type: application/json" -d @examples/new_request.json
 
-uv run pytest                                   # 135 tests, no network
+uv run pytest                                   # 131 tests, no network
 uv run python run_scenarios.py                  # 16 fake scenarios against the real models (~5 cents)
 ```
 
