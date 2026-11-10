@@ -1,2 +1,12 @@
 .venv/
 __pycache__/
+.pytest_cache/
+# Only the code the service runs goes into the image.
+test_*.py
+conftest.py
+README.md
+deploy.sh
+cloud/
+Dockerfile
+.dockerignore
+examples/

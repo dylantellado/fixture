@@ -2,6 +2,8 @@
 
 Proof that the pipeline runs end to end, with real inputs and outputs.
 
+Milestone 3 (the classifier on Cloud Run, with monitoring) is in [`ms3/`](ms3/README.md).
+
 ## Milestone 3: Vertex AI embeddings and thread context
 
 From a TF comment on Milestone 2 ("fix the 4 queries with no answer in the top 5 ... one chunk per message ranks short replies low, so try thread context"). `rag` now embeds with Vertex AI `gemini-embedding-001` and indexes message chunks with thread context plus one chunk per thread; search still returns messages.

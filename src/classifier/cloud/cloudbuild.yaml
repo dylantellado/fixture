@@ -1,0 +1,12 @@
+# Cloud Build config used by ../deploy.sh: build the image from the folder made by
+# build_context.sh and push it to Artifact Registry. _IMAGE is set by deploy.sh
+# (e.g. us-east1-docker.pkg.dev/fixture-ac215-96dhbm/fixture/classifier:<git commit>).
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "--tag", "${_IMAGE}", "."]
+images:
+  - "${_IMAGE}"
+options:
+  # Build logs go to Cloud Logging only (required when building as our own service
+  # account, which has no access to a logs bucket).
+  logging: CLOUD_LOGGING_ONLY

@@ -19,6 +19,24 @@ Where each Milestone 2 requirement lives in this repo:
 | Mock-up and app skeleton | [`docs/mockup/`](docs/mockup/README.md) (screens, Milestone 1 wireframe, what changed). Working skeleton: [`src/frontend`](src/frontend) (search and "How it works" pages) calling [`src/api`](src/api/README.md) (`GET /users`, `POST /search`). |
 | Tests | `uv run pytest` in each service folder under `src/`. |
 
+## MS3: deployment and monitoring
+
+The `classifier` (labels one email with Gemini) runs on **Cloud Run**:
+https://fixture-classifier-622192804476.us-east1.run.app (project `fixture-ac215-96dhbm`,
+region `us-east1`). It requires authentication: a project owner grants a person
+`roles/run.invoker`, and that person sends `Authorization: Bearer $(gcloud auth print-identity-token)`.
+Details: [`src/classifier/README.md`](src/classifier/README.md#deployed-service-cloud-run).
+
+| Requirement | Where |
+|---|---|
+| Serverless deployment, redeploy steps | `src/classifier/deploy.sh`: one command builds the image with Cloud Build and deploys it (first time: `cloud/setup.sh`). It runs as its own service account (Vertex AI user + log writer only), scales 0 to 2 instances, and the image has the exact `docs/data/labeling_rules.md` from the deployed commit inside. See [Deploy and redeploy](src/classifier/README.md#deploy-and-redeploy). |
+| Monitoring | Structured JSON logs in Cloud Logging (one line per request: label, latency, tokens, errors; never email text), three log-based metrics, a dashboard (requests, error rate, p50/p95 latency, instances), an authenticated uptime check on `/health` and an error-rate email alert, all created by `src/classifier/cloud/monitoring.sh`. See [Monitoring](src/classifier/README.md#monitoring). |
+| Documented, tested API with examples | [`src/classifier/README.md`](src/classifier/README.md#endpoints) (endpoints, JSON, local and deployed examples, auth), fake requests in [`src/classifier/examples/`](src/classifier/examples/), tests in `src/classifier/test_*.py`. |
+| Deployed service answering curl | [`docs/evidence/ms3/cloud_run_curl.md`](docs/evidence/ms3/cloud_run_curl.md) (exact commands and responses), screenshots and cost in [`docs/evidence/ms3/`](docs/evidence/ms3/README.md). |
+
+Cost: about $0.003 per classified email (Gemini is ~98% of it; $0.006 from 2027), about $3 a
+month at low usage, $0 when idle.
+
 ## Layout
 
 ```
@@ -205,7 +223,7 @@ Labels:
 Labels live Gmail emails for the web app; it doesn't read the pipeline's files. Details and examples: `src/classifier/README.md`.
 
 - `GET /health` → `{"status": "ok", "model": "gemini-3.8-flash", "rules_version": "1.5"}`. `rules_version` comes from `docs/data/labeling_rules.md`.
-- `POST /classify` with `{"thread": [{"from", "date", "subject", "body", "to"?, "from_user"?}], "target_index": int, "message_id"?: str}` returns `{"label", "needs_response", "reason", "model", "rules_version", "latency_ms"}`. `label` is one of the six labels above. Earlier messages are context; messages after `target_index` are ignored. Errors (`422`, `502`, `503`) never include a label.
+- `POST /classify` with `{"thread": [{"from", "date", "subject", "body", "to"?, "from_user"?}], "target_index": int, "message_id"?: str}` returns `{"label", "needs_response", "reason", "model", "rules_version", "latency_ms"}`. `label` is one of the six labels above. Earlier messages are context; messages after `target_index` are ignored. Errors (`422`, `502`, `503`, `500`) never include a label.
 - The web app caches answers in `data/fixture.db` (table `classifications`), keyed by account (sha256 of the signed-in email) and Gmail message id, classifies again when `rules_version` changes, and deletes the account's rows on sign-out.
 - The prompt includes `docs/data/labeling_rules.md` except its "Not adopted" and "Change log" sections (`docs/data/training_conflicts.md` is never sent); the classifier won't start if one of those headings is missing, so moving a section means updating `EXCLUDED_SECTIONS` in `src/classifier/prompt.py`.
 

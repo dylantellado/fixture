@@ -1,8 +1,6 @@
 """Tests for the classifier API and the Gemini wrapper. Gemini is never called:
 /classify gets a fake labeler, and the wrapper tests use fake errors."""
 
-import logging
-
 import httpx
 import pytest
 from fastapi.testclient import TestClient
@@ -96,12 +94,17 @@ def test_failures_return_an_error_never_a_label(error, status):
     assert response.json()["detail"].startswith("classification failed")
 
 
-def test_logs_never_contain_email_text(fake, caplog):
-    with caplog.at_level(logging.INFO, logger="classifier"):
-        client.post("/classify", json={"thread": THREAD, "target_index": 0, "message_id": "abc123"})
-    logged = caplog.text
-    assert "message_id=abc123" in logged and "label=new_request" in logged
-    assert "SECRET-BODY-TEXT" not in logged and "Coffee chat" not in logged
+def test_unexpected_errors_return_500_never_a_label():
+    main.app.dependency_overrides[main.get_labeler] = lambda: FakeLabeler(error=RuntimeError("bug"))
+    try:
+        response = client.post("/classify", json={"thread": THREAD, "target_index": 0})
+    finally:
+        main.app.dependency_overrides.clear()
+    assert response.status_code == 500
+    assert response.json() == {"detail": "classification failed: internal error"}
+
+
+# Structured logging, and that no email text ever reaches a log, is tested in test_logs.py.
 
 
 # --- gemini.py ----------------------------------------------------------------
@@ -219,6 +222,19 @@ def test_labeler_turns_permanent_api_error_into_error():
     with pytest.raises(gemini.GeminiError) as raised:
         labeler_with(api_error(404)).label("s", "u")
     assert raised.value.status == 502
+    assert raised.value.kind == "api_error" and raised.value.code == 404
+
+
+def test_labeler_names_rate_limits_and_bad_answers(monkeypatch):
+    # The error kind goes into the logs and the error metric (error_type).
+    retry_without_waiting = gemini.with_retries
+    monkeypatch.setattr(gemini, "with_retries", lambda call: retry_without_waiting(call, sleep=lambda _: None))
+    with pytest.raises(gemini.GeminiError) as raised:
+        labeler_with(api_error(429)).label("s", "u")
+    assert raised.value.kind == "rate_limited" and raised.value.status == 503
+    with pytest.raises(gemini.GeminiError) as raised:
+        labeler_with(FakeResponse("not json")).label("s", "u")
+    assert raised.value.kind == "invalid_answer" and raised.value.status == 502
 
 
 def test_labeler_without_project_fails_clearly():

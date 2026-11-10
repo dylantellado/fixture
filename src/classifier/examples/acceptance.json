@@ -1,0 +1,12 @@
+{
+  "message_id": "example-acceptance",
+  "thread": [
+    {"from": "Jordan Lee <jordan@example.com>", "date": "Tue, 13 Oct 2026 09:12:00 -0400",
+     "subject": "Coffee chat?", "body": "Could we find 20 minutes next week?"},
+    {"from": "Sam <sam@example.edu>", "date": "Tue, 13 Oct 2026 10:00:00 -0400",
+     "subject": "Re: Coffee chat?", "body": "Sure, Tue 2-4 or Wed after 1.", "from_user": true},
+    {"from": "Jordan Lee <jordan@example.com>", "date": "Tue, 13 Oct 2026 11:30:00 -0400",
+     "subject": "Re: Coffee chat?", "body": "Tuesday at 2:30 works, see you then. Zoom or in person?"}
+  ],
+  "target_index": 2
+}
