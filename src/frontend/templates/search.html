@@ -104,7 +104,7 @@
         <h3 class="result-subject">{{ r.subject }}</h3>
         <p class="result-snippet">{{ r.snippet }}</p>
         <div class="result-foot">
-          <span class="match" title="Similarity: 1 − cosine distance. Higher means a closer match.">
+          <span class="match" title="How close this email is to your question, averaged with how close its whole thread is (cosine similarity). Higher means a closer match.">
             <span class="match-bar" aria-hidden="true"><span style="width: {{ r.strength }}%"></span></span>
             Match {{ r.score }}
           </span>
@@ -136,7 +136,7 @@
   </section>
   {% endif %}
 
-  <p class="footnote">Results are ranked by meaning with all-MiniLM-L6-v2 embeddings. Email addresses and phone numbers are anonymized (e.g. EMAIL_003), and senders without a display name show that placeholder. <a href="/about">How it works</a></p>
+  <p class="footnote">Results are ranked by meaning with Vertex AI embeddings (gemini-embedding-001), using each email and its thread. Email addresses and phone numbers are anonymized (e.g. EMAIL_003), and senders without a display name show that placeholder. <a href="/about">How it works</a></p>
 </main>
 
 <script>

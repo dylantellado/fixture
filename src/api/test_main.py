@@ -5,6 +5,7 @@ app.dependency_overrides, backed by a fake client or Chroma's in-memory client.
 """
 
 import socket
+from pathlib import Path
 
 import chromadb
 import pytest
@@ -14,6 +15,7 @@ from fastapi.testclient import TestClient
 
 import chroma_store
 from chroma_store import MessageStore
+from embeddings import EmbeddingError, VertexEmbeddingFunction
 from main import app, get_store
 
 client = TestClient(app)
@@ -34,21 +36,11 @@ def reset_overrides():
 
 
 class FakeCollection:
-    """Stands in for a Chroma collection. query() returns canned results,
-    deliberately NOT in best-first order, and remembers what it was asked."""
+    """Stands in for a Chroma collection in tests that only need its name and metadata."""
 
     def __init__(self, name, metadata=None):
         self.name = name
         self.metadata = metadata
-        self.last_query = None
-
-    def query(self, **kwargs):
-        self.last_query = kwargs
-        return {
-            "documents": [["far", "close", "middle"]],
-            "metadatas": [[{"message_id": "a"}, {"message_id": "b"}, {"message_id": "c"}]],
-            "distances": [[0.9, 0.12345, 0.5]],
-        }
 
 
 class FakeClient:
@@ -71,14 +63,19 @@ class FakeClient:
 class KeywordEmbedding(EmbeddingFunction):
     """A tiny, deterministic embedding for tests: one dimension per keyword.
 
-    Avoids downloading the real model; it only needs to make related texts
-    land close together.
+    Stands in for Vertex AI (no network in tests); it only needs to make
+    related texts land close together. `queries` records every query embedded.
     """
 
     KEYWORDS = ["interview", "coffee", "reschedule", "dentist"]
+    model = "keyword-test"
 
     def __init__(self):
-        pass
+        self.queries = []
+
+    def embed_query(self, input):
+        self.queries.extend(input)
+        return self(input)
 
     def __call__(self, input: Documents) -> Embeddings:
         # The trailing 1.0 keeps every vector non-zero (cosine needs a length).
@@ -145,47 +142,166 @@ def test_unknown_or_malformed_user_returns_400(user_id):
 # --- Search results ----------------------------------------------------------------
 
 
-def test_search_response_shape_and_best_first_order():
-    collection = FakeCollection("messages_user_01")
-    store, fake = fake_store(collection)
-    use_store(store)
+def add_mailbox(chroma, user_id, messages, model="keyword-test"):
+    """Index a tiny mailbox the way rag does: one chunk per message
+    (chunk_type "message") and one chunk per thread (chunk_type "thread"),
+    with vectors computed up front and the model recorded in the metadata.
 
-    response = client.post("/search", json={"user_id": "user_01", "query": "interview", "k": 3})
+    messages: (message_id, thread_id, label, text) tuples.
+    """
+    embed = KeywordEmbedding()
+    collection = chroma.create_collection(
+        f"messages_{user_id}",
+        embedding_function=None,  # like rag: Chroma never embeds by itself
+        configuration={"hnsw": {"space": "cosine"}},  # same distance as rag
+        metadata={"user_name": user_id, "indexed_at": "2026-10-20T00:00:00+00:00", "embedding_model": model},
+    )
+    threads = {}
+    for mid, tid, _, text in messages:
+        threads.setdefault(tid, []).append((mid, text))
+    chunks = [
+        (f"{mid}-0", text, {"chunk_type": "message", "message_id": mid, "thread_id": tid, "user_id": user_id, "label": label})
+        for mid, tid, label, text in messages
+    ] + [
+        (f"thread-{tid}-0", " ".join(text for _, text in items),
+         {"chunk_type": "thread", "thread_id": tid, "user_id": user_id, "message_ids": ",".join(mid for mid, _ in items)})
+        for tid, items in threads.items()
+    ]
+    collection.add(
+        ids=[c[0] for c in chunks],
+        documents=[c[1] for c in chunks],
+        embeddings=embed([c[1] for c in chunks]),
+        metadatas=[c[2] for c in chunks],
+    )
+    return collection
+
+
+@pytest.fixture
+def chroma():
+    """An empty in-memory ChromaDB (in-memory clients share data within one process)."""
+    client = chromadb.EphemeralClient()
+    for c in client.list_collections():
+        client.delete_collection(c.name)
+    yield client
+    for c in client.list_collections():
+        client.delete_collection(c.name)
+
+
+def in_memory_store(chroma) -> MessageStore:
+    return MessageStore(client_factory=lambda: chroma, embedding_function=KeywordEmbedding())
+
+
+def test_search_response_shape_and_best_first_order(chroma):
+    add_mailbox(chroma, "user_01", [
+        ("m1", "t1", "new_request", "Interview next week?"),
+        ("m2", "t2", "none", "Dentist reminder"),
+        ("m3", "t3", "reschedule", "Can we reschedule the interview?"),
+    ])
+    use_store(in_memory_store(chroma))
+
+    response = client.post("/search", json={"user_id": "user_01", "query": "reschedule my interview", "k": 3})
 
     assert response.status_code == 200
     body = response.json()
     assert body["user_id"] == "user_01"
-    assert body["query"] == "interview"
-    # score = 1 - distance, rounded to 3 places, best first.
-    assert body["results"] == [
-        {"text": "close", "score": 0.877, "metadata": {"message_id": "b"}},
-        {"text": "middle", "score": 0.5, "metadata": {"message_id": "c"}},
-        {"text": "far", "score": 0.1, "metadata": {"message_id": "a"}},
-    ]
-    # Only the requested user's collection was opened, and k was passed through.
-    assert fake.opened == ["messages_user_01"]
-    assert collection.last_query["n_results"] == 3
-    assert collection.last_query["where"] is None
+    assert body["query"] == "reschedule my interview"
+    results = body["results"]
+    assert [set(r) for r in results] == [{"text", "score", "metadata"}] * 3
+    assert results[0]["metadata"]["message_id"] == "m3"  # matches both keywords
+    scores = [r["score"] for r in results]
+    assert scores == sorted(scores, reverse=True)  # best first
+    assert all(round(s, 3) == s for s in scores)  # rounded to 3 places
 
 
-def test_label_filter_is_passed_to_chroma():
-    collection = FakeCollection("messages_user_01")
-    store, _ = fake_store(collection)
+def test_results_are_messages_never_threads(chroma):
+    add_mailbox(chroma, "user_01", [
+        ("m1", "t1", "proposed_times", "Interview options: Tuesday or Friday"),
+        ("m2", "t1", "acceptance", "Friday works"),
+    ])
+    use_store(in_memory_store(chroma))
+
+    results = client.post("/search", json={"user_id": "user_01", "query": "interview", "k": 20}).json()["results"]
+
+    assert sorted(r["metadata"]["message_id"] for r in results) == ["m1", "m2"]  # each message once
+    assert all(r["metadata"]["chunk_type"] == "message" for r in results)
+
+
+def test_label_filter_limits_results(chroma):
+    add_mailbox(chroma, "user_01", [
+        ("m1", "t1", "new_request", "Interview next week?"),
+        ("m2", "t1", "reschedule", "Can we reschedule the interview?"),
+    ])
+    use_store(in_memory_store(chroma))
+
+    response = client.post("/search", json={"user_id": "user_01", "query": "interview", "label": "reschedule"})
+
+    assert [r["metadata"]["message_id"] for r in response.json()["results"]] == ["m2"]
+
+
+def test_default_k_is_5(chroma):
+    add_mailbox(chroma, "user_01", [(f"m{i}", f"t{i}", "none", f"interview {i}") for i in range(8)])
+    use_store(in_memory_store(chroma))
+
+    response = client.post("/search", json={"user_id": "user_01", "query": "interview"})
+
+    assert len(response.json()["results"]) == 5
+
+
+def test_index_built_with_another_model_is_refused(chroma):
+    add_mailbox(chroma, "user_01", [("m1", "t1", "none", "interview")], model="all-MiniLM-L6-v2")
+    embedding = KeywordEmbedding()
+    use_store(MessageStore(client_factory=lambda: chroma, embedding_function=embedding))
+
+    response = client.post("/search", json={"user_id": "user_01", "query": "interview"})
+
+    assert response.status_code == 503
+    assert "all-MiniLM-L6-v2" in response.json()["detail"]
+    assert "Rerun rag" in response.json()["detail"]
+    assert embedding.queries == []  # refused before the query was sent anywhere
+
+
+def test_vertex_failure_returns_503(chroma):
+    add_mailbox(chroma, "user_01", [("m1", "t1", "none", "interview")])
+
+    class Unavailable(KeywordEmbedding):
+        def embed_query(self, input):
+            raise EmbeddingError("Couldn't embed 1 text(s) with keyword-test: Vertex AI returned 429")
+
+    use_store(MessageStore(client_factory=lambda: chroma, embedding_function=Unavailable()))
+
+    response = client.post("/search", json={"user_id": "user_01", "query": "interview"})
+
+    assert response.status_code == 503
+    assert "429" in response.json()["detail"]
+    assert client.get("/health").status_code == 200  # the API itself stays up
+
+
+def test_unknown_user_never_reaches_vertex(chroma):
+    embedding = KeywordEmbedding()
+    use_store(MessageStore(client_factory=lambda: chroma, embedding_function=embedding))
+    assert client.post("/search", json={"user_id": "user_42", "query": "interview"}).status_code == 400
+    assert embedding.queries == []
+
+
+def test_query_is_embedded_once_as_a_query(chroma):
+    add_mailbox(chroma, "user_01", [("m1", "t1", "none", "interview")])
+    embedding = KeywordEmbedding()
+    use_store(MessageStore(client_factory=lambda: chroma, embedding_function=embedding))
+    client.post("/search", json={"user_id": "user_01", "query": "interview tips"})
+    assert embedding.queries == ["interview tips"]
+
+
+def test_default_store_uses_vertex_without_connecting_at_startup():
+    store = MessageStore()
+    assert isinstance(store.embedding_function, VertexEmbeddingFunction)
+    assert store.embedding_function._client is None  # created on first search, not at startup
+
+
+def test_search_opens_only_the_requested_collection():
+    store, fake = fake_store(FakeCollection("messages_user_01"), FakeCollection("messages_user_02"))
     use_store(store)
-
-    client.post("/search", json={"user_id": "user_01", "query": "x", "label": "reschedule"})
-
-    assert collection.last_query["where"] == {"label": "reschedule"}
-
-
-def test_default_k_is_5():
-    collection = FakeCollection("messages_user_01")
-    store, _ = fake_store(collection)
-    use_store(store)
-
-    client.post("/search", json={"user_id": "user_01", "query": "x"})
-
-    assert collection.last_query["n_results"] == 5
+    client.post("/search", json={"user_id": "user_03", "query": "interview"})
+    assert fake.opened == ["messages_user_03"]
 
 
 # --- Users ---------------------------------------------------------------------
@@ -240,33 +356,17 @@ def test_chroma_down_returns_503(monkeypatch):
 
 
 @pytest.fixture
-def two_user_chroma():
-    """An in-memory ChromaDB with two users who both email the same contact,
-    Jordan Lee, about an interview."""
-    chroma = chromadb.EphemeralClient()
-    # In-memory clients share data within one process, so start clean.
-    for c in chroma.list_collections():
-        chroma.delete_collection(c.name)
-
-    mailboxes = {
-        "user_01": ["Jordan Lee: interview Tuesday at 2:30 for Priya", "Dentist reminder for Priya"],
-        "user_02": ["Jordan Lee: interview Friday at 10:00 for Marcus", "Coffee chat with Marcus's mentor"],
-    }
-    for user_id, texts in mailboxes.items():
-        collection = chroma.create_collection(
-            f"messages_{user_id}",
-            embedding_function=KeywordEmbedding(),
-            configuration={"hnsw": {"space": "cosine"}},  # same distance as rag
-            metadata={"user_name": user_id, "indexed_at": "2026-10-20T00:00:00+00:00"},
-        )
-        collection.add(
-            ids=[f"{user_id}-{i}" for i in range(len(texts))],
-            documents=texts,
-            metadatas=[{"user_id": user_id, "sender_name": "Jordan Lee", "label": "none"} for _ in texts],
-        )
-    yield chroma
-    for c in chroma.list_collections():
-        chroma.delete_collection(c.name)
+def two_user_chroma(chroma):
+    """Two users who both email the same contact, Jordan Lee, about an interview."""
+    add_mailbox(chroma, "user_01", [
+        ("u1m1", "t001", "none", "Jordan Lee: interview Tuesday at 2:30 for Priya"),
+        ("u1m2", "t002", "none", "Dentist reminder for Priya"),
+    ])
+    add_mailbox(chroma, "user_02", [
+        ("u2m1", "t001", "none", "Jordan Lee: interview Friday at 10:00 for Marcus"),
+        ("u2m2", "t002", "none", "Coffee chat with Marcus's mentor"),
+    ])
+    return chroma
 
 
 def test_search_never_returns_another_users_messages(two_user_chroma):
@@ -282,6 +382,37 @@ def test_search_never_returns_another_users_messages(two_user_chroma):
         results = response.json()["results"]
         assert len(results) == 2  # only this user's two messages, nothing else
         assert all(r["metadata"]["user_id"] == user_id for r in results)
+        assert all(r["metadata"]["message_id"].startswith(user_id.replace("user_0", "u")) for r in results)
         assert all(first_name in r["text"] for r in results)
         # The shared-contact interview message is still the top hit.
         assert "interview" in results[0]["text"]
+
+
+def test_message_search_matches_the_rag_copy():
+    """message_search.py is copied from src/rag; the two must never drift."""
+    here = Path(__file__).resolve().parent
+    rag_copy = here.parent / "rag" / "message_search.py"
+    if not rag_copy.exists():
+        pytest.skip("src/rag is not next to this service (e.g. inside a container)")
+    assert (here / "message_search.py").read_text() == rag_copy.read_text()
+
+
+def test_embeddings_matches_the_rag_copy():
+    """embeddings.py is copied from src/rag; the two must never drift."""
+    here = Path(__file__).resolve().parent
+    rag_copy = here.parent / "rag" / "embeddings.py"
+    if not rag_copy.exists():
+        pytest.skip("src/rag is not next to this service (e.g. inside a container)")
+    assert (here / "embeddings.py").read_text() == rag_copy.read_text()
+
+
+def test_no_code_uses_chromas_default_onnx_embedder():
+    """Vertex AI is the only embedder: no api source file may use Chroma's
+    default embedding function (the local all-MiniLM-L6-v2 ONNX model)."""
+    here = Path(__file__).resolve().parent
+    for path in here.glob("*.py"):
+        if path.name.startswith("test_"):
+            continue
+        text = path.read_text()
+        for banned in ("DefaultEmbeddingFunction", "ONNXMiniLM", "onnxruntime", "embedding_functions"):
+            assert banned not in text, f"{path.name} mentions {banned}"

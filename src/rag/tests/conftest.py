@@ -13,17 +13,33 @@ from helpers import SAMPLES_DIR
 
 
 class FakeEmbeddingFunction(EmbeddingFunction[Documents]):
-    """A tiny, deterministic stand-in for MiniLM so tests run fast and offline.
+    """A tiny, deterministic stand-in for Vertex AI so tests run fast and offline.
 
     Each word is hashed into one of 64 slots and counted (a "bag of words"),
     then the vector is scaled to length 1. Texts that share words point in
-    similar directions, which is enough to test search behavior.
+    similar directions, which is enough to test search behavior. It has the
+    same methods rag uses on the real one (embeddings.VertexEmbeddingFunction).
     """
 
     DIMENSIONS = 64
+    model = "fake-bag-of-words"
+    token_limit = 2048
 
     def __init__(self) -> None:
         pass
+
+    def embed_documents(self, texts):
+        """(vectors, token counts); one "token" per word."""
+        return self(texts), [len(text.split()) for text in texts]
+
+    def collection_metadata(self, dimension):
+        return {
+            "embedding_model": self.model,
+            "embedding_dimension": dimension,
+            "embedding_task_document": "RETRIEVAL_DOCUMENT",
+            "embedding_task_query": "RETRIEVAL_QUERY",
+            "embedding_token_limit": self.token_limit,
+        }
 
     def __call__(self, input: Documents) -> Embeddings:
         vectors = []
@@ -37,7 +53,7 @@ class FakeEmbeddingFunction(EmbeddingFunction[Documents]):
                     vector[slot] += 1.0
             length = math.sqrt(sum(x * x for x in vector)) or 1.0
             vectors.append([x / length for x in vector])
-        return vectors
+        return [list(map(float, v)) for v in vectors]
 
     # Chroma 1.x stores the embedding function's name and config with the collection.
     @staticmethod

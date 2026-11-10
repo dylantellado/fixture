@@ -1,0 +1,44 @@
+# Milestone 3 pipeline rerun: ingest -> preprocess -> rag (Vertex AI embeddings + thread context)
+# Run locally with uv at commit 4379eb1 on 2026-11-09T20:09Z, ChromaDB 1.5.9 on localhost:8011.
+# Logs hold counts, hashes, timings and model ids only, never email text.
+
+## ingest
+2026-11-09 15:09:27,595 INFO ingest: read <repo>/data/source/users.json sha256=f112d23c2a62c3b3e803f300aad3bf4dfdcbcb61f174b5e47366cefc4c92dc0c
+2026-11-09 15:09:27,596 INFO ingest: read <repo>/data/source/generated_threads.jsonl sha256=ac3d48f401d409989eb05f18951a9ab67fa106ee2be48c37f61e03870c37ef00
+2026-11-09 15:09:27,627 INFO ingest: users: 4
+2026-11-09 15:09:27,627 INFO ingest:   user_01: 40 threads, 100 messages
+2026-11-09 15:09:27,627 INFO ingest:   user_02: 40 threads, 97 messages
+2026-11-09 15:09:27,627 INFO ingest:   user_03: 40 threads, 90 messages
+2026-11-09 15:09:27,627 INFO ingest:   user_04: 40 threads, 90 messages
+2026-11-09 15:09:27,627 INFO ingest: total: 160 threads, 377 messages (dropped 0 duplicate threads, 0 duplicate messages)
+2026-11-09 15:09:27,627 INFO ingest: wrote <repo>/data/raw/threads.jsonl sha256=42555b9ff677534e106967c5a7436c02d4778335825e8f3f7ca1d861fdfc39ad
+
+## preprocess
+2026-11-09 15:09:27,671 INFO preprocess: read <repo>/data/raw/threads.jsonl sha256=42555b9ff677534e106967c5a7436c02d4778335825e8f3f7ca1d861fdfc39ad
+2026-11-09 15:09:27,672 INFO preprocess: read <repo>/data/source/users.json sha256=f112d23c2a62c3b3e803f300aad3bf4dfdcbcb61f174b5e47366cefc4c92dc0c
+2026-11-09 15:09:27,747 INFO preprocess:   user_01: 100 messages
+2026-11-09 15:09:27,747 INFO preprocess:   user_02: 97 messages
+2026-11-09 15:09:27,747 INFO preprocess:   user_03: 90 messages
+2026-11-09 15:09:27,747 INFO preprocess:   user_04: 90 messages
+2026-11-09 15:09:27,747 INFO preprocess: total: 377 messages in 160 threads
+2026-11-09 15:09:27,747 INFO preprocess: labels: {'acceptance': 105, 'assistant_handoff': 10, 'new_request': 51, 'none': 92, 'proposed_times': 78, 'reschedule': 41}
+2026-11-09 15:09:27,747 INFO preprocess: wrote <repo>/data/processed/messages.jsonl sha256=542030285fec8bb8d062dfcb7d15e8dd68f631a334953512a84087e501449087
+2026-11-09 15:09:27,747 INFO preprocess: wrote <repo>/data/processed/manifest.json (git_commit=4379eb168faccd7f8cb04ccf024ee4802be7c801)
+
+## rag
+2026-11-09 15:09:28,393 INFO Input messages: <repo>/data/processed/messages.jsonl (sha256 542030285fec8bb8d062dfcb7d15e8dd68f631a334953512a84087e501449087)
+2026-11-09 15:09:28,393 INFO Input users:    <repo>/data/source/users.json
+2026-11-09 15:09:28,395 INFO Validated 377 messages for 4 users
+2026-11-09 15:09:28,395 INFO Manifest: git_commit=4379eb168faccd7f8cb04ccf024ee4802be7c801 created_at=2026-11-09T20:09:27Z
+2026-11-09 15:09:28,398 INFO User user_01: 100 messages -> 140 chunks
+2026-11-09 15:09:28,398 INFO User user_02: 97 messages -> 137 chunks
+2026-11-09 15:09:28,398 INFO User user_03: 90 messages -> 130 chunks
+2026-11-09 15:09:28,398 INFO User user_04: 90 messages -> 130 chunks
+2026-11-09 15:09:48,083 INFO Embedded 537 chunks with gemini-embedding-001 (dimension 3072, 96947 tokens) in 19.7 s
+2026-11-09 15:09:48,084 INFO Chunks over the 2048-token limit: 0
+2026-11-09 15:09:48,157 INFO Connected to ChromaDB at localhost:8011
+2026-11-09 15:09:48,850 INFO Collection messages_user_01: 140 chunks
+2026-11-09 15:09:48,850 INFO Collection messages_user_02: 137 chunks
+2026-11-09 15:09:48,850 INFO Collection messages_user_03: 130 chunks
+2026-11-09 15:09:48,850 INFO Collection messages_user_04: 130 chunks
+2026-11-09 15:09:48,850 INFO Indexing finished in 20.5 s

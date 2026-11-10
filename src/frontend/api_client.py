@@ -79,10 +79,11 @@ def is_healthy() -> bool:
 
 # --- Formatting for the page ---
 
-# rag puts a small header ("From: ...", "Subject: ...", "Date: ...") at the
-# top of each chunk's text. The page shows those fields separately, so the
-# snippet skips them.
-HEADER_LINE = re.compile(r"^(From|To|Subject|Date):.*$")
+# rag puts a small header ("Subject: ...", "From: ...", "Date: ...") at the
+# top of each chunk's text, plus "Replying to <sender>: <start of the previous
+# email>" on replies (context for search, not part of this email). The page
+# shows the fields separately, so the snippet and full text skip all of them.
+HEADER_LINE = re.compile(r"^(?:(?:From|To|Subject|Date):|Replying to ).*$")
 SNIPPET_LENGTH = 280
 
 

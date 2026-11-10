@@ -5,6 +5,7 @@ description = "rag service"
 requires-python = ">=3.12"
 dependencies = [
     "chromadb==1.5.9",
+    "google-genai>=2.34.0,<3",
 ]
 
 [dependency-groups]
