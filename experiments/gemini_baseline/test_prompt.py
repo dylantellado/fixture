@@ -75,7 +75,7 @@ def training_ids():
     """message_id of every training message, from the annotations (no processed data needed)."""
     with open(REPO_ROOT / "data" / "source" / "annotations.jsonl", encoding="utf-8") as f:
         rows = [json.loads(line) for line in f if line.strip()]
-    return {message_id(r["user_id"], r["thread_id"], r["position"]) for r in rows}
+    return {message_id(r["user_id"], r["thread_id"], r["position"]) for r in rows if r["user_id"] in TRAINING_USERS}
 
 
 def eval_ids():

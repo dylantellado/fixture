@@ -1,0 +1,80 @@
+# Generated mailbox owners (data-v2). All fictional; addresses use reserved
+# example domains. user_01 to user_04 are data-v1 (hand-planned, see
+# docs/data/generation/) and are not regenerated.
+#
+# split: "train" users may be used to tune prompts and rules; "eval" users are
+# held out and must never be used for tuning (see docs/data/versions.md).
+# life_context drives which counterparts and purposes come up, the dates, and
+# the user's time zone.
+
+- user_id: user_05
+  name: Daniel Kim
+  email: daniel.kim@example.com
+  split: train
+  life_context: Junior on campus mid-semester, CS major, applying to summer internships.
+  timezone: America/New_York
+  start: 2026-10-05
+  counterparts: {professor: 3, ta: 2, advisor: 2, recruiter: 4, alum: 3, classmate: 3, club: 2, vendor: 1, system: 2, group: 3, landlord: 1, doctor: 1}
+
+- user_id: user_06
+  name: Amara Nwosu
+  email: amara.nwosu@example.com
+  split: train
+  life_context: Senior in finals week then winter break at home in Houston, interviewing for full-time jobs.
+  timezone: America/Chicago
+  start: 2026-12-07
+  counterparts: {professor: 2, advisor: 1, recruiter: 5, hiring_manager: 3, alum: 2, family: 2, friend: 2, doctor: 1, system: 2, group: 2, vendor: 1}
+
+- user_id: user_07
+  name: Mateo Herrera
+  email: mateo.herrera@example.com
+  split: train
+  life_context: Junior studying abroad in Madrid for the fall; home school and recruiters are on US Eastern time.
+  timezone: Europe/Madrid
+  start: 2026-10-12
+  counterparts: {professor: 2, advisor: 3, recruiter: 3, alum: 2, classmate: 2, landlord: 2, family: 2, friend: 2, system: 2, group: 2, vendor: 1}
+
+- user_id: user_08
+  name: Grace Liu
+  email: grace.liu@example.com
+  split: train
+  life_context: Rising senior on a summer internship in San Francisco (fixed 9-5), also planning fall research.
+  timezone: America/Los_Angeles
+  start: 2026-07-06
+  counterparts: {manager: 4, coworker: 3, research_pi: 2, recruiter: 2, alum: 2, friend: 2, landlord: 1, system: 2, group: 2, vendor: 1}
+
+- user_id: user_09
+  name: Omar Haddad
+  email: omar.haddad@example.com
+  split: train
+  life_context: Second-year PhD student and TA; schedules sections, office hours, lab meetings and conference travel.
+  timezone: America/New_York
+  start: 2026-11-02
+  counterparts: {research_pi: 3, student: 4, ta: 2, professor: 2, coworker: 1, recruiter: 1, system: 2, group: 3, doctor: 1}
+
+- user_id: user_10
+  name: Jasmine Carter
+  email: jasmine.carter@example.com
+  split: train
+  life_context: Community college student transferring next fall, works part-time shifts at a cafe.
+  timezone: America/Denver
+  start: 2026-09-21
+  counterparts: {advisor: 3, professor: 2, manager: 3, coworker: 3, admissions: 3, family: 1, doctor: 2, system: 2, group: 2, vendor: 1}
+
+- user_id: user_11
+  name: Lucas Moreau
+  email: lucas.moreau@example.com
+  split: eval
+  life_context: Sophomore varsity rower; practice and travel meets fill the calendar; looking for a research assistant job.
+  timezone: America/New_York
+  start: 2026-10-19
+  counterparts: {coach: 3, professor: 3, ta: 2, research_pi: 3, advisor: 2, classmate: 2, friend: 2, system: 2, group: 3, vendor: 1}
+
+- user_id: user_12
+  name: Priyanka Rao
+  email: priyanka.rao@example.com
+  split: eval
+  life_context: Recent graduate in her first job in Seattle, networking toward a career switch and planning grad school visits.
+  timezone: America/Los_Angeles
+  start: 2026-11-16
+  counterparts: {manager: 3, coworker: 2, alum: 4, recruiter: 3, admissions: 3, friend: 2, landlord: 1, doctor: 1, system: 2, group: 2, vendor: 1}

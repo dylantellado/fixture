@@ -1,0 +1,8 @@
+# Settings that shape the data. DVC records them in dvc.lock, so every data
+# version says exactly which settings made it. Change one, then `dvc repro`.
+
+generate:
+  seed: 2026              # every scenario is rebuilt exactly from this seed and the card files
+  threads_per_user: 30    # threads for each user in src/generate/cards/users.yaml
+  model: claude-opus-5-5  # the writer (never the classifier's model family, so we don't grade Gemini on Gemini)
+  effort: medium

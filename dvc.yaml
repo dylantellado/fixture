@@ -1,14 +1,52 @@
 # Data pipeline, run with `dvc repro` from the repo root (see docs/data/versions.md).
 #
-# DVC reruns a stage only when one of its deps changed, and records the hash of
-# every dep and out in dvc.lock. Committing dvc.lock together with the code is
-# what ties each data version to the exact code and inputs that made it.
+#   data/base/  (data-v1, tracked by data/base.dvc)
+#   generate    cards + params -> Claude writes threads -> data/generated/
+#   assemble    data/base + data/generated -> data/source/ (what ingest reads; Data contract)
+#   ingest      data/source -> data/raw/threads.jsonl
+#   preprocess  data/raw -> data/processed/messages.jsonl
+#
+# DVC reruns a stage only when one of its deps or params changed, and records
+# the hash of every dep and out in dvc.lock. Committing dvc.lock together with
+# the code ties each data version to the exact code, settings and inputs.
 #
 # deps list the code that shapes the output (not tests or READMEs) plus each
 # service's pyproject.toml and uv.lock, so a library upgrade also reruns it.
-# The rag job writes to ChromaDB, not to files, so it isn't a stage here.
+# generate also caches every Claude write in data/cache/generate/, so a rerun
+# only pays for threads whose prompt actually changed. It needs
+# ANTHROPIC_API_KEY. The rag job writes to ChromaDB, not to files, so it isn't
+# a stage here.
 
 stages:
+  generate:
+    cmd: >-
+      uv run --directory src/generate python main.py generate
+      --seed ${generate.seed} --threads-per-user ${generate.threads_per_user}
+      --model ${generate.model} --effort ${generate.effort}
+    deps:
+      - src/generate/main.py
+      - src/generate/acts.py
+      - src/generate/sampler.py
+      - src/generate/times.py
+      - src/generate/writer.py
+      - src/generate/mess.py
+      - src/generate/cards
+      - src/generate/pyproject.toml
+      - src/generate/uv.lock
+    params:
+      - generate
+    outs:
+      - data/generated
+
+  assemble:
+    cmd: uv run --directory src/generate python main.py assemble
+    deps:
+      - data/base
+      - data/generated
+      - src/generate/main.py
+    outs:
+      - data/source
+
   ingest:
     cmd: uv run --directory src/ingest python main.py
     deps:

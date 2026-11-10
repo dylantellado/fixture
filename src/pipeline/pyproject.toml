@@ -1,0 +1,15 @@
+[project]
+name = "pipeline"
+version = "0.1.0"
+description = "Vertex AI pipeline: assemble -> ingest -> preprocess -> evaluate (W&B)"
+requires-python = ">=3.12"
+dependencies = [
+    "google-cloud-aiplatform>=2.7.0",
+    "kfp>=2.18.0",
+]
+
+[dependency-groups]
+dev = [
+    "functions-framework>=3.10.2",
+    "pytest>=9.2.0",
+]

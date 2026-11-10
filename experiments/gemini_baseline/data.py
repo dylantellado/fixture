@@ -102,13 +102,15 @@ def load_training(
     messages = read_jsonl(messages_path)
     annotations = read_jsonl(annotations_path)
     with open(users_path, encoding="utf-8") as f:
-        owners = {u["user_id"]: u["name"] for u in json.load(f)}
+        owners = {u["user_id"]: u["name"] for u in json.load(f) if u["user_id"] in TRAINING_USERS}
 
-    # Check every user_id before using anything.
+    # Check every user_id before using anything. Since data-v2 the files also hold
+    # generated users (user_05 and up, src/generate); this baseline keeps scoring
+    # data-v1 only, so it reads TRAINING_USERS and leaves the rest out.
     for record in [*messages, *annotations]:
         refuse_eval_user(record["user_id"])
-        if record["user_id"] not in TRAINING_USERS:
-            raise DataError(f"unexpected user {record['user_id']!r}: only {TRAINING_USERS} are training users")
+    messages = [m for m in messages if m["user_id"] in TRAINING_USERS]
+    annotations = [a for a in annotations if a["user_id"] in TRAINING_USERS]
 
     # Annotations are keyed by (user_id, thread_id, position); messages by message_id.
     by_id = {}

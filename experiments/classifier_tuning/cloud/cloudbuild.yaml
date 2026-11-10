@@ -1,0 +1,8 @@
+# Build an image from the folder build_image.sh makes, and push it.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "--tag", "${_IMAGE}", "--file", "${_DOCKERFILE}", "."]
+images:
+  - "${_IMAGE}"
+options:
+  logging: CLOUD_LOGGING_ONLY
