@@ -4,6 +4,7 @@
 #   api                           starts after rag finishes
 #   frontend                      starts after api is healthy
 #   classifier                    independent; the frontend falls back to keyword tags while it's down
+#   drafter                       independent; "Draft reply" shows an error while it's down
 #
 # Each service is owned by one person (see CLAUDE.md); edit only your own.
 
@@ -125,6 +126,33 @@ services:
       timeout: 3s
       retries: 20
 
+  # Drafts calendar-aware replies for the dashboard's "Draft reply" button (see src/drafter/README.md).
+  # Each request carries the thread, free/busy times and past emails; the drafter holds no Google
+  # user credentials and never reads Gmail or Calendar, sends email or writes to a calendar. It calls
+  # Gemini and embeddings on Vertex AI with your gcloud application-default credentials (mounted
+  # read-only), and the classifier when the web app has no cached label. Email text and drafts are
+  # never logged or saved.
+  drafter:
+    build: ./src/drafter
+    environment:
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-fixture-ac215-96dhbm}
+      - GOOGLE_CLOUD_LOCATION=${GOOGLE_CLOUD_LOCATION:-global}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.8-flash}
+      # Its own variable, so the classifier's GEMINI_THINKING_BUDGET can't change it.
+      - GEMINI_THINKING_BUDGET=${DRAFTER_THINKING_BUDGET:-512}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-gemini-embedding-001}
+      - EMBEDDING_LOCATION=${EMBEDDING_LOCATION:-us-central1}
+      - CLASSIFIER_URL=http://classifier:8002
+    ports:
+      - "8003:8003"
+    volumes:
+      - ~/.config/gcloud:/root/.config/gcloud:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
   # --- Web app ---
 
   frontend:
@@ -135,6 +163,7 @@ services:
       - DATA_DIR=/data
       - API_URL=http://api:8000
       - CLASSIFIER_URL=http://classifier:8002
+      - DRAFTER_URL=http://drafter:8003
     ports:
       - "8501:8501"
     depends_on:
