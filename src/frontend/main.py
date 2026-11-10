@@ -1,5 +1,7 @@
 """Fixture demo web app: sign in with Google, then see your calendar and inbox,
-with each recent email labeled by the classifier service (Gemini).
+with each recent email labeled by the classifier service (Gemini). Emails that
+need a response get a "Draft reply" button (POST /api/draft-reply), which asks
+the drafter service for a calendar-aware reply; nothing is sent or saved.
 The /search page searches fake demo mailboxes through the Fixture API, and /about
 explains the pipeline with live status. Neither needs sign-in.
 
@@ -13,7 +15,7 @@ import sys
 from pathlib import Path
 
 from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from google.auth.exceptions import RefreshError
@@ -22,9 +24,12 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.errors import HttpError
 from dotenv import load_dotenv
+from pydantic import BaseModel, Field
 from starlette.middleware.sessions import SessionMiddleware
 
 import api_client
+import draft_inputs
+import drafter_client
 import google_data
 import live_labels
 from classification_cache import ClassificationCache
@@ -41,6 +46,7 @@ load_dotenv(REPO_ROOT / ".env")
 
 # Our own log lines (e.g. which message ids were classified) at INFO. Never log email text.
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+log = logging.getLogger("fixture")
 
 
 def require_env(name: str, how_to_generate: str) -> str:
@@ -270,6 +276,52 @@ def about_page(request: Request):
             # /health answers without ChromaDB; /users needs it.
             status["error"] = "The API is up, but its search database (ChromaDB) can't be reached."
     return templates.TemplateResponse(request, "about.html", {**nav_context(request, "about"), "status": status})
+
+
+# Gmail ids are hex today; allow the URL-safe characters Google could use, nothing else.
+GMAIL_ID = r"^[A-Za-z0-9_-]{1,64}$"
+
+# Messages for the draft panel when the reply couldn't be drafted at all.
+DRAFT_ERRORS = {
+    "signed_out": "Your Google sign-in expired. Reload the page and sign in again.",
+    "not_found": "That email isn't in its thread anymore. Reload the page and try again.",
+    "google": "Couldn't read your Gmail or Calendar just now. Try again in a moment.",
+    "drafter_down": "The drafter service isn't reachable. Check that it's running (port 8003), then try again.",
+}
+
+
+class DraftReplyRequest(BaseModel):
+    message_id: str = Field(pattern=GMAIL_ID)
+    thread_id: str = Field(pattern=GMAIL_ID)
+    regenerate: bool = False
+
+
+@app.post("/api/draft-reply")
+def draft_reply(request: Request, body: DraftReplyRequest):
+    """Draft a reply to one of the signed-in user's emails (the dashboard's "Draft reply" button).
+
+    Reads the thread, free/busy and past emails with the sender (read-only),
+    asks the drafter, and returns its answer as JSON. Nothing is sent, saved or
+    put in Gmail drafts. Errors come back as {"error": message} with an HTTP status.
+    """
+    creds = current_credentials(request)
+    if not creds:
+        return JSONResponse({"error": DRAFT_ERRORS["signed_out"]}, status_code=401)
+    email = request.session["email"]
+    profile = store.load_profile(email) or {}
+    # load_profile falls back to the address when Google gave no name; don't sign a draft with it.
+    name = profile.get("name") if profile.get("name") != email else ""
+    user = {"name": name or "", "email": email}
+    try:
+        return draft_inputs.draft_reply(creds, label_cache, user, body.message_id, body.thread_id, body.regenerate)
+    except LookupError:
+        return JSONResponse({"error": DRAFT_ERRORS["not_found"]}, status_code=404)
+    except HttpError as e:
+        log.warning("draft failed message_id=%s google_status=%s", body.message_id, e.resp.status)
+        return JSONResponse({"error": DRAFT_ERRORS["google"]}, status_code=502)
+    except drafter_client.DrafterUnavailable as e:
+        log.warning("draft failed message_id=%s drafter=%s", body.message_id, e)
+        return JSONResponse({"error": DRAFT_ERRORS["drafter_down"]}, status_code=503)
 
 
 @app.get("/auth/login")
