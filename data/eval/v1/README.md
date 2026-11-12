@@ -18,7 +18,7 @@ users and contacts, other writing styles, a later date range, and many hard nega
 | `threads.jsonl` | 140 threads, 298 messages, in the source-thread format from the Data contract. `label` is the final label. Nothing else is in it, so a classifier never sees the notes below. |
 | `annotations.jsonl` | One line per message, keyed by `user_id` + `thread_id` + `position` (0-based index in the thread): `writer_agent`, `category`, `difficulty` (easy/hard), `needs_response`, `intended_label` (writer), `labeler_label` (independent labeler), `final_label`, `rationale`, `rules_version` (the version of `docs/data/labeling_rules.md` the values follow) |
 | `changes_rules_v1.0.json`, `changes_rules_v1.1.json`, `changes_rules_v1.2.json` | Every change made when the set was re-checked against labeling rules v1.0, v1.1 and v1.2 (see below) |
-| `check.py` | Checks the set (format, rules below, counts, agreement, leakage). `python3 data/eval/v1/check.py final` |
+| `check.py` | Checks the set (format, rules below, counts, agreement, leakage). `python3 data/eval/v1/check.py final`. The leakage checks compare against the training data in DVC, so run `dvc pull` from the repo root first |
 | `build.py` | How the writers' drafts became the two files above (merge and renumber, apply labels, apply rule changes) |
 
 The writers' drafts (`work/`) and the pipeline output (`processed/`) stay local and are git-ignored.

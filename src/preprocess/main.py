@@ -5,7 +5,8 @@ Reads (see "Data contract" in the README):
   data/source/users.json     the users, so counts include every user
 Writes:
   data/processed/messages.jsonl   one message per line, contract schema
-  data/processed/manifest.json    counts, sha256 of inputs and outputs, provenance
+  data/processed/manifest.json    counts and sha256 of inputs and outputs (DVC-tracked, deterministic)
+  data/processed/run.json         when, and from which commit, this run happened (untracked)
 
 For each message: clean the body (cleaning.py), replace addresses and phone
 numbers with placeholders (anonymize.py), convert the timestamp to ISO 8601,
@@ -128,25 +129,42 @@ def write_atomically(path: Path, text: str) -> None:
         raise
 
 
-def git_commit() -> str:
-    """The code version: GIT_COMMIT from the environment (Docker), else ask git, else 'unknown'."""
+def run_from_commit() -> tuple[str, bool]:
+    """(commit the code was run from, whether there were uncommitted changes).
+
+    GIT_COMMIT from the environment (Docker has no git; dirty is then unknown and
+    reported False), else ask git, else ('unknown', False). This is only a hint for
+    people: dvc.lock is what ties a data version to its code (docs/data/versions.md).
+    """
     if os.environ.get("GIT_COMMIT"):
-        return os.environ["GIT_COMMIT"]
+        return os.environ["GIT_COMMIT"], False
+    here = Path(__file__).parent
     try:
-        result = subprocess.run(
-            ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True, cwd=Path(__file__).parent
-        )
-        return result.stdout.strip()
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True,
+                                cwd=here).stdout.strip()
+        status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, check=True,
+                                cwd=here).stdout
+        return commit, bool(status.strip())
     except (OSError, subprocess.CalledProcessError):
-        return "unknown"
+        return "unknown", False
+
+
+def build_run_info() -> dict:
+    """When and from which code this run happened. Written to run.json, which neither git
+    nor DVC tracks, so the tracked manifest stays identical for identical inputs."""
+    commit, dirty = run_from_commit()
+    return {"created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "run_from_commit": commit, "dirty": dirty}
 
 
 def build_manifest(records, users, inputs: dict[str, Path], outputs: dict[str, Path]) -> dict:
-    """Counts and fingerprints that tie this run's outputs to its inputs."""
+    """Counts and fingerprints that tie this run's outputs to its inputs.
+
+    Only what the inputs and code determine: two runs on the same inputs write a
+    byte-identical manifest (it is a DVC output). Time and commit go to run.json.
+    """
     per_user = Counter(r["user_id"] for r in records)
     return {
-        "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "git_commit": git_commit(),
         "counts": {
             "total": len(records),
             "per_user": {u["user_id"]: per_user[u["user_id"]] for u in users},
@@ -170,6 +188,7 @@ def run(data_dir: Path) -> int:
     users_path = data_dir / "source" / "users.json"
     messages_path = data_dir / "processed" / "messages.jsonl"
     manifest_path = data_dir / "processed" / "manifest.json"
+    run_info_path = data_dir / "processed" / "run.json"
 
     missing = [p for p in (threads_path, users_path) if not p.exists()]
     if missing:
@@ -202,13 +221,16 @@ def run(data_dir: Path) -> int:
         outputs={"data/processed/messages.jsonl": messages_path},
     )
     write_atomically(manifest_path, json.dumps(manifest, indent=2) + "\n")
+    run_info = build_run_info()
+    write_atomically(run_info_path, json.dumps(run_info, indent=2) + "\n")
 
     for user_id, count in manifest["counts"]["per_user"].items():
         log.info("  %s: %d messages", user_id, count)
     log.info("total: %d messages in %d threads", manifest["counts"]["total"], manifest["counts"]["threads"])
     log.info("labels: %s", manifest["counts"]["per_label"])
     log.info("wrote %s sha256=%s", messages_path, manifest["sha256"]["data/processed/messages.jsonl"])
-    log.info("wrote %s (git_commit=%s)", manifest_path, manifest["git_commit"])
+    log.info("wrote %s and %s (run_from_commit=%s, dirty=%s)", manifest_path, run_info_path,
+             run_info["run_from_commit"], run_info["dirty"])
     return 0
 
 

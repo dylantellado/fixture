@@ -1,7 +1,7 @@
 schema: '2.0'
 stages:
   ingest:
-    cmd: uv run --directory src/ingest python main.py
+    cmd: uv run --locked --directory src/ingest python main.py
     deps:
     - path: data/source/generated_threads.jsonl
       hash: md5
@@ -11,33 +11,18 @@ stages:
       hash: md5
       md5: 6927c9f02491245646e8f394c2a63ae1
       size: 1225
-    - path: src/ingest/collectors.py
+    - path: src/ingest
       hash: md5
-      md5: 96586997ed0966b8390c32c0e25120d3
-      size: 3045
-    - path: src/ingest/main.py
-      hash: md5
-      md5: f788c8861c6839e6cd90ba7f49d3106d
-      size: 7144
-    - path: src/ingest/pyproject.toml
-      hash: md5
-      md5: 0ebf53e51a39b712e82e28e80bf4130a
-      size: 249
-    - path: src/ingest/uv.lock
-      hash: md5
-      md5: 2769edbe1ad8f362ef02633014ceea39
-      size: 106803
-    - path: src/ingest/validation.py
-      hash: md5
-      md5: a5c88889cc9a09652a55151a7d4935b4
-      size: 5726
+      md5: 43f39e9789285c107de7a792534a2314.dir
+      size: 132869
+      nfiles: 11
     outs:
     - path: data/raw/threads.jsonl
       hash: md5
       md5: 34f9e9f8f008bbc393bef8fa2567ea13
       size: 840867
   preprocess:
-    cmd: uv run --directory src/preprocess python main.py
+    cmd: uv run --locked --directory src/preprocess python main.py
     deps:
     - path: data/raw/threads.jsonl
       hash: md5
@@ -47,76 +32,29 @@ stages:
       hash: md5
       md5: 6927c9f02491245646e8f394c2a63ae1
       size: 1225
-    - path: src/preprocess/anonymize.py
+    - path: src/preprocess
       hash: md5
-      md5: 6e9dd7a1ebbb40d9a8f3b75545924934
-      size: 3400
-    - path: src/preprocess/cleaning.py
-      hash: md5
-      md5: 925cb50902c18e00c83aa72fbf0976b6
-      size: 5883
-    - path: src/preprocess/main.py
-      hash: md5
-      md5: 08b829e0c931c430442ee3e4c246672a
-      size: 9507
-    - path: src/preprocess/pyproject.toml
-      hash: md5
-      md5: b77ce4fa4bf056ad496304f296796a02
-      size: 180
-    - path: src/preprocess/uv.lock
-      hash: md5
-      md5: a9fffcd64bf2ecd299f09ce6a76e2999
-      size: 4652
+      md5: a61e8d40f7fa158da7d6b5cc00fbde01.dir
+      size: 25432
+      nfiles: 8
     outs:
     - path: data/processed/manifest.json
       hash: md5
-      md5: cac878c4b97fa40a2292e0b331c1bccc
-      size: 934
+      md5: 67cd0ff3b215b5dc8525a408537038b5
+      size: 834
     - path: data/processed/messages.jsonl
       hash: md5
       md5: 439a64f82467849dda83023b10ba7227
       size: 606547
   generate:
-    cmd: uv run --directory src/generate python main.py generate --seed 2026 
-      --threads-per-user 30 --model claude-opus-5-5 --effort medium
+    cmd: uv run --locked --directory src/generate python main.py generate --seed
+      2026 --threads-per-user 30 --model claude-opus-5-5 --effort medium
     deps:
-    - path: src/generate/acts.py
+    - path: src/generate
       hash: md5
-      md5: 7351d1fcf3f57fc104ddd5ba8cf36490
-      size: 9837
-    - path: src/generate/cards
-      hash: md5
-      md5: 875b8c8afc383fc95529619469ea7620.dir
-      size: 10902
-      nfiles: 3
-    - path: src/generate/main.py
-      hash: md5
-      md5: dbf7c6c85928fa2e13165c6efd6a7b86
-      size: 9680
-    - path: src/generate/mess.py
-      hash: md5
-      md5: b8f706c839d7b926c2bf1a37eddca9ef
-      size: 2072
-    - path: src/generate/pyproject.toml
-      hash: md5
-      md5: 0e145b674040a5b0a8472028c56ed699
-      size: 280
-    - path: src/generate/sampler.py
-      hash: md5
-      md5: ad6e2e0a8086ed99e75ddc5f25bff67e
-      size: 13232
-    - path: src/generate/times.py
-      hash: md5
-      md5: a2b3f980469b6366ca08a03115568886
-      size: 4965
-    - path: src/generate/uv.lock
-      hash: md5
-      md5: 1474921d725031db0eee5e452b94c835
-      size: 91326
-    - path: src/generate/writer.py
-      hash: md5
-      md5: 4217a71fe042b22052cb2bd5e908cda5
-      size: 7525
+      md5: 4c8a338e9a74af8694051a1178f7b544.dir
+      size: 149824
+      nfiles: 12
     params:
       params.yaml:
         generate:
@@ -131,7 +69,7 @@ stages:
       size: 1148398
       nfiles: 5
   assemble:
-    cmd: uv run --directory src/generate python main.py assemble
+    cmd: uv run --locked --directory src/generate python main.py assemble
     deps:
     - path: data/base
       hash: md5
@@ -143,10 +81,11 @@ stages:
       md5: ae57ded19ed34604593181b3f054ce5e.dir
       size: 1148398
       nfiles: 5
-    - path: src/generate/main.py
+    - path: src/generate
       hash: md5
-      md5: dbf7c6c85928fa2e13165c6efd6a7b86
-      size: 9680
+      md5: 4c8a338e9a74af8694051a1178f7b544.dir
+      size: 149824
+      nfiles: 12
     outs:
     - path: data/source
       hash: md5

@@ -15,7 +15,7 @@ SOURCE = Path(__file__).resolve().parents[2] / "data" / "source"
 THREADS = SOURCE / "generated_threads.jsonl"
 ANNOTATIONS = SOURCE / "annotations.jsonl"
 
-needs_source = pytest.mark.skipif(not ANNOTATIONS.exists(), reason="no data/source/annotations.jsonl")
+needs_source = pytest.mark.skipif(not ANNOTATIONS.exists(), reason="data/source not pulled: run dvc pull")
 
 
 def read_jsonl(path):
@@ -34,7 +34,12 @@ def test_one_annotation_per_source_message():
 def test_annotation_fields():
     for annotation in read_jsonl(ANNOTATIONS):
         assert isinstance(annotation["needs_response"], bool)
-        assert annotation["rule"].startswith("NR")
+        # data-v1 (user_01-04) cites only the needs_response rule ("NR3 ...");
+        # generated users (src/generate) cite the label rule too ("D2; NR1 ...").
+        if annotation["user_id"] in ("user_01", "user_02", "user_03", "user_04"):
+            assert annotation["rule"].startswith("NR")
+        else:
+            assert "NR" in annotation["rule"]
         assert annotation["rules_version"]
 
 

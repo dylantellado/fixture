@@ -10,66 +10,54 @@
 # the hash of every dep and out in dvc.lock. Committing dvc.lock together with
 # the code ties each data version to the exact code, settings and inputs.
 #
-# deps list the code that shapes the output (not tests or READMEs) plus each
-# service's pyproject.toml and uv.lock, so a library upgrade also reruns it.
-# generate also caches every Claude write in data/cache/generate/, so a rerun
-# only pays for threads whose prompt actually changed. It needs
-# ANTHROPIC_API_KEY. The rag job writes to ChromaDB, not to files, so it isn't
-# a stage here.
+# Each stage depends on its whole service folder, so a new module, a
+# pyproject.toml / uv.lock / .python-version change, or any code edit reruns it.
+# .dvcignore leaves out what doesn't shape the data (tests, READMEs, .venv,
+# caches). A false rerun is harmless; a missed one would release old data with
+# new code. `uv run --locked` fails instead of rewriting uv.lock mid-run.
+# generate caches every Claude write in data/cache/generate/, so a rerun only
+# pays for threads whose prompt actually changed. It needs ANTHROPIC_API_KEY.
+# The rag job writes to ChromaDB, not to files, so it isn't a stage here.
 
 stages:
   generate:
     cmd: >-
-      uv run --directory src/generate python main.py generate
+      uv run --locked --directory src/generate python main.py generate
       --seed ${generate.seed} --threads-per-user ${generate.threads_per_user}
       --model ${generate.model} --effort ${generate.effort}
     deps:
-      - src/generate/main.py
-      - src/generate/acts.py
-      - src/generate/sampler.py
-      - src/generate/times.py
-      - src/generate/writer.py
-      - src/generate/mess.py
-      - src/generate/cards
-      - src/generate/pyproject.toml
-      - src/generate/uv.lock
+      - src/generate
     params:
       - generate
     outs:
       - data/generated
 
   assemble:
-    cmd: uv run --directory src/generate python main.py assemble
+    cmd: uv run --locked --directory src/generate python main.py assemble
     deps:
       - data/base
       - data/generated
-      - src/generate/main.py
+      - src/generate
     outs:
       - data/source
 
   ingest:
-    cmd: uv run --directory src/ingest python main.py
+    cmd: uv run --locked --directory src/ingest python main.py
     deps:
       - data/source/generated_threads.jsonl
       - data/source/users.json
-      - src/ingest/main.py
-      - src/ingest/collectors.py
-      - src/ingest/validation.py
-      - src/ingest/pyproject.toml
-      - src/ingest/uv.lock
+      - src/ingest
     outs:
       - data/raw/threads.jsonl
 
   preprocess:
-    cmd: uv run --directory src/preprocess python main.py
+    cmd: uv run --locked --directory src/preprocess python main.py
     deps:
       - data/raw/threads.jsonl
       - data/source/users.json
-      - src/preprocess/main.py
-      - src/preprocess/cleaning.py
-      - src/preprocess/anonymize.py
-      - src/preprocess/pyproject.toml
-      - src/preprocess/uv.lock
+      - src/preprocess
     outs:
+      # manifest.json holds only counts and hashes, so it is identical for identical
+      # inputs. run.json (time, commit) is written next to it but not tracked.
       - data/processed/messages.jsonl
       - data/processed/manifest.json

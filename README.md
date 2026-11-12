@@ -72,9 +72,11 @@ an identical copy of `classifier_client.py` (a test in each service checks they 
 ## Layout
 
 ```
-data/        data/source/ holds the data-v1 inputs (in DVC: `dvc pull`, see docs/data/versions.md);
-             data/eval/v1/ is the held-out classifier test set (in git, never tune on it);
-             everything else in data/ is local and git-ignored
+data/        three kinds of files (see docs/data/versions.md):
+             - tracked by DVC (`dvc pull`; don't edit by hand): data/source/ (data-v1 inputs),
+               data/raw/threads.jsonl, data/processed/messages.jsonl and manifest.json
+             - in git: data/eval/ (held-out classifier test set, never tune on it) and data/*.dvc
+             - only local: fixture.db, data/processed/run.json, the eval work/ and processed/ folders
 dvc.yaml     the data pipeline (ingest -> preprocess) for `dvc repro`; dvc.lock pins every hash
 docs/        data notes, evidence of pipeline runs, and the app mock-up
 experiments/ one-off experiments, e.g. gemini_baseline/ (Gemini labeling the training data)
@@ -110,11 +112,13 @@ Each service under `src/` is its own [uv](https://docs.astral.sh/uv/) project wi
    dvc pull
    ```
 
-3. Run the whole pipeline and app with one command. `GIT_COMMIT` is recorded in `data/processed/manifest.json`, so you can see which code produced the data. The input data (data-v1, see `docs/data/corpus_notes.md`) is now in `data/source/`:
+3. Run the whole pipeline and app with one command. `GIT_COMMIT` is recorded in `data/processed/run.json` (not tracked) as the commit the run started from; the exact code for a data version is recorded in `dvc.lock` (see [`docs/data/versions.md`](docs/data/versions.md#which-code-made-this-data)). The input data (data-v1, see `docs/data/corpus_notes.md`) is now in `data/source/`:
 
    ```sh
    GIT_COMMIT=$(git rev-parse HEAD) docker compose up --build
    ```
+
+   Ran `docker compose` before `dvc pull`? On Linux, Docker created the data folders as root: run `sudo chown -R "$USER" data`, then `dvc pull`.
 
 Startup order: `ingest` → `preprocess` → `rag` run once and exit, each waiting for the previous one to succeed. `rag` also waits for `chromadb` to be healthy. `api` starts after `rag` finishes, and `frontend` starts after `api` is healthy. `classifier` and `drafter` start on their own; until the classifier is up, the dashboard uses keyword tags, and until the drafter is up, Draft reply shows an error.
 

@@ -71,9 +71,12 @@ def test_real_rules_file():
 # ---- Leak checks on the real prompt: the system part and every training user part ----
 
 
+ANNOTATIONS = REPO_ROOT / "data" / "source" / "annotations.jsonl"
+
+
 def training_ids():
     """message_id of every training message, from the annotations (no processed data needed)."""
-    with open(REPO_ROOT / "data" / "source" / "annotations.jsonl", encoding="utf-8") as f:
+    with open(ANNOTATIONS, encoding="utf-8") as f:
         rows = [json.loads(line) for line in f if line.strip()]
     return {message_id(r["user_id"], r["thread_id"], r["position"]) for r in rows if r["user_id"] in TRAINING_USERS}
 
@@ -91,18 +94,30 @@ def real_system_prompt():
 
 def real_user_prompts():
     if not (REPO_ROOT / "data" / "processed" / "messages.jsonl").exists():
-        pytest.skip("run ingest and preprocess first")
+        pytest.skip("data/processed not pulled: run dvc pull")
     messages, owners = load_training()
     return [user for _m, user in main.build_jobs(messages, owners, TRAINING_USERS, None)]
 
 
+def test_no_id_like_text_in_system_prompt():
+    # Needs no data, so it always runs: nothing that even looks like a message id
+    # (16 hex characters), no eval user, and none of the ids the rules files mention.
+    system = real_system_prompt()
+    assert not re.findall(r"\b[0-9a-f]{16}\b", system)
+    assert "eval_" not in system
+    rules_files = RULES_PATH.read_text(encoding="utf-8")
+    rules_files += (RULES_PATH.parent / "training_conflicts.md").read_text(encoding="utf-8")
+    mentioned = set(re.findall(r"\b[0-9a-f]{16}\b", rules_files))
+    assert mentioned and not [i for i in mentioned if i in system]
+
+
+@pytest.mark.skipif(not ANNOTATIONS.exists(), reason="data/source not pulled: run dvc pull")
 def test_no_training_message_id_in_prompt():
+    # The real training set (a fake one would check nothing), so it needs the data.
     ids = training_ids()
     assert len(ids) == 377
     system = real_system_prompt()
     assert not [i for i in ids if i in system]
-    # Nothing that even looks like a message id (16 hex characters).
-    assert not re.findall(r"\b[0-9a-f]{16}\b", system)
     for user in real_user_prompts():
         assert not [i for i in ids if i in user]
 
