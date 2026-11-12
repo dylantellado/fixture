@@ -95,3 +95,5 @@ cp data/eval/v1.1/threads.jsonl "$EVAL_RUN/source/generated_threads.jsonl"
 mkdir -p data/eval/v1.1/processed && cp "$EVAL_RUN"/processed/* data/eval/v1.1/processed/
 python3 data/eval/v1.1/check.py final
 ```
+
+`check.py final` compares against the training data, which lives in DVC: run `dvc pull` from the repo root first.

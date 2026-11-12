@@ -15,7 +15,7 @@ SOURCE = Path(__file__).resolve().parents[2] / "data" / "source"
 THREADS = SOURCE / "generated_threads.jsonl"
 ANNOTATIONS = SOURCE / "annotations.jsonl"
 
-needs_source = pytest.mark.skipif(not ANNOTATIONS.exists(), reason="no data/source/annotations.jsonl")
+needs_source = pytest.mark.skipif(not ANNOTATIONS.exists(), reason="data/source not pulled: run dvc pull")
 
 
 def read_jsonl(path):

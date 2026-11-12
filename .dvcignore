@@ -1,0 +1,19 @@
+# Files DVC skips when it hashes folders (data outputs and the src/ stage deps).
+# DVC uses this file, not .gitignore, so editor and OS clutter would otherwise
+# change a folder's md5 and look like a new data or code version.
+
+# OS and editor clutter
+.DS_Store
+._*
+*.swp
+*~
+
+# Python caches and virtualenvs
+__pycache__/
+.pytest_cache/
+.venv/
+
+# Not code that shapes the data: tests and docs in the service folders that are stage deps
+src/*/test_*.py
+src/*/conftest.py
+src/*/README.md

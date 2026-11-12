@@ -85,7 +85,7 @@ def test_wrong_counts_stop_the_run():
         check_counts(messages)
 
 
-@pytest.mark.skipif(not (REPO_ROOT / "data" / "processed" / "messages.jsonl").exists(), reason="run ingest and preprocess first")
+@pytest.mark.skipif(not (REPO_ROOT / "data" / "processed" / "messages.jsonl").exists(), reason="data/processed not pulled: run dvc pull")
 def test_real_training_data_loads():
     messages, owners = load_training()
     assert len(messages) == 377

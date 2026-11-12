@@ -1,0 +1,48 @@
+schema: '2.0'
+stages:
+  ingest:
+    cmd: uv run --locked --directory src/ingest python main.py
+    deps:
+    - path: data/source/generated_threads.jsonl
+      hash: md5
+      md5: 816fa0bcac66bf15cdb1a5148d376f65
+      size: 307308
+    - path: data/source/users.json
+      hash: md5
+      md5: c6715cac8519dc012e8b6aaae1523067
+      size: 345
+    - path: src/ingest
+      hash: md5
+      md5: 43f39e9789285c107de7a792534a2314.dir
+      size: 132869
+      nfiles: 11
+    outs:
+    - path: data/raw/threads.jsonl
+      hash: md5
+      md5: 79d82d1e28fedefbe060365c8d98f749
+      size: 334720
+  preprocess:
+    cmd: uv run --locked --directory src/preprocess python main.py
+    deps:
+    - path: data/raw/threads.jsonl
+      hash: md5
+      md5: 79d82d1e28fedefbe060365c8d98f749
+      size: 334720
+    - path: data/source/users.json
+      hash: md5
+      md5: c6715cac8519dc012e8b6aaae1523067
+      size: 345
+    - path: src/preprocess
+      hash: md5
+      md5: a61e8d40f7fa158da7d6b5cc00fbde01.dir
+      size: 25432
+      nfiles: 8
+    outs:
+    - path: data/processed/manifest.json
+      hash: md5
+      md5: 87a509814f061ea0c6dd07df955ab9f6
+      size: 663
+    - path: data/processed/messages.jsonl
+      hash: md5
+      md5: 483ed6d7c925267804deccb63bf44662
+      size: 236204

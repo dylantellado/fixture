@@ -42,10 +42,15 @@ This is the starting layout, not a final architecture. Folders and services may 
 ```
 docker-compose.yml   runs all services together, in pipeline order (see README)
 .env.example         template for .env (copy it, never commit .env)
-data/                data/source/ holds the data-v1 inputs (committed until DVC is set up); data/eval/v1/
-                     is the held-out classifier test set (committed; never tune or train on it, see its
-                     README), frozen at tag eval-v1; data/eval/v1.1/ is the same set under labeling rules v1.5; everything else is local and git-ignored, e.g. fixture.db (the web app's
-                     encrypted logins)
+dvc.yaml, dvc.lock   DVC data pipeline (ingest -> preprocess) and its pinned hashes; rules in docs/data/versions.md
+data/                three kinds of files (same list in README and docs/data/versions.md):
+                     - tracked by DVC (bucket gs://fixture-ac215-96dhbm-dvc; get them with `dvc pull`, never
+                       edit by hand): data/source/ (data-v1 inputs), data/raw/threads.jsonl,
+                       data/processed/messages.jsonl and manifest.json
+                     - in git: data/eval/ (held-out classifier test set, never tune or train on it, see its
+                       README; frozen at tag eval-v1; v1.1/ is it under rules v1.5) and the data/*.dvc pointers
+                     - only local: fixture.db (the web app's encrypted logins), data/processed/run.json,
+                       and the eval work/ and processed/ folders
 experiments/         one-off experiments, each its own uv project (gemini_baseline/: Gemini on the training data)
 samples/             fake data safe to commit: users.json, messages_sample.jsonl (processed schema)
 secrets/             local credentials (git-ignored), see "Google access" below
@@ -170,6 +175,14 @@ Deploy the classifier to Cloud Run (commit first; it builds from the last commit
 src/classifier/deploy.sh
 ```
 
+Data (from the repo root; needs `uv tool install "dvc[gs]==3.67.1"` and gcloud application-default credentials; rules in `docs/data/versions.md`):
+
+```sh
+dvc pull     # fetch the data for this commit
+dvc repro    # rerun ingest -> preprocess if inputs or code changed; commit dvc.lock with the code
+dvc push     # upload new data before pushing the commit
+```
+
 Tests (from any service folder: `src/ingest`, `src/preprocess`, `src/rag`, `src/api`, `src/classifier`, `src/drafter`, or `src/frontend`):
 
 ```sh
@@ -179,7 +192,8 @@ uv run pytest
 ## Working rules
 
 - **Never commit secrets:** that includes `.env`, credentials, API keys, tokens, and personal email or calendar data. Use fake data in `samples/`.
-- **Real email stays private:** live classification and Draft reply send the signed-in user's email text (and, for drafts, free/busy times) to Gemini in our own GCP project. Never log or save real email bodies, subjects, senders or drafts (logs may hold message ids, labels, statuses, counts and timing), and never put real email in tests, samples or commits.
+- **Real email stays private:** live classification and Draft reply send the signed-in user's email text (and, for drafts, free/busy times) to Gemini in our own GCP project. The services never log or save real email bodies, subjects, senders or drafts (logs may hold message ids, labels, statuses, counts and timing), and real email never goes in git, tests, samples or commits.
+- **The one place real email may be stored:** Will's and Dylan's own inbox emails (agreed 2026-11-09, e.g. for a real eval set) may be saved only under `data/real/`, tracked by DVC in the private bucket `gs://fixture-ac215-96dhbm-dvc`, which only project owners and editors can read (no project viewers). Anonymize it with preprocess before upload where possible, keep it separate from generated data (`real-vN` versions), and never log it. Details: rule 6 in `docs/data/versions.md`.
 - **Drafts are checked in code:** the drafter returns a draft only when every check in `src/drafter/checker.py` passes. Don't add a path that returns or shows an unchecked draft, and keep "busy events are never offered" in code, not in the editable rules.
 - **Keep code simple, readable, and commented:** both team members must be able to explain any part of it.
 - **Add tests for new features.**

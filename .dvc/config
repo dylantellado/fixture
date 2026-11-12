@@ -1,0 +1,5 @@
+[core]
+    remote = gcs
+    autostage = true
+['remote "gcs"']
+    url = gs://fixture-ac215-96dhbm-dvc/dvcstore
