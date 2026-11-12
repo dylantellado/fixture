@@ -85,3 +85,39 @@ HTTP 422
 `latency_ms` is the Gemini call; the extra ~0.1 s in `time_total` is the network and
 Cloud Run. These requests hit a warm instance. Each used about 3,600 to 3,800 input tokens,
 40 to 50 output tokens and no thinking tokens (from the log lines).
+
+### 8. The run in `curl_terminal.png`
+
+The screenshot [`curl_terminal.png`](curl_terminal.png) shows this run, made on
+2026-11-12 at about 03:50 UTC against the same revision (`fixture-classifier-00002-gc7`,
+image `classifier:5950325fb512`, rules v1.5). It repeats checks 1 to 3 in one terminal,
+with an inline, fake proposed-times email instead of the example file. The token is set
+with `TOKEN=$(gcloud auth print-identity-token)` and never printed.
+
+```console
+$ URL=https://fixture-classifier-622192804476.us-east1.run.app
+$ TOKEN=$(gcloud auth print-identity-token)
+$ curl -s -o /dev/null -w "%{http_code}\n" $URL/health                 # no token
+403
+$ curl -s -w "\nHTTP %{http_code}\n" -H "Authorization: Bearer $TOKEN" $URL/health
+{"status":"ok","model":"gemini-3.8-flash","rules_version":"1.5"}
+HTTP 200
+$ curl -s -X POST $URL/classify \
+    -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+    -d '{"message_id": "demo-proposed-times", "target_index": 0, "thread": [{
+          "from": "Jordan Lee <jordan@example.com>", "to": "Sam Student <sam@example.edu>",
+          "subject": "Re: Coffee chat?",
+          "body": "I can do Thu Nov 19 at 3pm or Fri Nov 20 at 10am ET. Which works?"}]}' \
+  | python3 -m json.tool
+{
+    "label": "proposed_times",
+    "needs_response": true,
+    "reason": "D2, PR: offers specific times for a meeting; NR1: requires user response to pick a time.",
+    "model": "gemini-3.8-flash",
+    "rules_version": "1.5",
+    "latency_ms": 1721
+}
+```
+
+The label and `needs_response` match the labeling rules (D2: the contact offers specific
+times; NR1: the user has to pick one).
