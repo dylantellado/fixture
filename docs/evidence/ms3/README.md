@@ -77,35 +77,51 @@ Idle cost is $0. A teaching-staff check of 100 requests costs about $0.30.
 
 ## Screenshot checklist
 
-Save each image in this folder (`docs/evidence/ms3/`) with the name given.
+Each image is saved in this folder (`docs/evidence/ms3/`) with the name given. The steps
+stay here so the shots can be retaken.
 
-1. **`curl_terminal.png`: terminal, curl against the deployed service.** From the repo root:
+- [x] 1. **[`curl_terminal.png`](curl_terminal.png): terminal, curl against the deployed service.**
+   From the repo root (taken 2026-11-12; the same commands and output as text are in
+   [`cloud_run_curl.md`](cloud_run_curl.md#8-the-run-in-curl_terminalpng)):
 
    ```sh
    URL=https://fixture-classifier-622192804476.us-east1.run.app
    TOKEN=$(gcloud auth print-identity-token)
-   curl -s -o /dev/null -w "%{http_code}\n" $URL/health          # 403: no token
-   curl -s -H "Authorization: Bearer $TOKEN" $URL/health; echo
-   curl -s -X POST $URL/classify -H "Authorization: Bearer $TOKEN" \
-     -H "Content-Type: application/json" -d @src/classifier/examples/injection_newsletter.json | python3 -m json.tool
+   curl -s -o /dev/null -w "%{http_code}\n" $URL/health                 # no token
+   curl -s -w "\nHTTP %{http_code}\n" -H "Authorization: Bearer $TOKEN" $URL/health
+   curl -s -X POST $URL/classify \
+       -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+       -d '{"message_id": "demo-proposed-times", "target_index": 0, "thread": [{
+             "from": "Jordan Lee <jordan@example.com>", "to": "Sam Student <sam@example.edu>",
+             "subject": "Re: Coffee chat?",
+             "body": "I can do Thu Nov 19 at 3pm or Fri Nov 20 at 10am ET. Which works?"}]}' \
+     | python3 -m json.tool
    ```
 
-   Capture the commands and output in one shot: the `.run.app` URL, the 403, the health
-   JSON and the label JSON. Don't `echo $TOKEN`.
-2. **`cloud_run_service.png`: the Cloud Run service page.** Open the
+   Shows the `.run.app` URL, the 403, the health JSON and the label JSON
+   (`proposed_times`, `needs_response: true`). The token is never echoed.
+
+   ![curl against the deployed classifier: 403 without a token, /health and /classify with one](curl_terminal.png)
+- [x] 2. **[`cloud_run_service.png`](cloud_run_service.png): the Cloud Run service page.** Open the
    [service](https://console.cloud.google.com/run/detail/us-east1/fixture-classifier/metrics?project=fixture-ac215-96dhbm).
    Show the name, region us-east1, the URL, the green status and the Metrics tab (request
    count, latency, instance count). A second shot of the "Security" tab showing
-   "Require authentication" would also help.
-3. **`logs_explorer_entry.png`: Logs Explorer with one structured entry expanded.** Open
+   "Require authentication" would also help (not taken yet).
+
+   ![Cloud Run service page for fixture-classifier](cloud_run_service.png)
+- [x] 3. **[`logs_explorer_entry.png`](logs_explorer_entry.png): Logs Explorer with one structured entry expanded.** Open
    [Logs Explorer](https://console.cloud.google.com/logs/query;query=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22fixture-classifier%22%0AjsonPayload.event%3D%22classify%22?project=fixture-ac215-96dhbm)
    (the query is filled in), click one entry, and expand `jsonPayload` so `label`,
    `needs_response`, `latency_ms`, the token counts, `rules_version` and `message_id` show.
-4. **`monitoring_dashboard.png`: the "Fixture classifier" dashboard.** Send a few requests
+
+   ![Logs Explorer with one classify entry expanded](logs_explorer_entry.png)
+- [x] 4. **[`monitoring_dashboard.png`](monitoring_dashboard.png): the "Fixture classifier" dashboard.** Send a few requests
    first (step 1, or the four examples), wait 2 to 3 minutes, then open the
    [dashboard](https://console.cloud.google.com/monitoring/dashboards/builder/6bbe0f64-0c52-43a4-8bf8-80029a1dc8d4?project=fixture-ac215-96dhbm)
    with the time range at "1 hour". Show the request, error-rate, latency and instance charts.
-5. Optional: **`uptime_check.png`** ([uptime checks](https://console.cloud.google.com/monitoring/uptime?project=fixture-ac215-96dhbm), the check passing in all three regions) and **`alert_policy.png`** ([alerting](https://console.cloud.google.com/monitoring/alerting?project=fixture-ac215-96dhbm)).
+
+   ![The Fixture classifier Monitoring dashboard](monitoring_dashboard.png)
+- [ ] 5. Optional, not taken yet: **`uptime_check.png`** ([uptime checks](https://console.cloud.google.com/monitoring/uptime?project=fixture-ac215-96dhbm), the check passing in all three regions) and **`alert_policy.png`** ([alerting](https://console.cloud.google.com/monitoring/alerting?project=fixture-ac215-96dhbm)).
 
 ## Classifier tuning and pipeline
 
@@ -122,3 +138,11 @@ data pipeline as a Vertex AI pipeline. Scores and the full table are in the main
 
 Run links: [W&B project](https://forge.coreweave.com/wandb/wsherwoodcollege-harvard-university/fixture-classifier)
 (sign-in needed). Each run's report is also in git under `experiments/classifier_tuning/runs/`.
+
+![Vertex AI custom job](tuning_vertex_custom_job.jpg)
+
+![The Vertex job's run in W&B](tuning_wandb_vertex_run.jpg)
+
+![All tuning runs in W&B](tuning_wandb_runs_table.jpg)
+
+![The Vertex AI pipeline, all steps green](tuning_pipeline_run.jpg)
