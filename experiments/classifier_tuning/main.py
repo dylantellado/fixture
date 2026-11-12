@@ -167,9 +167,11 @@ def main(argv=None) -> int:
         load_wandb_key_from_secret()
         wb = wandb.init(project=WANDB_PROJECT, name=run_name, job_type="final_eval" if args.split == "eval" else "tune",
                         config=config, notes=args.notes, tags=[harness.name, f"rules-{harness.rules_version}", args.split])
-        for kind, path, name in (("harness", harness.path, harness.name),
-                                 ("rules", Path(harness.config["rules_path"]) if args.rules else
-                                  Path(__file__).resolve().parents[2] / harness.config["rules_path"], "labeling_rules")):
+        files = [("harness", harness.path, harness.name)]
+        if harness.config["rules_path"]:  # simple_v1 and the like send no rules file
+            files.append(("rules", Path(harness.config["rules_path"]) if args.rules else
+                          Path(__file__).resolve().parents[2] / harness.config["rules_path"], "labeling_rules"))
+        for kind, path, name in files:
             artifact = wandb.Artifact(name, type=kind, metadata={"sha": harness.sha if kind == "harness"
                                                                  else harness.rules_file_sha,
                                                                  "rules_version": harness.rules_version})

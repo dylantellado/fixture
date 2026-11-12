@@ -25,6 +25,15 @@ def test_prod_harness_matches_the_classifier_and_hides_rule_history():
     assert harness.summary()["harness_sha"] == harness.sha
 
 
+def test_simple_harness_sends_no_rules():
+    harness = load_harness(HERE / "harnesses" / "simple_v1.yaml")
+    assert harness.rules_version == "none" and harness.rules_text == ""
+    assert "NR1" not in harness.system and "# Labeling rules" not in harness.system
+    for label in ("new_request", "proposed_times", "acceptance", "reschedule", "assistant_handoff", "none"):
+        assert f"- {label}:" in harness.system
+    assert harness.summary()["rules_path"] is None
+
+
 def test_rules_override_is_recorded(tmp_path):
     draft = tmp_path / "rules.md"
     text = (Path(__file__).resolve().parents[2] / "docs/data/labeling_rules.md").read_text()

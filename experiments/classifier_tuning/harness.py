@@ -48,6 +48,8 @@ class Harness:
 
     @property
     def system(self) -> str:
+        if not self.rules_text:
+            return self.config["instructions"].rstrip() + "\n"
         return self.config["instructions"].rstrip() + "\n\n" + self.rules_text
 
     def summary(self) -> dict:
@@ -90,6 +92,9 @@ def load_harness(path: Path, rules_override: Path | None = None) -> Harness:
                 "excluded_sections", "instructions"):
         if key not in config:
             raise ValueError(f"{path}: missing '{key}'")
+    if config["rules_path"] is None and not rules_override:
+        # A harness with no rules file (e.g. simple_v1): the instructions are the whole prompt.
+        return Harness(config["name"], Path(path), text, config, "", "none", "")
     rules_path = Path(rules_override) if rules_override else REPO_ROOT / config["rules_path"]
     if rules_override:
         config = {**config, "rules_path": str(rules_override)}
