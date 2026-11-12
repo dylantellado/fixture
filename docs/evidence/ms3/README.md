@@ -106,3 +106,19 @@ Save each image in this folder (`docs/evidence/ms3/`) with the name given.
    [dashboard](https://console.cloud.google.com/monitoring/dashboards/builder/6bbe0f64-0c52-43a4-8bf8-80029a1dc8d4?project=fixture-ac215-96dhbm)
    with the time range at "1 hour". Show the request, error-rate, latency and instance charts.
 5. Optional: **`uptime_check.png`** ([uptime checks](https://console.cloud.google.com/monitoring/uptime?project=fixture-ac215-96dhbm), the check passing in all three regions) and **`alert_policy.png`** ([alerting](https://console.cloud.google.com/monitoring/alerting?project=fixture-ac215-96dhbm)).
+
+## Classifier tuning and pipeline
+
+Will's part of MS3: tuning runs of the classifier harness on Vertex AI, tracked in W&B, and the
+data pipeline as a Vertex AI pipeline. Scores and the full table are in the main README's
+"MS3: data, classifier tuning and the cloud pipeline" section.
+
+| File | What it shows |
+|---|---|
+| `tuning_vertex_custom_job.jpg` | The Vertex AI custom job `classifier-tuning-20261112-034623` (us-east1, e2-standard-4): finished in 17 min 35 sec, the image from Artifact Registry and its arguments (data from the DVC bucket, harness `prod_v1`). |
+| `tuning_wandb_vertex_run.jpg` | The same run in W&B (`miuw5neq`): notes, tags (`prod_v1`, `rules-1.5`, `train`), host `cmle-training-workerpool0-…` (it ran on Vertex AI) and the exact command. |
+| `tuning_wandb_runs_table.jpg` | All tuning runs in W&B with needs_response accuracy, false alarms, label accuracy and split. The two `eval` rows are the held-out users 11–12: prod_v1 (1 false alarm) vs simple_v1 with no rules (8). |
+| `tuning_pipeline_run.jpg` | The Vertex AI pipeline `assemble → ingest → preprocess → evaluate`, every step green. |
+
+Run links: [W&B project](https://forge.coreweave.com/wandb/wsherwoodcollege-harvard-university/fixture-classifier)
+(sign-in needed). Each run's report is also in git under `experiments/classifier_tuning/runs/`.
