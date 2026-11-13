@@ -5,12 +5,12 @@ stages:
     deps:
     - path: data/source/generated_threads.jsonl
       hash: md5
-      md5: 816fa0bcac66bf15cdb1a5148d376f65
-      size: 307308
+      md5: b3751d6a41b22c549c461961f7a1efb6
+      size: 772175
     - path: data/source/users.json
       hash: md5
-      md5: c6715cac8519dc012e8b6aaae1523067
-      size: 345
+      md5: 6927c9f02491245646e8f394c2a63ae1
+      size: 1225
     - path: src/ingest
       hash: md5
       md5: 43f39e9789285c107de7a792534a2314.dir
@@ -19,19 +19,19 @@ stages:
     outs:
     - path: data/raw/threads.jsonl
       hash: md5
-      md5: 79d82d1e28fedefbe060365c8d98f749
-      size: 334720
+      md5: 34f9e9f8f008bbc393bef8fa2567ea13
+      size: 840867
   preprocess:
     cmd: uv run --locked --directory src/preprocess python main.py
     deps:
     - path: data/raw/threads.jsonl
       hash: md5
-      md5: 79d82d1e28fedefbe060365c8d98f749
-      size: 334720
+      md5: 34f9e9f8f008bbc393bef8fa2567ea13
+      size: 840867
     - path: data/source/users.json
       hash: md5
-      md5: c6715cac8519dc012e8b6aaae1523067
-      size: 345
+      md5: 6927c9f02491245646e8f394c2a63ae1
+      size: 1225
     - path: src/preprocess
       hash: md5
       md5: a61e8d40f7fa158da7d6b5cc00fbde01.dir
@@ -40,9 +40,55 @@ stages:
     outs:
     - path: data/processed/manifest.json
       hash: md5
-      md5: 87a509814f061ea0c6dd07df955ab9f6
-      size: 663
+      md5: 67cd0ff3b215b5dc8525a408537038b5
+      size: 834
     - path: data/processed/messages.jsonl
       hash: md5
-      md5: 483ed6d7c925267804deccb63bf44662
-      size: 236204
+      md5: 439a64f82467849dda83023b10ba7227
+      size: 606547
+  generate:
+    cmd: uv run --locked --directory src/generate python main.py generate --seed
+      2026 --threads-per-user 30 --model claude-opus-5-5 --effort medium
+    deps:
+    - path: src/generate
+      hash: md5
+      md5: 4c8a338e9a74af8694051a1178f7b544.dir
+      size: 149824
+      nfiles: 12
+    params:
+      params.yaml:
+        generate:
+          seed: 2026
+          threads_per_user: 30
+          model: claude-opus-5-5
+          effort: medium
+    outs:
+    - path: data/generated
+      hash: md5
+      md5: ae57ded19ed34604593181b3f054ce5e.dir
+      size: 1148398
+      nfiles: 5
+  assemble:
+    cmd: uv run --locked --directory src/generate python main.py assemble
+    deps:
+    - path: data/base
+      hash: md5
+      md5: acc2a878388b4202524e4309e21909a1.dir
+      size: 378328
+      nfiles: 3
+    - path: data/generated
+      hash: md5
+      md5: ae57ded19ed34604593181b3f054ce5e.dir
+      size: 1148398
+      nfiles: 5
+    - path: src/generate
+      hash: md5
+      md5: 4c8a338e9a74af8694051a1178f7b544.dir
+      size: 149824
+      nfiles: 12
+    outs:
+    - path: data/source
+      hash: md5
+      md5: 235ba29d794dc37b28406eba3cc5f585.dir
+      size: 1439623
+      nfiles: 5

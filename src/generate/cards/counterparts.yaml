@@ -1,0 +1,152 @@
+# Who the user schedules with. Each kind lists the flows (from acts.FLOWS) it
+# takes part in, with weights, plus what the meetings are about and how they
+# write. "assistant" is the chance their side uses an assistant or coordinator
+# (needed by the handoff flows). Domains are reserved example domains.
+
+professor:
+  title: Professor
+  domain: faculty.college.example
+  purposes: [office hours question, recommendation letter, research opportunity, grade question]
+  styles: [formal and brief, warm but busy, terse, writes from phone]
+  assistant: 0.3
+  flows: {they_offer: 2, user_asks: 4, user_asks_restate: 1, decline_then_offer: 1, reschedule_offer: 1, reschedule_directive: 1, cancel_followup: 1, handoff_wait: 1, handoff_ask: 1, sched_link: 1, still_on: 1, thanks: 1, info: 1, task_split: 0}
+ta:
+  title: Teaching Assistant
+  domain: college.example
+  purposes: [problem set help, regrade request, project check-in, section swap]
+  styles: [casual, friendly, terse]
+  assistant: 0
+  flows: {user_asks: 3, they_offer: 2, user_offers: 2, cancel_invite: 1, reschedule_directive: 1, info: 1, still_on: 1}
+advisor:
+  title: Academic Advisor
+  domain: advising.college.example
+  purposes: [course planning, major declaration, study abroad credit, transfer plan]
+  styles: [formal and kind, uses bullet points, brief]
+  assistant: 0.4
+  flows: {sched_link: 3, user_asks: 3, they_offer: 2, handoff_wait: 1, handoff_ask: 1, cancel_invite: 1, still_on: 1, user_asks_restate: 1}
+recruiter:
+  title: University Recruiter
+  domain: talent.acmecorp.example
+  purposes: [first-round interview, phone screen, superday, offer call, coffee chat]
+  styles: [upbeat and polished, corporate with a legal footer, brief]
+  assistant: 0.5
+  flows: {they_offer: 3, they_offer_question: 2, sched_link: 3, handoff_wait: 2, handoff_ask: 1, reschedule_offer: 2, cancel_invite: 1, still_on: 1, cold_sales: 0}
+hiring_manager:
+  title: Hiring Manager
+  domain: acmecorp.example
+  purposes: [team-match conversation, final interview, offer discussion]
+  styles: [direct, friendly, brief]
+  assistant: 0.5
+  flows: {they_offer: 2, handoff_wait: 2, reschedule_directive: 1, reschedule_offer: 1, user_offers: 1}
+alum:
+  title: Alum
+  domain: mail.example
+  purposes: [coffee chat about their career, informational interview, referral advice]
+  styles: [warm and chatty, busy and terse, writes from phone]
+  assistant: 0.1
+  flows: {they_ask_user_offers: 3, user_asks: 3, catchup: 2, they_decline_user_times: 1, user_offers: 2, reschedule_offer: 1, cancel_followup: 1, intro_user: 1, intro_other: 1, thanks: 1}
+classmate:
+  title: Classmate
+  domain: college.example
+  purposes: [group project meeting, study session, lab report split]
+  styles: [very casual texting style, casual, emoji user]
+  assistant: 0
+  flows: {they_ask_user_offers: 2, user_offers: 3, they_decline_user_times: 1, reschedule_directive: 1, task_split: 2, info: 1}
+club:
+  title: Club Officer
+  domain: clubs.college.example
+  purposes: [club board meeting, event planning, interview for a club role]
+  styles: [casual, enthusiastic]
+  assistant: 0
+  flows: {they_ask_user_offers: 2, they_offer: 1, announcement: 2, sched_link: 1}
+student:
+  title: Student
+  domain: college.example
+  purposes: [office hours, extension request, project feedback]
+  styles: [nervous and polite, casual, brief]
+  assistant: 0
+  flows: {they_ask_user_offers: 3, they_offer: 1, user_offers: 2, cancel_invite: 1, still_on: 1, thanks: 1}
+research_pi:
+  title: Principal Investigator
+  domain: lab.college.example
+  purposes: [research assistant interview, project check-in, paper draft review]
+  styles: [terse, formal, warm but busy]
+  assistant: 0.4
+  flows: {they_offer: 2, user_asks: 2, handoff_wait: 1, handoff_ask: 1, reschedule_directive: 2, cancel_followup: 1, task_split: 1}
+manager:
+  title: Manager
+  domain: work.example
+  purposes: [one-on-one, shift change, performance check-in, project review]
+  styles: [direct, friendly, brief]
+  assistant: 0.1
+  flows: {they_offer: 2, reschedule_directive: 2, reschedule_offer: 1, cancel_invite: 1, user_asks: 2, task_split: 1, info: 1}
+coworker:
+  title: Coworker
+  domain: work.example
+  purposes: [shift swap, pairing session, lunch, project sync]
+  styles: [casual, terse, emoji user]
+  assistant: 0
+  flows: {they_ask_user_offers: 2, user_offers: 2, catchup: 1, task_split: 1, info: 1}
+admissions:
+  title: Admissions Officer
+  domain: admissions.university.example
+  purposes: [campus visit, admissions interview, transfer info session]
+  styles: [formal and polished, warm]
+  assistant: 0.3
+  flows: {sched_link: 3, they_offer: 2, handoff_wait: 1, still_on: 1, announcement: 1}
+coach:
+  title: Head Coach
+  domain: athletics.college.example
+  purposes: [team meeting, individual check-in, travel logistics]
+  styles: [blunt and brief, all caps sometimes]
+  assistant: 0.2
+  flows: {reschedule_directive: 2, they_offer: 1, user_asks: 1, announcement: 2}
+landlord:
+  title: Property Manager
+  domain: rentals.example
+  purposes: [apartment viewing, repair visit, move-out inspection]
+  styles: [brief and practical, formal]
+  assistant: 0.2
+  flows: {they_offer: 2, reschedule_directive: 1, user_asks: 1, automated: 1}
+doctor:
+  title: Clinic Scheduler
+  domain: clinic.example
+  purposes: [checkup, dentist cleaning, follow-up visit]
+  styles: [formal and brief]
+  assistant: 0
+  flows: {they_offer: 2, automated: 2, sched_link: 1, cancel_invite: 1}
+family:
+  title: Family
+  domain: mail.example
+  purposes: [video call, dinner when home, airport pickup]
+  styles: [warm and rambling, uses no punctuation, writes from phone]
+  assistant: 0
+  flows: {catchup: 2, they_ask_user_offers: 1, user_offers: 1, reschedule_directive: 1, info: 1}
+friend:
+  title: Friend
+  domain: mail.example
+  purposes: [dinner, study date, visiting over break]
+  styles: [very casual texting style, emoji user]
+  assistant: 0
+  flows: {catchup: 3, they_ask_user_offers: 1, user_offers: 2, they_decline_user_times: 1, cancel_followup: 1, info: 1}
+vendor:
+  title: Account Executive
+  domain: salesco.example
+  purposes: [product demo]
+  styles: [pushy and polished]
+  assistant: 0
+  flows: {cold_sales: 1}
+system:
+  title: Notifications
+  domain: notify.example
+  purposes: [appointment reminder, registration confirmation, shift reminder]
+  styles: [machine-written]
+  assistant: 0
+  flows: {automated: 2, out_of_office: 1}
+group:
+  title: Mailing list
+  domain: lists.college.example
+  purposes: [event announcement, deadline reminder, office hours schedule]
+  styles: [newsletter]
+  assistant: 0
+  flows: {announcement: 1}

@@ -29,7 +29,7 @@ Fixture is a Harvard AC215 course project by Dylan Tellado and Will Sherwood. It
 **The contract:** the "Data contract" section of `README.md` is the source of truth for file paths, the message schema, labels, id rules, the vector database layout, and the API. Read it before working on any service. Don't change it without telling the other person, and update it in the same PR as the change.
 
 **Ownership:**
-- **Will:** data generation, `src/ingest`, `src/preprocess`, DVC, labels, test scenarios
+- **Will:** data generation (`src/generate`), `src/ingest`, `src/preprocess`, DVC, labels, test scenarios, `experiments/classifier_tuning` (W&B tuning runs)
 - **Dylan:** `src/rag`, `src/api`, `src/classifier`, `src/drafter`, the frontend (search page, live labels, Draft reply), the `chromadb`, `classifier` and `drafter` services, the mockup
 - **Both:** `docker-compose.yml` (each edits only their own services), `README.md`, `docs/` and evidence
 
@@ -42,19 +42,25 @@ This is the starting layout, not a final architecture. Folders and services may 
 ```
 docker-compose.yml   runs all services together, in pipeline order (see README)
 .env.example         template for .env (copy it, never commit .env)
-dvc.yaml, dvc.lock   DVC data pipeline (ingest -> preprocess) and its pinned hashes; rules in docs/data/versions.md
+dvc.yaml, dvc.lock   DVC data pipeline (generate -> assemble -> ingest -> preprocess) and its pinned hashes;
+params.yaml          generator settings (seed, threads per user, writer model); rules in docs/data/versions.md
 data/                three kinds of files (same list in README and docs/data/versions.md):
                      - tracked by DVC (bucket gs://fixture-ac215-96dhbm-dvc; get them with `dvc pull`, never
-                       edit by hand): data/source/ (data-v1 inputs), data/raw/threads.jsonl,
-                       data/processed/messages.jsonl and manifest.json
+                       edit by hand): data/base/ (data-v1), data/generated/ (src/generate's output),
+                       data/source/ (both assembled: what ingest reads, plus splits.json and
+                       thread_states.jsonl), data/raw/threads.jsonl, data/processed/messages.jsonl and manifest.json
                      - in git: data/eval/ (held-out classifier test set, never tune or train on it, see its
                        README; frozen at tag eval-v1; v1.1/ is it under rules v1.5) and the data/*.dvc pointers
-                     - only local: fixture.db (the web app's encrypted logins), data/processed/run.json,
-                       and the eval work/ and processed/ folders
-experiments/         one-off experiments, each its own uv project (gemini_baseline/: Gemini on the training data)
+                     - only local: fixture.db (the web app's encrypted logins), data/cache/generate/ (cached
+                       Claude writes), data/processed/run.json, and the eval work/ and processed/ folders
+experiments/         one-off experiments, each its own uv project (gemini_baseline/: Gemini on the training data;
+                     classifier_tuning/ (Will): needs_response tuning runs over harnesses/ + rules, tracked in W&B)
 samples/             fake data safe to commit: users.json, messages_sample.jsonl (processed schema)
 secrets/             local credentials (git-ignored), see "Google access" below
 src/
+  generate/     (Will) writes fictional threads state-first: cards/ + seed -> scenarios with true labels,
+                needs_response and thread states (acts.py follows labeling_rules.md) -> Claude writes the
+                text -> data/generated/; `assemble` builds data/source/. Needs ANTHROPIC_API_KEY
   ingest/       validates and dedups source threads -> data/raw/threads.jsonl; validate.py checks thread files;
                 also google_auth.py and list_events.py (Calendar check)
   preprocess/   cleans, anonymizes, flattens -> data/processed/messages.jsonl + manifest.json

@@ -9,12 +9,18 @@ file in between.
 
 | Piece | Where | What it holds |
 |---|---|---|
-| `data/source.dvc` | git | Hash of the `data/source/` folder: the pipeline's inputs (users, threads, annotations) |
-| `dvc.yaml` | git | The pipeline: `ingest` → `preprocess`, with each stage's command, inputs (code folders and data) and outputs |
+| `data/base.dvc` | git | Hash of `data/base/`: data-v1, the hand-planned corpus (users, threads, annotations) |
+| `params.yaml` | git | Settings that shape the data (generator seed, threads per user, writer model) |
+| `dvc.yaml` | git | The pipeline: `generate` → `assemble` → `ingest` → `preprocess`, with each stage's command, inputs (code folders, data, params) and outputs |
 | `dvc.lock` | git | The md5 of every input and output of the last run. Committed with the code, it records which code made which data |
 | `.dvc/config` | git | The remote: `gs://fixture-ac215-96dhbm-dvc/dvcstore` |
 | `.dvcignore` | git | What DVC skips when hashing folders (OS clutter, caches, tests, READMEs) |
 | The files themselves | the bucket, and `.dvc/cache/` locally | Stored by hash, so nothing is overwritten in place |
+
+The stages: `generate` (`src/generate`) writes new threads with Claude into `data/generated/`;
+`assemble` combines `data/base/` and `data/generated/` into `data/source/`, which is what ingest
+reads (Data contract), plus `splits.json` and `thread_states.jsonl`. Claude writes are also cached
+in `data/cache/generate/` (local), so rerunning `generate` only pays for threads that changed.
 
 The bucket (project `fixture-ac215-96dhbm`, `us-east1`) is private, with object versioning on: a
 deleted or overwritten object can be recovered for 30 days, then the lifecycle rule in
@@ -25,11 +31,11 @@ deleted or overwritten object can be recovered for 30 days, then the lifecycle r
 The same list is in the README and `CLAUDE.md`:
 
 - **Tracked by DVC** (get them with `dvc pull`; don't edit them by hand, since `dvc pull` and
-  `dvc checkout` overwrite them): `data/source/`, `data/raw/threads.jsonl`,
+  `dvc checkout` overwrite them): `data/base/`, `data/generated/`, `data/source/`, `data/raw/threads.jsonl`,
   `data/processed/messages.jsonl` and `data/processed/manifest.json`.
 - **In git:** `data/eval/` (frozen by its tags, see [`data/eval/v1/README.md`](../../data/eval/v1/README.md))
   and the `data/*.dvc` pointer files.
-- **Only local:** `data/fixture.db` (the web app's encrypted logins), `data/processed/run.json`
+- **Only local:** `data/fixture.db` (the web app's encrypted logins), `data/cache/generate/` (cached Claude writes), `data/processed/run.json`
   (when and from which commit preprocess last ran), and the eval `work/` and `processed/` folders.
 
 ## Setup (once)
@@ -37,7 +43,7 @@ The same list is in the README and `CLAUDE.md`:
 ```sh
 uv tool install "dvc[gs]==3.67.1"     # DVC with Google Cloud Storage support
 gcloud auth application-default login # DVC uses these credentials, like Vertex AI
-dvc pull                              # from the repo root: fetches data/source, data/raw, data/processed
+dvc pull                              # from the repo root: fetches data/base, data/generated, data/source, data/raw, data/processed
 ```
 
 Access: only project owners and editors can read the bucket, which includes any service account
@@ -80,16 +86,17 @@ the record.
 ## Rules
 
 1. **Data never changes without a commit.** Change the inputs or code, run `dvc repro`, then
-   commit `dvc.lock` (and `data/source.dvc` if the inputs changed) with the code in one commit.
+   commit `dvc.lock` (and `data/base.dvc` if data-v1 changed) with the code in one commit.
 2. **Push data before code.** `dvc push`, then `git push`, so nobody pulls a commit whose data
    isn't in the bucket.
 3. **Releases are tags and are never moved.** A release is a git tag `data-vN` on `main` plus a
    row in the table below. A fix is a new version, never an edited old one.
-4. **Eval sets are separate and frozen.** They stay in git under `data/eval/`, frozen by their
-   own tags, and nothing is tuned on them. A generated eval set gets its own `eval-*` version.
-5. **Seeds and settings are inputs too.** When the generator exists it becomes a `generate`
-   stage in `dvc.yaml` that writes `data/source/`, with its seed range, card-file version and
-   writer model in `params.yaml`. Then `data/source.dvc` is removed, since the stage records it.
+4. **Eval sets are separate and frozen.** eval-v1 stays in git under `data/eval/`, frozen by its
+   tag. Generated users marked `eval` in `src/generate/cards/users.yaml` (listed in
+   `data/source/splits.json`) are held out too: they are scored only for a final report, and
+   nothing is tuned on them.
+5. **Seeds and settings are inputs too.** The generator's seed, threads per user and writer
+   model live in `params.yaml`, and the card files are stage deps, so `dvc.lock` records them.
 6. **Real email goes in the bucket only, never git.** Will and Dylan agreed (2026-11-09) that
    their own inbox emails may be versioned here, e.g. as a real eval set. Those emails also hold
    other people's messages, so:
@@ -114,9 +121,9 @@ To get an old version: `git checkout data-vN && dvc pull`.
 
 ## Versions
 
-| Version | Date | What | Messages | Threads | `data/source` md5 |
+| Version | Date | What | Messages | Threads | md5 |
 |---|---|---|---|---|---|
-| data-v1 | 2026-10-19 (DVC since 2026-11-09) | 4 fictional users, scheduling emails generated from `docs/data/generation/`; labeling rules v1.5 | 377 | 160 | `acc2a878388b4202524e4309e21909a1` |
+| data-v1 | 2026-10-19 (DVC since 2026-11-09) | 4 fictional users, scheduling emails generated from `docs/data/generation/`; labeling rules v1.5. Now `data/base/` | 377 | 160 | `data/base` `acc2a878388b4202524e4309e21909a1` |
 
 data-v1 labels: acceptance 105, none 92, proposed_times 78, new_request 51, reschedule 41,
 assistant_handoff 10; `needs_response` 109 true, 268 false.

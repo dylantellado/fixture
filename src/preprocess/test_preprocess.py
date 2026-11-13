@@ -149,21 +149,27 @@ def test_bad_input_fails_and_keeps_previous_output(tmp_path):
 
 REAL = Path(__file__).resolve().parents[2] / "data" / "processed" / "messages.jsonl"
 needs_corpus = pytest.mark.skipif(not REAL.exists(), reason="data/processed not pulled: run dvc pull")
+DATA_V1_USERS = {"user_01", "user_02", "user_03", "user_04"}  # the hand-planned corpus (data/base)
 
 
 @needs_corpus
 def test_corpus_every_user_has_all_six_labels():
+    # A planned property of data-v1 (user_01-04). Generated users get whatever
+    # flows their counterparts allow, so they aren't held to it.
     labels = {}
     for record in map(json.loads, REAL.read_text().splitlines()):
-        labels.setdefault(record["user_id"], set()).add(record["label"])
+        if record["user_id"] in DATA_V1_USERS:
+            labels.setdefault(record["user_id"], set()).add(record["label"])
     assert all(len(found) == 6 for found in labels.values()), labels
 
 
 @needs_corpus
 def test_corpus_shared_contacts_appear_for_two_or_more_users():
+    # data-v1's shared contacts (user_01-04 only; generated users have their own people).
     users_by_sender = {}
     for record in map(json.loads, REAL.read_text().splitlines()):
-        users_by_sender.setdefault(record["sender"], set()).add(record["user_id"])
+        if record["user_id"] in DATA_V1_USERS:
+            users_by_sender.setdefault(record["sender"], set()).add(record["user_id"])
     shared = {sender for sender, users in users_by_sender.items() if len(users) >= 2}
     names = {sender.split(" <")[0] for sender in shared}
     for person in ["Dana Whitfield", "Nadia Brooks", "Jordan Lee", "Tess Navarro", "Elena Vasquez", "Rohan Mehta"]:

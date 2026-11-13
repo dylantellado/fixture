@@ -1,17 +1,46 @@
 # Data pipeline, run with `dvc repro` from the repo root (see docs/data/versions.md).
 #
-# DVC reruns a stage only when one of its deps changed, and records the hash of
-# every dep and out in dvc.lock. Committing dvc.lock together with the code is
-# what ties each data version to the exact code and inputs that made it.
+#   data/base/  (data-v1, tracked by data/base.dvc)
+#   generate    cards + params -> Claude writes threads -> data/generated/
+#   assemble    data/base + data/generated -> data/source/ (what ingest reads; Data contract)
+#   ingest      data/source -> data/raw/threads.jsonl
+#   preprocess  data/raw -> data/processed/messages.jsonl
+#
+# DVC reruns a stage only when one of its deps or params changed, and records
+# the hash of every dep and out in dvc.lock. Committing dvc.lock together with
+# the code ties each data version to the exact code, settings and inputs.
 #
 # Each stage depends on its whole service folder, so a new module, a
 # pyproject.toml / uv.lock / .python-version change, or any code edit reruns it.
 # .dvcignore leaves out what doesn't shape the data (tests, READMEs, .venv,
 # caches). A false rerun is harmless; a missed one would release old data with
 # new code. `uv run --locked` fails instead of rewriting uv.lock mid-run.
+# generate caches every Claude write in data/cache/generate/, so a rerun only
+# pays for threads whose prompt actually changed. It needs ANTHROPIC_API_KEY.
 # The rag job writes to ChromaDB, not to files, so it isn't a stage here.
 
 stages:
+  generate:
+    cmd: >-
+      uv run --locked --directory src/generate python main.py generate
+      --seed ${generate.seed} --threads-per-user ${generate.threads_per_user}
+      --model ${generate.model} --effort ${generate.effort}
+    deps:
+      - src/generate
+    params:
+      - generate
+    outs:
+      - data/generated
+
+  assemble:
+    cmd: uv run --locked --directory src/generate python main.py assemble
+    deps:
+      - data/base
+      - data/generated
+      - src/generate
+    outs:
+      - data/source
+
   ingest:
     cmd: uv run --locked --directory src/ingest python main.py
     deps:

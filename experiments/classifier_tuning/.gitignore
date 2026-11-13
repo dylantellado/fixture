@@ -1,0 +1,4 @@
+# Run outputs stay local (W&B keeps the full record), except each run's report.md.
+runs/*/*
+!runs/*/report.md
+wandb/

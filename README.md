@@ -41,6 +41,42 @@ New in MS3 as well: the [`drafter`](src/drafter/README.md) service and the dashb
 reply** button ([below](#draft-reply)). The drafter's image is Cloud Run-ready but not deployed;
 it runs locally and in Docker Compose.
 
+## MS3: data, classifier tuning and the cloud pipeline
+
+We tune the classifier by changing its **harness** (the prompt, context and model settings
+around Gemini) and the **labeling rules**, not its weights. Every run is scored on generated
+emails whose correct answers are known, and every run is tracked in Weights & Biases.
+
+| Requirement | Where |
+|---|---|
+| Data (built and versioned) | [`src/generate`](src/generate/README.md) writes threads state-first: a seeded sampler fixes each thread's true state and labels, then Claude writes emails that must match it (checked in code). 240 new threads; 400 threads and 952 messages in all. The true state after every message is in `data/source/thread_states.jsonl`. Everything is versioned with **DVC** in `gs://fixture-ac215-96dhbm-dvc` (`dvc pull`, `dvc repro`; rules in [`docs/data/versions.md`](docs/data/versions.md)). |
+| Train/held-out split | `data/source/splits.json`: users 01–10 train, users 11–12 held out. Held-out runs are only reported, never used to change a harness or rule. |
+| Training (tuning) runs, serverless | [`experiments/classifier_tuning`](experiments/classifier_tuning/README.md): one run classifies a split with a harness and scores it. `cloud/run_vertex_job.sh` runs it as a **Vertex AI custom job** (image built with Cloud Build, service account `fixture-tuning`, W&B key from Secret Manager). |
+| Experiment tracking | **W&B** project `fixture-classifier`: each run logs the harness file and rules doc as artifacts, their hashes and the data version in its config, scores overall and by email type, and a table of every prediction. |
+| Automated pipeline | [`src/pipeline`](src/pipeline/pipeline.py): a **Vertex AI pipeline** `assemble → ingest → preprocess → evaluate`. `run_pipeline.sh --direct` runs it by hand. A Cloud Function trigger that starts it when new data lands in the bucket is built and ready (`deploy_trigger.sh`) but not deployed for MS3. |
+| Evidence | Screenshots and run links in [`docs/evidence/ms3/`](docs/evidence/ms3/README.md#classifier-tuning-and-pipeline). |
+
+### Results
+
+`needs_response` is whether the user has to reply; a false alarm says a reply is needed when it
+isn't. The held-out rows are the ones to report: those users were never used to tune anything.
+
+| Run | Where | Split (messages) | needs_response accuracy | Recall | Missed | False alarms | Label accuracy | W&B |
+|---|---|---|---|---|---|---|---|---|
+| prod_v1, run 1 | local | train (802) | 0.995 | 0.992 | 2 | 2 | 0.985 | [o37rbnbx](https://forge.coreweave.com/wandb/wsherwoodcollege-harvard-university/fixture-classifier/runs/o37rbnbx) |
+| prod_v1, run 2 | local | train (792 scored, 10 calls failed) | 0.996 | 1.000 | 0 | 3 | 0.990 | [fkfwzgbd](https://forge.coreweave.com/wandb/wsherwoodcollege-harvard-university/fixture-classifier/runs/fkfwzgbd) |
+| prod_v1 | Vertex AI custom job | train (802) | 0.998 | 1.000 | 0 | 2 | 0.989 | [miuw5neq](https://forge.coreweave.com/wandb/wsherwoodcollege-harvard-university/fixture-classifier/runs/miuw5neq) |
+| prod_v1 | Vertex AI pipeline (`evaluate` step) | train (802) | 0.996 | 1.000 | 0 | 3 | 0.989 | [bvdtpud4](https://forge.coreweave.com/wandb/wsherwoodcollege-harvard-university/fixture-classifier/runs/bvdtpud4) |
+| **prod_v1** | local | **held out (150)** | **0.980** | 0.961 | 2 | **1** | **1.000** | [xradpjzj](https://forge.coreweave.com/wandb/wsherwoodcollege-harvard-university/fixture-classifier/runs/xradpjzj) |
+| simple_v1 (six one-line labels, no rules) | local | held out (150) | 0.940 | 0.980 | 1 | 8 | 0.940 | [9lnwy9i1](https://forge.coreweave.com/wandb/wsherwoodcollege-harvard-university/fixture-classifier/runs/9lnwy9i1) |
+
+**What it shows:** on users the harness never saw, the labeling rules cut false alarms from 8 to
+1 and lift label accuracy from 0.940 to 1.000. Without the rules, Gemini treats cold sales
+emails and introductions between two other people as needing a reply. prod_v1's three held-out
+mistakes are two introductions addressed to the user (missed) and one confirmation that also asks
+for a phone number, which is a generator issue we are tracking. Full reports:
+`experiments/classifier_tuning/runs/*/report.md`.
+
 ### Use the deployed classifier
 
 The dashboard uses the local classifier by default. To label emails with the one on Cloud Run:
@@ -191,7 +227,8 @@ What changed for the search side in Milestone 3 (Will: nothing changes in your f
 - **Chunks:** each message chunk now starts with the thread subject, sender, date and a `Replying to` excerpt of the previous message, and each thread gets its own chunk. Metadata gains `chunk_type`, `token_count`, and for thread chunks `message_ids`.
 - **Search:** still one user's collection only, still returns messages (never threads) in the same request/response shape. **`score` means something new:** `0.5 × the message's own similarity + 0.5 × its thread's` (definition under API below), no longer one chunk's cosine similarity. A collection built with another embedding model is refused (`503`, rerun rag).
 - **New rule rag depends on:** `messages.jsonl` lists each thread's messages in thread order (it already does).
-- **Data is in DVC (Will):** `data/source/` is no longer in git. Run `dvc pull` after cloning or checking out (needs gcloud application-default credentials). Paths, file shapes and ids don't change. `dvc repro` reruns `ingest` → `preprocess` and records every hash in `dvc.lock`; releases are git tags `data-vN` listed in [`docs/data/versions.md`](docs/data/versions.md).
+- **Data is in DVC (Will):** `data/source/` is no longer in git. Run `dvc pull` after cloning or checking out (needs gcloud application-default credentials). Paths, file shapes and ids don't change. `dvc repro` reruns `generate` → `assemble` → `ingest` → `preprocess` and records every hash in `dvc.lock`; releases are git tags `data-vN` listed in [`docs/data/versions.md`](docs/data/versions.md).
+- **Generated data (Will):** `src/generate` writes new users (`user_05` to `user_12`) whose threads are built from ground-truth thread states and written by Claude. `data/source/` is now assembled from `data/base/` (data-v1, unchanged) and `data/generated/`. Two new files in `data/source/`: `splits.json` (which users are `train` and which are held-out `eval`) and `thread_states.jsonl` (the true thread state after every generated message, state schema v0.1). New `user_id`s appear in `messages.jsonl`; rag indexes them like any other user.
 - Measurements: [`docs/evidence/retrieval_check.md`](docs/evidence/retrieval_check.md) and [`docs/evidence/rag_experiments.md`](docs/evidence/rag_experiments.md).
 - **New service, `drafter` (Dylan):** `POST /draft` drafts a calendar-aware reply to one live Gmail email for the dashboard's Draft reply button (contract under [Drafter](#drafter) below). It doesn't read or change any pipeline file, and nothing in `data/` changes. It uses the same labels as `messages.jsonl` and the classifier, and the same embedding model and task types as rag and the api, so a per-user inbox index built by rag could later replace its live sender search.
 
@@ -202,6 +239,8 @@ What changed for the search side in Milestone 3 (Will: nothing changes in your f
 | `data/source/users.json` | data generation | The fake users: a JSON list of `{"user_id", "name", "email"}`. |
 | `data/source/generated_threads.jsonl` | data generation | One JSON object per thread: `user_id`, `thread_id`, `subject`, `participants`, `messages` (each: `sender`, `recipients`, `timestamp`, `body`, `label`). `timestamp` is the email "Date" header format, e.g. `Tue, 13 Oct 2026 09:12:00 -0400`. Versioned with DVC (data-v1, fictional, ~300 KB): `dvc pull` fetches it; releases are listed in [`docs/data/versions.md`](docs/data/versions.md). |
 | `data/source/annotations.jsonl` | labeling | One line per source message, keyed by `user_id`, `thread_id` and `position` (0-based index in the thread): `needs_response` (bool), the `rule` that set it, `rationale` and `rules_version`, following `docs/data/labeling_rules.md`. Not read by the pipeline; it is the ground truth for scoring `needs_response`. |
+| `data/source/splits.json` | `assemble` | `{"train": [user_id, ...], "eval": [user_id, ...]}`. Tuning reads only `train`; `eval` users are held out for final reports. |
+| `data/source/thread_states.jsonl` | `generate` | Generated threads only: one line per thread with `flow`, `counterpart`, `seed`, `cards_version`, `participants` (`pid`, `address`, `role`, `timezone`; `P0` is the user) and `states`: per `position`, the `act`, `sender` and the true state after that message (`status`, `proposed`, `confirmed`, `waiting_on`, `scheduler`, `needs_response`; state schema v0.1). Not read by the pipeline. |
 | `data/raw/threads.jsonl` | `ingest` | Same shape as the source threads, validated and deduplicated, sorted by `(user_id, thread_id)`, with `user_id` kept. Adds `source` (`"generated"`) and `provenance` (`file`, `line`, `sha256` of the thread). |
 | `data/processed/messages.jsonl` | `preprocess` | One JSON object per message (schema below). This is what `rag` indexes. |
 | `data/processed/manifest.json` | `preprocess` | Counts, file hashes, and provenance (below). |
